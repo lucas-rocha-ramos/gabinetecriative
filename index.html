@@ -1598,30 +1598,46 @@
                 payloadData.file = fileData;
             }
 
-            const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
-            if(fIdx > -1) {
-                let f = appState.tarefasFluxo[fIdx];
-                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
-                let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
-                
-                etapaAtualIdx++;
-                f.EtapaAtual = etapaAtualIdx;
-                f.Etapaatual = etapaAtualIdx;
-                
-                if(etapaAtualIdx >= fluxoObj.length) {
-                    f.Status = 'concluida';
-                } else {
-                    f.Status = 'em andamento';
-                    f.UsuarioAtual = fluxoObj[etapaAtualIdx].usuarioId;
-                    f.Usuarioatual = fluxoObj[etapaAtualIdx].usuarioId;
+            // O modal NÃO fecha imediatamente agora, ele aguarda o upload concluir para não cancelar o envio!
+            const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
+            
+            if(res.success) {
+                // Atualização Otimista: Insere o arquivo localmente no histórico para mostrar na tela imediatamente
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
+                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                    
+                    let histArr = []; try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
+                    let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
+                    
+                    if(fileData.base64) {
+                        logConclusao.fileUrl = 'data:' + fileData.mimeType + ';base64,' + fileData.base64;
+                        logConclusao.fileName = fileData.fileName;
+                        logConclusao.fileType = fileData.mimeType;
+                    }
+                    histArr.push(logConclusao);
+                    f.Historico = JSON.stringify(histArr);
+
+                    etapaAtualIdx++;
+                    f.EtapaAtual = etapaAtualIdx;
+                    f.Etapaatual = etapaAtualIdx;
+                    
+                    if(etapaAtualIdx >= fluxoObj.length) {
+                        f.Status = 'concluida';
+                    } else {
+                        f.Status = 'em andamento';
+                        f.UsuarioAtual = fluxoObj[etapaAtualIdx].usuarioId;
+                        f.Usuarioatual = fluxoObj[etapaAtualIdx].usuarioId;
+                    }
+                    renderAll();
                 }
-                renderAll();
+            } else {
+                alert("Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
             }
 
             closeModal('modalConcluirEtapa');
-
-            const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
-            if(!res.success) { console.error("Erro: " + (res.error || "Erro desconhecido")); }
             forceSync(); 
             setBtnLoading('ce_btn', false);
         }
