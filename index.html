@@ -846,10 +846,31 @@
             } else {
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
+                    let histArr = [];
                     try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico); } catch(e){}
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
+
+                    let anexosHtml = '';
+                    histArr.forEach(h => {
+                        if(h.fileUrl) {
+                            const isVideo = h.fileType && h.fileType.includes('video');
+                            const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                            const safeUrl = h.fileUrl.replace(/'/g, "\\'");
+                            const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
+                            const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
+                            anexosHtml += `
+                            <div class="mb-3 p-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between cursor-pointer hover:scale-[0.98] transition-transform" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div class="w-8 h-8 bg-blue-100 text-iosBlue rounded-md flex items-center justify-center shrink-0"><i class="ph-fill ${icon} text-lg"></i></div>
+                                    <span class="text-xs font-semibold truncate text-gray-700 dark:text-gray-300">${safeName}</span>
+                                </div>
+                                <i class="ph-bold ph-download-simple text-gray-400 shrink-0 mr-1"></i>
+                            </div>`;
+                        }
+                    });
 
                     return `
                     <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
@@ -858,6 +879,7 @@
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo}</h4>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao}</p>
+                        ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
                             <span class="font-bold text-xs text-iosBlue">${etapaAtualInfo.etapa}</span>
@@ -1070,7 +1092,9 @@
                 html += `<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3 px-1"><i class="ph-bold ph-calendar-blank mr-1"></i> ${displayDate}</h3>`;
                 html += `<div class="space-y-4">` + grouped[date].map(f => {
                     let fluxoObj = [];
+                    let histArr = [];
                     try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico); } catch(e){}
                     
                     const idVal = f.ID !== undefined ? f.ID : f.id;
                     
@@ -1083,6 +1107,25 @@
                     const nomeUserAtual = userAtual ? userAtual.Nome.split(' ')[0] : 'Sistema';
                     
                     const isMinhaVez = (usuarioAtualVal === currentUser.ID);
+
+                    let anexosHtml = '';
+                    histArr.forEach(h => {
+                        if(h.fileUrl) {
+                            const isVideo = h.fileType && h.fileType.includes('video');
+                            const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                            const safeUrl = h.fileUrl.replace(/'/g, "\\'");
+                            const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
+                            const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
+                            anexosHtml += `
+                            <div class="mb-4 p-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between cursor-pointer hover:scale-[0.98] transition-transform" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
+                                <div class="flex items-center gap-3 overflow-hidden">
+                                    <div class="w-8 h-8 bg-blue-100 text-iosBlue rounded-md flex items-center justify-center shrink-0"><i class="ph-fill ${icon} text-lg"></i></div>
+                                    <span class="text-xs font-semibold truncate text-gray-700 dark:text-gray-300">${safeName}</span>
+                                </div>
+                                <i class="ph-bold ph-download-simple text-gray-400 shrink-0 mr-1"></i>
+                            </div>`;
+                        }
+                    });
 
                     return `
                     <div class="glass-panel ios-card p-5 relative ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}">
@@ -1099,6 +1142,8 @@
                         
                         <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo}</h4>
                         <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao}</p>
+                        
+                        ${anexosHtml}
                         
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
                             <div>
@@ -1149,12 +1194,35 @@
             if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma tarefa encontrada.</p>`; return; }
             list.innerHTML = concluidas.map(t => {
                 const idVal = t.ID !== undefined ? t.ID : t.id;
+                
+                let histArr = [];
+                try { histArr = JSON.parse(t.Historico); } catch(e){}
+                let anexosHtml = '';
+                histArr.forEach(h => {
+                    if(h.fileUrl) {
+                        const isVideo = h.fileType && h.fileType.includes('video');
+                        const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                        const safeUrl = h.fileUrl.replace(/'/g, "\\'");
+                        const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
+                        const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
+                        anexosHtml += `
+                        <div class="mt-3 p-2 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between cursor-pointer hover:scale-[0.98] transition-transform" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <div class="w-8 h-8 bg-blue-100 text-iosBlue rounded-md flex items-center justify-center shrink-0"><i class="ph-fill ${icon} text-lg"></i></div>
+                                <span class="text-xs font-semibold truncate text-gray-700 dark:text-gray-300">${safeName}</span>
+                            </div>
+                            <i class="ph-bold ph-download-simple text-gray-400 shrink-0 mr-1"></i>
+                        </div>`;
+                    }
+                });
+
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-center opacity-70 relative">
-                    <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center"><i class="ph-bold ph-check text-sm"></i></div>
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative">
+                    <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
                         <button onclick="openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
