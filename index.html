@@ -217,14 +217,6 @@
                 </div>
         </div>
 
-        <div id="view-checklist" class="view-section hidden space-y-4">
-            <h1 class="text-3xl font-extrabold tracking-tight mb-6">Checklist</h1>
-            <div class="glass-panel ios-card overflow-hidden">
-                <div id="checklistList" class="divide-y divide-gray-200 dark:divide-gray-800">
-                    </div>
-            </div>
-        </div>
-
         <div id="view-materiais" class="view-section hidden space-y-4">
             <h1 class="text-3xl font-extrabold tracking-tight mb-4">Materiais</h1>
             <input type="text" id="searchMateriais" onkeyup="renderMateriais()" placeholder="Pesquisar materiais ou links..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
@@ -314,9 +306,6 @@
         </button>
         <button onclick="switchTab('concluidas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="concluidas">
             <i class="ph-fill ph-check-square-offset text-2xl"></i><span class="text-[9px] font-semibold uppercase">Feitas</span>
-        </button>
-        <button onclick="switchTab('checklist')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="checklist">
-            <i class="ph-fill ph-clipboard-text text-2xl"></i><span class="text-[9px] font-semibold uppercase">Check</span>
         </button>
         <button onclick="switchTab('materiais')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="materiais">
             <i class="ph-fill ph-folder-notch text-2xl"></i><span class="text-[9px] font-semibold uppercase">Mídia</span>
@@ -443,21 +432,6 @@
         </div>
     </div>
 
-    <div id="modalChecklist" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
-            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
-            <div class="flex justify-between items-center mb-6">
-                <h2 id="modalChecklistTitle" class="text-xl font-bold">Adicionar ao Checklist</h2>
-                <button onclick="closeModal('modalChecklist')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
-            </div>
-            <form id="formChecklist" onsubmit="submitChecklist(event)" class="space-y-4">
-                <input type="text" id="c_nome" placeholder="Nome do Item" class="ios-input" required>
-                <input type="number" id="c_qtd" placeholder="Quantidade" class="ios-input" required min="1">
-                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 flex justify-center items-center gap-2"><span id="c_btn_text">Adicionar</span><i id="c_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i></button>
-            </form>
-        </div>
-    </div>
-
     <div id="modalMaterial" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
             <div class="flex justify-between items-center mb-6">
@@ -571,11 +545,9 @@
         let currentAvisoId = null;
         let pollingInterval = null;
 
-        // ADICIONADO: 'etapas' no estado inicial do app
         let appState = { 
             currentTab: 'inicio', 
             tarefasFluxo: [], 
-            checklist: [], 
             materiais: [],
             usuarios: [],
             avisos: [],
@@ -764,8 +736,7 @@
             if(!currentUser) return;
             renderDashboard(); 
             renderTarefas(); 
-            renderConcluidas(); 
-            renderChecklist(); 
+            renderConcluidas();  
             renderMateriais();
             renderEquipe();
             verificarAvisosAlerta(); 
@@ -1166,30 +1137,6 @@
             `}).join('');
         }
 
-        function renderChecklist() { 
-            const list = document.getElementById('checklistList');
-            if(appState.checklist.length === 0) { list.innerHTML = `<div class="p-6 text-center text-gray-400">Checklist vazio</div>`; return; }
-            list.innerHTML = appState.checklist.map(c => {
-                const idVal = c.id !== undefined ? c.id : c.ID;
-                return `
-                <div class="p-4 flex items-center justify-between group">
-                    <div class="flex items-center gap-4 cursor-pointer flex-1" onclick="toggleChecklistStatus('${idVal}', '${c.status === 'concluida' ? 'pendente' : 'concluida'}')">
-                        <div class="w-6 h-6 rounded-md border-2 ${c.status === 'concluida' ? 'bg-iosBlue border-iosBlue text-white' : 'border-gray-300 dark:border-gray-600'} flex items-center justify-center">${c.status === 'concluida' ? '<i class="ph-bold ph-check text-xs"></i>' : ''}</div>
-                        <span class="font-medium ${c.status === 'concluida' ? 'text-gray-400 line-through' : ''} text-[17px]">${c.nome || c.Nome}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <span class="bg-gray-200 dark:bg-gray-800 px-3 py-1 rounded-full text-sm font-bold">${c.quantidade || c.Quantidade}</span>
-                        ${currentUser.TipoUsuario === 'admin' ? `
-                        <div class="flex items-center gap-2 ml-2 border-l border-gray-200 dark:border-gray-700 pl-2">
-                            <button onclick="openEditChecklist('${idVal}')" class="text-gray-400 hover:text-iosBlue"><i class="ph-bold ph-pencil-simple text-lg"></i></button>
-                            <button onclick="deleteChecklist('${idVal}')" class="text-gray-400 hover:text-red-500"><i class="ph-bold ph-trash text-lg"></i></button>
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `}).join('');
-        }
-
         function renderMateriais() { 
             const list = document.getElementById('materiaisList');
             const search = document.getElementById('searchMateriais').value.toLowerCase();
@@ -1227,14 +1174,6 @@
             const tab = appState.currentTab;
             if((tab === 'inicio' || tab === 'tarefas') && currentUser.TipoUsuario === 'admin') {
                 openTarefaCreate();
-            }
-            else if(tab === 'checklist') {
-                editingItemId = null;
-                document.getElementById('modalChecklistTitle').innerText = 'Adicionar ao Checklist';
-                document.getElementById('c_nome').value = '';
-                document.getElementById('c_qtd').value = '';
-                document.getElementById('c_btn_text').innerText = 'Adicionar';
-                openModal('modalChecklist');
             }
             else if(tab === 'materiais') {
                 editingItemId = null;
@@ -1586,50 +1525,6 @@
             openModal('modalDetalheFluxo');
         }
 
-        function openEditChecklist(id) {
-            const item = appState.checklist.find(c => (c.ID || c.id) === id);
-            if(!item) return;
-            editingItemId = id;
-            document.getElementById('modalChecklistTitle').innerText = 'Editar Checklist';
-            document.getElementById('c_nome').value = item.nome || item.Nome;
-            document.getElementById('c_qtd').value = item.quantidade || item.Quantidade;
-            document.getElementById('c_btn_text').innerText = 'Salvar Alterações';
-            openModal('modalChecklist');
-        }
-
-        async function deleteChecklist(id) {
-            if(!confirm("Deseja excluir este item?")) return;
-            appState.checklist = appState.checklist.filter(c => (c.ID || c.id) !== id);
-            renderChecklist();
-            await apiRequest({ action: 'deleteChecklist', data: { id: id } });
-            forceSync();
-        }
-
-        async function submitChecklist(e) {
-            e.preventDefault(); setBtnLoading('c_btn', true);
-            const itemData = { nome: document.getElementById('c_nome').value, quantidade: document.getElementById('c_qtd').value };
-            
-            if (editingItemId) {
-                itemData.id = editingItemId;
-                const idx = appState.checklist.findIndex(c => (c.id || c.ID) === editingItemId);
-                if(idx > -1) { appState.checklist[idx].nome = itemData.nome; appState.checklist[idx].quantidade = itemData.quantidade; }
-            } else {
-                itemData.status = 'pendente';
-                itemData.id = 'temp_' + Date.now();
-                appState.checklist.push(itemData);
-            }
-            renderChecklist();
-            closeModal('modalChecklist');
-
-            if (editingItemId) {
-                await apiRequest({ action: 'editChecklist', data: itemData });
-            } else {
-                await apiRequest({ action: 'addChecklist', data: itemData });
-            }
-            forceSync();
-            setBtnLoading('c_btn', false);
-        }
-
         function openEditMaterial(id) {
             const m = appState.materiais.find(x => (x.ID || x.id) === id);
             if(!m) return;
@@ -1672,16 +1567,6 @@
             }
             forceSync();
             setBtnLoading('m_btn', false);
-        }
-
-        async function toggleChecklistStatus(id, newStatus) {
-            const index = appState.checklist.findIndex(c => (c.id || c.ID) === id);
-            if(index > -1) {
-                appState.checklist[index].status = newStatus; 
-                renderChecklist(); 
-                await apiRequest({ action: 'updateChecklistStatus', data: { id, status: newStatus } });
-                forceSync();
-            }
         }
 
         async function openGallery(materialId) {
