@@ -318,6 +318,34 @@
         </button>
     </nav>
 
+    <div id="modalConcluirEtapa" class="modal-overlay fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">Concluir Etapa</h2>
+                <button onclick="closeModal('modalConcluirEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formConcluirEtapa" onsubmit="submitAvancarEtapa(event)" class="space-y-4">
+                <input type="hidden" id="ce_tarefa_id">
+                <p class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
+
+                <input type="file" id="ce_arquivo" accept="image/*,video/*" class="hidden" onchange="previewConcluirArquivo(event)">
+                <div class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
+                    <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
+                    <p id="ce_nome_arquivo" class="text-sm font-semibold text-center truncate w-full px-4 text-gray-600 dark:text-gray-300">Clique para selecionar arquivo</p>
+                </div>
+                <input type="hidden" id="ce_file_base64">
+                <input type="hidden" id="ce_file_mime">
+                <input type="hidden" id="ce_file_name">
+
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="ce_btn_text">Confirmar e Avançar</span>
+                    <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalEtapas" class="modal-overlay fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
@@ -1088,7 +1116,7 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <button onclick="avancarEtapa('${idVal}')" class="w-full py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                            <button onclick="openConcluirEtapa('${idVal}')" class="w-full py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
                                 <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                             </button>
                         ` : ''}
@@ -1456,11 +1484,56 @@
             setBtnLoading('t_btn', false);
         }
 
-        async function avancarEtapa(fluxoId) {
+        // --- NOVAS FUNÇÕES PARA ANEXAR ARQUIVO NA ETAPA ---
+        function openConcluirEtapa(fluxoId) {
+            document.getElementById('ce_tarefa_id').value = fluxoId;
+            document.getElementById('ce_arquivo').value = '';
+            document.getElementById('ce_file_base64').value = '';
+            document.getElementById('ce_file_mime').value = '';
+            document.getElementById('ce_file_name').value = '';
+            document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar arquivo';
+            document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
+            openModal('modalConcluirEtapa');
+        }
+
+        function previewConcluirArquivo(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('ce_nome_arquivo').innerText = file.name;
+            const isVideo = file.type.startsWith('video/');
+            document.getElementById('ce_icone').className = isVideo ? 'ph-bold ph-video-camera text-4xl text-iosBlue mb-2' : 'ph-bold ph-image text-4xl text-iosBlue mb-2';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Data = e.target.result.split(',')[1];
+                document.getElementById('ce_file_base64').value = base64Data;
+                document.getElementById('ce_file_mime').value = file.type;
+                document.getElementById('ce_file_name').value = file.name;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function submitAvancarEtapa(e) {
+            e.preventDefault(); 
+            setBtnLoading('ce_btn', true);
+            
+            const fluxoId = document.getElementById('ce_tarefa_id').value;
+            const fileData = {
+                base64: document.getElementById('ce_file_base64').value,
+                mimeType: document.getElementById('ce_file_mime').value,
+                fileName: document.getElementById('ce_file_name').value
+            };
+
+            const payloadData = { id: fluxoId };
+            if (fileData.base64) {
+                payloadData.file = fileData;
+            }
+
             const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
             if(fIdx > -1) {
                 let f = appState.tarefasFluxo[fIdx];
-                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
                 let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
                 
                 etapaAtualIdx++;
@@ -1477,9 +1550,29 @@
                 renderAll();
             }
 
-            const res = await apiRequest({ action: 'avancarEtapaFluxo', data: { id: fluxoId } });
+            closeModal('modalConcluirEtapa');
+
+            const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
             if(!res.success) { console.error("Erro: " + (res.error || "Erro desconhecido")); }
             forceSync(); 
+            setBtnLoading('ce_btn', false);
+        }
+
+        // Adicionado para abrir a visualização do arquivo no histórico
+        function openPreviewTaskFile(url, name, type) {
+            let driveId = null;
+            const driveMatch = url.match(/[-\w]{25,}/);
+            if(url.includes('drive.google.com') && driveMatch) {
+                driveId = driveMatch[0];
+            }
+            
+            currentGalleryFiles = [{
+                url: url,
+                name: name || 'Anexo',
+                type: type && type.includes('video') ? 'video' : 'image',
+                id: driveId
+            }];
+            openPreview(0);
         }
 
         function openDetalheFluxo(fluxoId) {
@@ -1517,9 +1610,27 @@
                 </div>`;
             }).join('');
 
+            // ATUALIZADO para processar arquivos enviados na conclusão
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
-                return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-1 mb-1"><span class="text-gray-400 block text-[9px]">${date}</span>${h.msg}</div>`;
+                let anexoHtml = '';
+                if(h.fileUrl) {
+                    const isVideo = h.fileType && h.fileType.includes('video');
+                    const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                    const safeUrl = h.fileUrl.replace(/'/g, "\\'");
+                    const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
+                    const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
+                    
+                    anexoHtml = `
+                    <div class="mt-2 p-2 bg-gray-100 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between cursor-pointer hover:scale-[0.98] transition-transform" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <div class="w-8 h-8 bg-blue-100 text-iosBlue rounded-md flex items-center justify-center shrink-0"><i class="ph-fill ${icon} text-lg"></i></div>
+                            <span class="text-xs font-semibold truncate text-gray-700 dark:text-gray-300">${safeName}</span>
+                        </div>
+                        <i class="ph-bold ph-download-simple text-gray-400 shrink-0 mr-1"></i>
+                    </div>`;
+                }
+                return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${date}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexoHtml}</div>`;
             }).join('') || 'Sem histórico';
 
             openModal('modalDetalheFluxo');
