@@ -346,6 +346,30 @@
         </div>
     </div>
 
+    <div id="modalRetornarEtapa" class="modal-overlay fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-red-600 flex items-center gap-2"><i class="ph-bold ph-arrow-u-up-left"></i> Retornar Tarefa</h2>
+                <button onclick="closeModal('modalRetornarEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formRetornarEtapa" onsubmit="submitRetornarEtapa(event)" class="space-y-4">
+                <input type="hidden" id="re_tarefa_id">
+                
+                <p class="text-sm text-gray-500 mb-2">Para qual etapa deseja retornar?</p>
+                <select id="re_etapa_idx" class="ios-input py-3 text-sm font-semibold" required>
+                    </select>
+
+                <textarea id="re_observacao" placeholder="O que precisa ser corrigido? (Observações)" class="ios-input h-24 resize-none" required></textarea>
+
+                <button type="submit" class="w-full py-4 rounded-2xl bg-red-600 text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="re_btn_text">Confirmar Retorno</span>
+                    <i id="re_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalEtapas" class="modal-overlay fixed inset-0 z-[60] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
@@ -564,7 +588,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4OerHYrzFpGHKdkDsy-_Dd5DZLYXF-34hYv1fBZ8A4ty0D6a8Bd963bTRk9FEJuLa/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2GKrzeOutjJAtx6VzIWBsd2vQ0NkUPVoDSM23SnOfa9w2KYU8LLeKp2-VocfXcZ9U/exec"; 
 
         let editingItemId = null;
         let currentGalleryFiles = [];
@@ -852,6 +876,8 @@
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
+                    const idVal = f.ID !== undefined ? f.ID : f.id;
+                    const isMinhaVez = (userId === currentUser.ID);
 
                     let anexosHtml = '';
                     histArr.forEach(h => {
@@ -891,10 +917,23 @@
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo}</h4>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao}</p>
                         ${anexosHtml}
-                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between">
+                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
                             <span class="font-bold text-xs text-iosBlue">${etapaAtualInfo.etapa}</span>
                         </div>
+
+                        ${isMinhaVez ? `
+                            <div class="w-full flex gap-2">
+                                ${etapaAtualIdx > 0 ? `
+                                <button onclick="openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
+                                </button>
+                                ` : ''}
+                                <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>`;
                 }).join('');
             }
@@ -1183,9 +1222,16 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <button onclick="openConcluirEtapa('${idVal}')" class="w-full py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform">
-                                <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
-                            </button>
+                            <div class="w-full flex gap-2">
+                                ${etapaAtualIdx > 0 ? `
+                                <button onclick="openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
+                                </button>
+                                ` : ''}
+                                <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
+                                </button>
+                            </div>
                         ` : ''}
                     </div>`;
                 }).join('') + `</div>`;
@@ -1585,7 +1631,7 @@
             setBtnLoading('t_btn', false);
         }
 
-        // --- NOVAS FUNÇÕES PARA ANEXAR ARQUIVO NA ETAPA ---
+        // --- FUNÇÕES DE ANEXO E RETORNO DE TAREFA ---
         function openConcluirEtapa(fluxoId) {
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
@@ -1631,11 +1677,9 @@
                 payloadData.file = fileData;
             }
 
-            // O modal NÃO fecha imediatamente agora, ele aguarda o upload concluir para não cancelar o envio!
             const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
             
             if(res.success) {
-                // Atualização Otimista: Insere o arquivo localmente no histórico para mostrar na tela imediatamente
                 const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
                 if(fIdx > -1) {
                     let f = appState.tarefasFluxo[fIdx];
@@ -1675,7 +1719,70 @@
             setBtnLoading('ce_btn', false);
         }
 
-        // Adicionado para abrir a visualização do arquivo no histórico
+        // NOVO: Funções para retornar etapa
+        function openRetornarEtapa(fluxoId) {
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+            if(!f) return;
+
+            document.getElementById('re_tarefa_id').value = fluxoId;
+            document.getElementById('re_observacao').value = '';
+            
+            let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+            const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+            const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+
+            const select = document.getElementById('re_etapa_idx');
+            select.innerHTML = '<option value="">Selecione a etapa de destino...</option>';
+            
+            for(let i = 0; i < etapaAtualIdx; i++) {
+                select.innerHTML += `<option value="${i}">${i+1}. ${fluxoObj[i].etapa}</option>`;
+            }
+            
+            openModal('modalRetornarEtapa');
+        }
+
+        async function submitRetornarEtapa(e) {
+            e.preventDefault();
+            setBtnLoading('re_btn', true);
+            
+            const fluxoId = document.getElementById('re_tarefa_id').value;
+            const stepIndex = parseInt(document.getElementById('re_etapa_idx').value);
+            const observacao = document.getElementById('re_observacao').value;
+
+            const payloadData = { id: fluxoId, stepIndex: stepIndex, observacao: observacao };
+
+            const res = await apiRequest({ action: 'retornarEtapaFluxo', data: payloadData });
+            
+            if(res.success) {
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
+                    
+                    let histArr = []; try { histArr = JSON.parse(f.Historico || "[]"); } catch(err){}
+                    histArr.push({ 
+                        msg: `Retornado para [${fluxoObj[stepIndex].etapa}] por ${currentUser.Nome.split(' ')[0]}. Obs: ${observacao}`, 
+                        data: new Date().toISOString() 
+                    });
+                    f.Historico = JSON.stringify(histArr);
+
+                    f.EtapaAtual = stepIndex;
+                    f.Etapaatual = stepIndex;
+                    f.UsuarioAtual = fluxoObj[stepIndex].usuarioId;
+                    f.Usuarioatual = fluxoObj[stepIndex].usuarioId;
+                    f.Status = 'em andamento';
+                    
+                    renderAll();
+                }
+            } else {
+                alert("Falha ao retornar a tarefa.");
+            }
+
+            closeModal('modalRetornarEtapa');
+            forceSync(); 
+            setBtnLoading('re_btn', false);
+        }
+
         function openPreviewTaskFile(url, name, type) {
             let driveId = null;
             const driveMatch = url.match(/[-\w]{25,}/);
@@ -1727,7 +1834,6 @@
                 </div>`;
             }).join('');
 
-            // ATUALIZADO para processar arquivos enviados na conclusão
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
                 let anexoHtml = '';
