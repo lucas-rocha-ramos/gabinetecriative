@@ -1834,6 +1834,7 @@
                 </div>`;
             }).join('');
 
+            // ATUALIZADO para processar arquivos enviados na conclusão
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
                 let anexoHtml = '';
