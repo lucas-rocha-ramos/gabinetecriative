@@ -872,7 +872,7 @@
                     let fluxoObj = [];
                     let histArr = [];
                     try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
-                    try { histArr = JSON.parse(f.Historico); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
@@ -1144,7 +1144,7 @@
                     let fluxoObj = [];
                     let histArr = [];
                     try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
-                    try { histArr = JSON.parse(f.Historico); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
                     
                     const idVal = f.ID !== undefined ? f.ID : f.id;
                     
@@ -1264,7 +1264,7 @@
                 const idVal = t.ID !== undefined ? t.ID : t.id;
                 
                 let histArr = [];
-                try { histArr = JSON.parse(t.Historico); } catch(e){}
+                try { histArr = JSON.parse(t.Historico || "[]"); } catch(e){}
                 let anexosHtml = '';
                 histArr.forEach(h => {
                     if(h.fileUrl) {
@@ -1711,7 +1711,7 @@
                     renderAll();
                 }
             } else {
-                alert("Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
+                alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
             }
 
             closeModal('modalConcluirEtapa');
@@ -1775,7 +1775,7 @@
                     renderAll();
                 }
             } else {
-                alert("Falha ao retornar a tarefa.");
+                alert(res.error || "Falha ao retornar a tarefa.");
             }
 
             closeModal('modalRetornarEtapa');
@@ -1808,7 +1808,7 @@
             let fluxoArr = [];
             let histArr = [];
             try { fluxoArr = JSON.parse(f.Fluxo); } catch(e){}
-            try { histArr = JSON.parse(f.Historico); } catch(e){}
+            try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
             
             const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
             const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
@@ -1834,6 +1834,7 @@
                 </div>`;
             }).join('');
 
+            // ATUALIZADO para processar arquivos enviados na conclusão
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
                 let anexoHtml = '';
