@@ -813,7 +813,7 @@
 
         function renderDashboard() {
             const total = appState.tarefasFluxo.length;
-            const concluidas = appState.tarefasFluxo.filter(t => t.Status === 'concluida').length;
+            const concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida').length;
             const percent = total === 0 ? 0 : Math.round((concluidas / total) * 100);
 
             document.getElementById('dashPercent').innerText = `${percent}%`;
@@ -863,7 +863,7 @@
             document.getElementById('perf_funcao').innerText = user.Funcao;
             
             const list = document.getElementById('perf_tarefas_list');
-            const userTarefas = appState.tarefasFluxo.filter(f => f.Status !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
+            const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma tarefa ativa no momento.</p>`;
@@ -871,8 +871,8 @@
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
                     let histArr = [];
-                    try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
-                    try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
+                    try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
@@ -912,10 +912,10 @@
                     return `
                     <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
                         </div>
-                        <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo}</h4>
-                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao}</p>
+                        <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
+                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1110,7 +1110,7 @@
         function renderTarefas() {
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo;
-            let tarefasAtivas = tarefas.filter(f => f.Status !== 'concluida');
+            let tarefasAtivas = tarefas.filter(f => (f.Status || f.status) !== 'concluida');
             
             if(tarefasAtivas.length === 0) {
                 list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma tarefa ativa.</p></div>`;
@@ -1119,7 +1119,7 @@
 
             const grouped = {};
             tarefasAtivas.forEach(f => {
-                let rawDate = f.DataCriacao || f.Datacriacao || "0000-00-00"; 
+                let rawDate = f.DataCriacao || f.Datacriacao || f.datacriacao || "0000-00-00"; 
                 if(!grouped[rawDate]) grouped[rawDate] = [];
                 grouped[rawDate].push(f);
             });
@@ -1143,8 +1143,8 @@
                 html += `<div class="space-y-4">` + grouped[date].map(f => {
                     let fluxoObj = [];
                     let histArr = [];
-                    try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
-                    try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
+                    try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                     
                     const idVal = f.ID !== undefined ? f.ID : f.id;
                     
@@ -1191,7 +1191,7 @@
                     return `
                     <div class="glass-panel ios-card p-5 relative ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status}</span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
                                 <button onclick="openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
@@ -1201,8 +1201,8 @@
                             </div>
                         </div>
                         
-                        <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo}</h4>
-                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao}</p>
+                        <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo || f.titulo}</h4>
+                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao || f.descricao}</p>
                         
                         ${anexosHtml}
                         
@@ -1244,7 +1244,7 @@
             const list = appState.tarefasFluxo;
             const hasPendente = list.some(f => {
                 const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
-                return usuarioAtualVal === currentUser.ID && f.Status !== 'concluida';
+                return usuarioAtualVal === currentUser.ID && (f.Status || f.status) !== 'concluida';
             });
             const badge = document.getElementById('badgeTarefa');
             if(badge) {
@@ -1256,15 +1256,15 @@
         function renderConcluidas() { 
             const list = document.getElementById('concluidasList');
             const search = document.getElementById('searchConcluidas').value.toLowerCase();
-            let concluidas = appState.tarefasFluxo.filter(t => t.Status === 'concluida');
-            if(search) concluidas = concluidas.filter(t => t.Titulo.toLowerCase().includes(search));
+            let concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida');
+            if(search) concluidas = concluidas.filter(t => (t.Titulo || t.titulo).toLowerCase().includes(search));
             
             if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma tarefa encontrada.</p>`; return; }
             list.innerHTML = concluidas.map(t => {
                 const idVal = t.ID !== undefined ? t.ID : t.id;
                 
                 let histArr = [];
-                try { histArr = JSON.parse(t.Historico || "[]"); } catch(e){}
+                try { histArr = JSON.parse(t.Historico || t.historico || "[]"); } catch(e){}
                 let anexosHtml = '';
                 histArr.forEach(h => {
                     if(h.fileUrl) {
@@ -1503,11 +1503,11 @@
             
             editingItemId = id;
             document.getElementById('modalTarefaTitle').innerText = 'Editar Tarefa';
-            document.getElementById('t_titulo').value = f.Titulo;
-            document.getElementById('t_desc').value = f.Descricao;
+            document.getElementById('t_titulo').value = f.Titulo || f.titulo;
+            document.getElementById('t_desc').value = f.Descricao || f.descricao;
             
             let fluxoObj = [];
-            try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+            try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
             
             const container = document.getElementById('t_etapas_container');
             container.innerHTML = '';
@@ -1683,10 +1683,10 @@
                 const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
                 if(fIdx > -1) {
                     let f = appState.tarefasFluxo[fIdx];
-                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
                     let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
                     
-                    let histArr = []; try { histArr = JSON.parse(f.Historico || "[]"); } catch(e){}
+                    let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                     let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
                     
                     if(fileData.base64) {
@@ -1696,6 +1696,7 @@
                     }
                     histArr.push(logConclusao);
                     f.Historico = JSON.stringify(histArr);
+                    f.historico = f.Historico;
 
                     etapaAtualIdx++;
                     f.EtapaAtual = etapaAtualIdx;
@@ -1703,8 +1704,10 @@
                     
                     if(etapaAtualIdx >= fluxoObj.length) {
                         f.Status = 'concluida';
+                        f.status = 'concluida';
                     } else {
                         f.Status = 'em andamento';
+                        f.status = 'em andamento';
                         f.UsuarioAtual = fluxoObj[etapaAtualIdx].usuarioId;
                         f.Usuarioatual = fluxoObj[etapaAtualIdx].usuarioId;
                     }
@@ -1727,7 +1730,7 @@
             document.getElementById('re_tarefa_id').value = fluxoId;
             document.getElementById('re_observacao').value = '';
             
-            let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(e){}
+            let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
             const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
             const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
 
@@ -1757,20 +1760,22 @@
                 const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
                 if(fIdx > -1) {
                     let f = appState.tarefasFluxo[fIdx];
-                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo); } catch(err){}
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
                     
-                    let histArr = []; try { histArr = JSON.parse(f.Historico || "[]"); } catch(err){}
+                    let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
                     histArr.push({ 
                         msg: `Retornado para [${fluxoObj[stepIndex].etapa}] por ${currentUser.Nome.split(' ')[0]}. Obs: ${observacao}`, 
                         data: new Date().toISOString() 
                     });
                     f.Historico = JSON.stringify(histArr);
+                    f.historico = f.Historico;
 
                     f.EtapaAtual = stepIndex;
                     f.Etapaatual = stepIndex;
                     f.UsuarioAtual = fluxoObj[stepIndex].usuarioId;
                     f.Usuarioatual = fluxoObj[stepIndex].usuarioId;
                     f.Status = 'em andamento';
+                    f.status = 'em andamento';
                     
                     renderAll();
                 }
@@ -1803,19 +1808,19 @@
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
             if(!f) return;
 
-            document.getElementById('det_f_titulo').innerText = f.Titulo;
+            document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
             
             let fluxoArr = [];
             let histArr = [];
-            try { fluxoArr = JSON.parse(f.Fluxo); } catch(e){}
-            try { histArr = JSON.parse(f.Historico); } catch(e){}
+            try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+            try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
             
             const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
             const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
 
             document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
                 const isPassado = idx < etapaAtualIdx;
-                const isAtual = idx === etapaAtualIdx && f.Status !== 'concluida';
+                const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
                 const user = appState.usuarios.find(u => (u.ID || u.id) === et.usuarioId);
                 const userName = user ? user.Nome : 'Desconhecido';
                 
@@ -1834,7 +1839,6 @@
                 </div>`;
             }).join('');
 
-            // ATUALIZADO para processar arquivos enviados na conclusão
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
                 let anexoHtml = '';
