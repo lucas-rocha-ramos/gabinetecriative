@@ -212,7 +212,7 @@
 
         <div id="view-concluidas" class="view-section hidden space-y-4">
             <h1 class="text-3xl font-extrabold tracking-tight mb-4">Concluídas</h1>
-            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar tarefas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
+            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar demandas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
             <div id="concluidasList" class="space-y-4">
                 </div>
         </div>
@@ -866,7 +866,7 @@
             const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma tarefa ativa no momento.</p>`;
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
             } else {
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
