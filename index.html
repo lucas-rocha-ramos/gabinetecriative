@@ -1113,7 +1113,7 @@
             let tarefasAtivas = tarefas.filter(f => (f.Status || f.status) !== 'concluida');
             
             if(tarefasAtivas.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma tarefa ativa.</p></div>`;
+                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
                 return;
             }
 
