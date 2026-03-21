@@ -126,7 +126,7 @@
                 <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-32 h-32 object-contain dark:invert-0 invert" alt="Logo">
             </div>
             <h1 class="text-3xl font-extrabold text-center mb-2">Bem-vindo</h1>
-            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas tarefas</p>
+            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas demandas</p>
             
             <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
                 <input type="email" id="login_email" placeholder="E-mail" class="ios-input" required>
@@ -173,7 +173,7 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Progresso Geral</h2>
                     <p class="text-4xl font-extrabold mt-1" id="dashPercent">0%</p>
-                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> tarefas</p>
+                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> demandas</p>
                 </div>
                 <div class="relative w-28 h-28">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -204,7 +204,7 @@
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold tracking-tight">Tarefas</h1>
+                <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
             </div>
             <div id="tarefasList" class="space-y-4">
                 </div>
@@ -290,7 +290,7 @@
             <div class="flex flex-col items-center justify-center mt-12 text-gray-400">
                 <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-16 h-16 opacity-50 mb-2 grayscale" alt="Logo">
                 <p class="text-xs font-medium uppercase tracking-widest">Gabinete Criative</p>
-                <p class="text-[10px]">Versão 2.6 • Pro WhatsApp</p>
+                <p class="text-[10px]">Versão 2.6 • Lucas Sistemas</p>
             </div>
         </div>
 
@@ -301,7 +301,7 @@
             <i class="ph-fill ph-squares-four text-2xl"></i><span class="text-[9px] font-semibold uppercase">Início</span>
         </button>
         <button onclick="switchTab('tarefas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors relative" data-tab="tarefas">
-            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Tarefas</span>
+            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Demandas</span>
             <span id="badgeTarefa" class="absolute top-0 right-2 w-2.5 h-2.5 bg-red-500 rounded-full hidden"></span>
         </button>
         <button onclick="switchTab('concluidas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="concluidas">
@@ -406,7 +406,7 @@
                 <p id="perf_funcao" class="text-gray-500 text-sm">Função</p>
             </div>
             <div class="p-4">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Tarefas Atuais</h3>
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Demandas Atuais</h3>
                 <div id="perf_tarefas_list" class="space-y-3">
                     </div>
             </div>
