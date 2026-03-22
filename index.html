@@ -12,6 +12,9 @@
     <link rel="apple-touch-icon" href="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png">
     <link rel="manifest" href="manifest.json">
 
+    <link rel="preconnect" href="https://drive.google.com">
+    <link rel="preconnect" href="https://lh3.googleusercontent.com">
+
     <title>Gabinete Criative - Gestão Inteligênte</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -594,7 +597,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4OerHYrzFpGHKdkDsy-_Dd5DZLYXF-34hYv1fBZ8A4ty0D6a8Bd963bTRk9FEJuLa/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2GKrzeOutjJAtx6VzIWBsd2vQ0NkUPVoDSM23SnOfa9w2KYU8LLeKp2-VocfXcZ9U/exec"; 
 
         let editingItemId = null;
         let currentGalleryFiles = [];
@@ -1764,7 +1767,7 @@
                     renderAll();
                 }
             } else {
-                alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
+                alert(res.error || "Falha no envio do arquivo. O Google Drive não conseguiu salvar a imagem. Verifique se o backend está na versão correta.");
             }
 
             closeModal('modalConcluirEtapa');
