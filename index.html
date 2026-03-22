@@ -126,7 +126,7 @@
                 <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-32 h-32 object-contain dark:invert-0 invert" alt="Logo">
             </div>
             <h1 class="text-3xl font-extrabold text-center mb-2">Bem-vindo</h1>
-            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas demandas</p>
+            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas tarefas</p>
             
             <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
                 <input type="email" id="login_email" placeholder="E-mail" class="ios-input" required>
@@ -173,7 +173,7 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Progresso Geral</h2>
                     <p class="text-4xl font-extrabold mt-1" id="dashPercent">0%</p>
-                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> demandas</p>
+                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> tarefas</p>
                 </div>
                 <div class="relative w-28 h-28">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -204,7 +204,7 @@
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
+                <h1 class="text-3xl font-extrabold tracking-tight">Tarefas</h1>
             </div>
             <div id="tarefasList" class="space-y-4">
                 </div>
@@ -212,7 +212,7 @@
 
         <div id="view-concluidas" class="view-section hidden space-y-4">
             <h1 class="text-3xl font-extrabold tracking-tight mb-4">Concluídas</h1>
-            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar demandas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
+            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar tarefas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
             <div id="concluidasList" class="space-y-4">
                 </div>
         </div>
@@ -290,7 +290,7 @@
             <div class="flex flex-col items-center justify-center mt-12 text-gray-400">
                 <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-16 h-16 opacity-50 mb-2 grayscale" alt="Logo">
                 <p class="text-xs font-medium uppercase tracking-widest">Gabinete Criative</p>
-                <p class="text-[10px]">Versão 2.6 • Lucas Sistemas</p>
+                <p class="text-[10px]">Versão 2.6 • Pro WhatsApp</p>
             </div>
         </div>
 
@@ -301,7 +301,7 @@
             <i class="ph-fill ph-squares-four text-2xl"></i><span class="text-[9px] font-semibold uppercase">Início</span>
         </button>
         <button onclick="switchTab('tarefas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors relative" data-tab="tarefas">
-            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Demandas</span>
+            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Tarefas</span>
             <span id="badgeTarefa" class="absolute top-0 right-2 w-2.5 h-2.5 bg-red-500 rounded-full hidden"></span>
         </button>
         <button onclick="switchTab('concluidas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="concluidas">
@@ -406,7 +406,7 @@
                 <p id="perf_funcao" class="text-gray-500 text-sm">Função</p>
             </div>
             <div class="p-4">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Demandas Atuais</h3>
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Tarefas Atuais</h3>
                 <div id="perf_tarefas_list" class="space-y-3">
                     </div>
             </div>
@@ -468,6 +468,12 @@
             </div>
             <form id="formTarefa" onsubmit="submitTarefa(event)" class="space-y-4">
                 <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-500 font-bold uppercase ml-1">Prazo de Entrega</label>
+                        <input type="date" id="t_prazo" class="ios-input mt-1">
+                    </div>
+                </div>
                 <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
                 
                 <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4">
@@ -627,6 +633,13 @@
                 }, 1000);
             }
         };
+
+        function formatarDataPTBR(dataStr) {
+            if(!dataStr) return '';
+            const partes = dataStr.split('T')[0].split('-');
+            if(partes.length !== 3) return dataStr;
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
 
         function verificarSessao() {
             const savedUser = localStorage.getItem('umadecre_user');
@@ -866,7 +879,7 @@
             const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma tarefa ativa no momento.</p>`;
             } else {
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
@@ -912,7 +925,10 @@
                     return `
                     <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                            </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
@@ -1113,7 +1129,7 @@
             let tarefasAtivas = tarefas.filter(f => (f.Status || f.status) !== 'concluida');
             
             if(tarefasAtivas.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
+                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma tarefa ativa.</p></div>`;
                 return;
             }
 
@@ -1191,7 +1207,10 @@
                     return `
                     <div class="glass-panel ios-card p-5 relative ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}">
                         <div class="flex justify-between items-start mb-2">
-                            <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                            </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
                                 <button onclick="openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
@@ -1488,6 +1507,7 @@
             editingItemId = null;
             document.getElementById('modalTarefaTitle').innerText = 'Nova Tarefa';
             document.getElementById('t_titulo').value = '';
+            document.getElementById('t_prazo').value = '';
             document.getElementById('t_desc').value = '';
             document.getElementById('t_btn_text').innerText = 'Salvar Tarefa';
             
@@ -1504,6 +1524,11 @@
             editingItemId = id;
             document.getElementById('modalTarefaTitle').innerText = 'Editar Tarefa';
             document.getElementById('t_titulo').value = f.Titulo || f.titulo;
+            
+            let rawPrazo = f.Prazo || f.prazo || '';
+            if (rawPrazo && rawPrazo.includes('T')) rawPrazo = rawPrazo.split('T')[0];
+            document.getElementById('t_prazo').value = rawPrazo;
+            
             document.getElementById('t_desc').value = f.Descricao || f.descricao;
             
             let fluxoObj = [];
@@ -1604,6 +1629,7 @@
             const data = {
                 titulo: document.getElementById('t_titulo').value,
                 descricao: document.getElementById('t_desc').value,
+                prazo: document.getElementById('t_prazo').value,
                 fluxo: fluxoArr
             };
 
@@ -1616,10 +1642,12 @@
                     appState.tarefasFluxo[idx].Titulo = data.titulo;
                     appState.tarefasFluxo[idx].Descricao = data.descricao;
                     appState.tarefasFluxo[idx].Fluxo = JSON.stringify(data.fluxo);
+                    appState.tarefasFluxo[idx].Prazo = data.prazo;
+                    appState.tarefasFluxo[idx].prazo = data.prazo;
                 }
             } else {
                 appState.tarefasFluxo.push({
-                    ID: 'temp_' + Date.now(), Titulo: data.titulo, Descricao: data.descricao, Fluxo: JSON.stringify(data.fluxo), EtapaAtual: 0, Etapaatual: 0, UsuarioAtual: data.fluxo[0].usuarioId, Usuarioatual: data.fluxo[0].usuarioId, Status: 'pendente', Historico: "[]"
+                    ID: 'temp_' + Date.now(), Titulo: data.titulo, Descricao: data.descricao, Fluxo: JSON.stringify(data.fluxo), EtapaAtual: 0, Etapaatual: 0, UsuarioAtual: data.fluxo[0].usuarioId, Usuarioatual: data.fluxo[0].usuarioId, Status: 'pendente', Historico: "[]", Prazo: data.prazo, prazo: data.prazo
                 });
             }
             renderAll();
