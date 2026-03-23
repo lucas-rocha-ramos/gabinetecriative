@@ -8,7 +8,7 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Team">
+    <meta name="apple-mobile-web-app-title" content="Gabinete Criative">
     <link rel="apple-touch-icon" href="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png">
     <link rel="manifest" href="manifest.json">
 
@@ -176,7 +176,7 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Progresso Geral</h2>
                     <p class="text-4xl font-extrabold mt-1" id="dashPercent">0%</p>
-                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span>demandas</p>
+                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> demandas</p>
                 </div>
                 <div class="relative w-28 h-28">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -206,9 +206,15 @@
         </div>
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
-            <div class="flex justify-between items-center mb-6">
+            <div class="flex justify-between items-center mb-4">
                 <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
             </div>
+            
+            <div class="flex gap-2 mb-6">
+                <input type="text" id="filtroAssuntoTarefa" onkeyup="renderTarefas()" placeholder="Filtrar por assunto..." class="ios-input py-3 px-4 text-sm shadow-sm flex-1">
+                <input type="date" id="filtroDataTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm w-1/3">
+            </div>
+
             <div id="tarefasList" class="space-y-4">
                 </div>
         </div>
@@ -230,7 +236,10 @@
         <div id="view-equipe" class="view-section hidden space-y-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-extrabold tracking-tight">Equipe</h1>
-                <button onclick="openCreateAviso()" class="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg active:scale-95 transition-transform admin-only"><i class="ph-bold ph-bell-ringing text-lg"></i> Criar Aviso</button>
+                <div class="flex gap-2">
+                    <button onclick="openAvisosHistorico()" class="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform"><i class="ph-bold ph-clock-counter-clockwise text-lg"></i> Histórico</button>
+                    <button onclick="openCreateAviso()" class="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg active:scale-95 transition-transform admin-only"><i class="ph-bold ph-bell-ringing text-lg"></i> Criar Aviso</button>
+                </div>
             </div>
             <div id="equipeList" class="space-y-3">
                 </div>
@@ -332,14 +341,11 @@
                 <input type="hidden" id="ce_tarefa_id">
                 <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
 
-                <input type="file" id="ce_arquivo" accept="image/*,video/*" class="hidden" onchange="previewConcluirArquivo(event)">
+                <input type="file" id="ce_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewConcluirArquivo(event)">
                 <div id="ce_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
                     <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
-                    <p id="ce_nome_arquivo" class="text-sm font-semibold text-center truncate w-full px-4 text-gray-600 dark:text-gray-300">Clique para selecionar arquivo</p>
+                    <p id="ce_nome_arquivo" class="text-sm font-semibold text-center truncate w-full px-4 text-gray-600 dark:text-gray-300">Clique para selecionar os arquivos</p>
                 </div>
-                <input type="hidden" id="ce_file_base64">
-                <input type="hidden" id="ce_file_mime">
-                <input type="hidden" id="ce_file_name">
 
                 <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
@@ -361,7 +367,7 @@
                 
                 <p class="text-sm text-gray-500 mb-2">Para qual etapa deseja retornar?</p>
                 <select id="re_etapa_idx" class="ios-input py-3 text-sm font-semibold" required>
-                    </select>
+                </select>
 
                 <textarea id="re_observacao" placeholder="O que precisa ser corrigido? (Observações)" class="ios-input h-24 resize-none" required></textarea>
 
@@ -370,6 +376,41 @@
                     <i id="re_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
             </form>
+        </div>
+    </div>
+
+    <div id="modalAvisosHistorico" class="slide-modal fixed inset-0 z-[70] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
+        <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
+            <div class="flex items-center justify-between px-4 py-3">
+                <button onclick="document.getElementById('modalAvisosHistorico').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Histórico de Avisos</h2>
+                <div class="w-16"></div>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-safe-bottom" id="lista_avisos_historico">
+            </div>
+    </div>
+
+    <div id="modalAvisoDetalhes" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
+        <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
+            <div class="flex items-center justify-between px-4 py-3">
+                <button onclick="document.getElementById('modalAvisoDetalhes').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Detalhes</h2>
+                <div class="w-16"></div>
+            </div>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 pb-safe-bottom">
+            <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-5 mb-6 shadow-sm">
+                <h2 id="det_aviso_titulo" class="text-xl font-bold mb-2">Titulo</h2>
+                <p id="det_aviso_desc" class="text-gray-500 text-sm leading-relaxed">Mensagem</p>
+                <p id="det_aviso_data" class="text-xs text-gray-400 mt-4 font-medium uppercase tracking-wider"></p>
+            </div>
+            
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3 px-1"><i class="ph-bold ph-check-circle text-green-500"></i> Confirmaram</h3>
+            <div id="det_aviso_confirmaram" class="space-y-2 mb-6"></div>
+
+            <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-3 px-1"><i class="ph-bold ph-clock text-orange-500"></i> Pendentes</h3>
+            <div id="det_aviso_pendentes" class="space-y-2"></div>
         </div>
     </div>
 
@@ -390,7 +431,7 @@
             </form>
 
             <div id="listaEtapas" class="space-y-2">
-                </div>
+            </div>
         </div>
     </div>
 
@@ -411,7 +452,7 @@
             <div class="p-4">
                 <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Demandas Atuais</h3>
                 <div id="perf_tarefas_list" class="space-y-3">
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -605,6 +646,7 @@
         let galleryCache = {}; 
         let currentAvisoId = null;
         let pollingInterval = null;
+        let ce_files_array = []; 
 
         let appState = { 
             currentTab: 'inicio', 
@@ -892,45 +934,19 @@
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
+                    const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     const idVal = f.ID !== undefined ? f.ID : f.id;
                     const isMinhaVez = (userId === currentUser.ID);
 
-                    let anexosHtml = '';
-                    histArr.forEach(h => {
-                        if(h.fileUrl) {
-                            const isVideo = h.fileType && h.fileType.includes('video');
-                            const icon = isVideo ? 'ph-video-camera' : 'ph-image';
-                            const safeUrl = h.fileUrl.replace(/'/g, "\\'");
-                            const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
-                            const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
-                            
-                            let thumbUrl = safeUrl;
-                            const driveMatch = safeUrl.match(/[-\w]{25,}/);
-                            if(safeUrl.includes('drive.google.com') && driveMatch) {
-                                thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
-                            }
-
-                            anexosHtml += `
-                            <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
-                                <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                                    <i class="ph-fill ${icon} text-4xl mb-1"></i>
-                                </div>
-                                <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
-                                ${isVideo ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
-                                <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
-                                    <p class="text-white text-[11px] font-semibold truncate flex-1 pr-2">${safeName}</p>
-                                    <i class="ph-bold ph-download-simple text-white text-sm"></i>
-                                </div>
-                            </div>`;
-                        }
-                    });
+                    let anexosHtml = renderAnexos(histArr);
 
                     return `
                     <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
                         <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
-                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                                ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
                             </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
@@ -948,9 +964,15 @@
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
+                                ${!foiIniciada ? `
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-play"></i> Iniciar Demanda
+                                </button>
+                                ` : `
                                 <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
+                                `}
                             </div>
                         ` : ''}
                     </div>`;
@@ -960,7 +982,49 @@
             document.getElementById('modalPerfilUsuario').classList.add('active');
         }
 
-        // FUNÇÕES DE ETAPAS (ADMIN)
+        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
+        function renderAnexos(histArr) {
+            let anexosHtml = '';
+            histArr.forEach(h => {
+                let itemsParaRenderizar = [];
+                if(h.fileUrl) { 
+                    itemsParaRenderizar.push({ url: h.fileUrl, name: h.fileName, type: h.fileType }); 
+                }
+                if(h.files && h.files.length > 0) { 
+                    itemsParaRenderizar = itemsParaRenderizar.concat(h.files); 
+                }
+                
+                itemsParaRenderizar.forEach(arq => {
+                    const isVideo = arq.type && arq.type.includes('video');
+                    const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                    const safeUrl = arq.url.replace(/'/g, "\\'");
+                    const safeName = arq.name ? arq.name.replace(/'/g, "\\'") : 'Anexo';
+                    const safeType = arq.type ? arq.type.replace(/'/g, "\\'") : '';
+                    
+                    let thumbUrl = safeUrl;
+                    const driveMatch = safeUrl.match(/[-\w]{25,}/);
+                    if(safeUrl.includes('drive.google.com') && driveMatch) {
+                        thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
+                    }
+
+                    anexosHtml += `
+                    <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
+                        <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                            <i class="ph-fill ${icon} text-4xl mb-1"></i>
+                        </div>
+                        <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
+                        ${isVideo ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
+                        <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
+                            <p class="text-white text-[11px] font-semibold truncate flex-1 pr-2">${safeName}</p>
+                            <i class="ph-bold ph-download-simple text-white text-sm"></i>
+                        </div>
+                    </div>`;
+                });
+            });
+            return anexosHtml;
+        }
+
+        // FUNÇÕES DE ETAPAS E AVISOS...
         function openEtapasConfig() {
             renderListaEtapas();
             openModal('modalEtapas');
@@ -1126,10 +1190,124 @@
             setTimeout(verificarAvisosAlerta, 800);
         }
 
+        // NOVO: Histórico de Avisos
+        function openAvisosHistorico() {
+            const container = document.getElementById('lista_avisos_historico');
+            if(!appState.avisos || appState.avisos.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 text-sm mt-10">Nenhum aviso encontrado.</p>`;
+            } else {
+                // Ordenar dos mais recentes para os mais antigos
+                let avisosSorted = [...appState.avisos].reverse();
+                container.innerHTML = avisosSorted.map(a => {
+                    const dataFormatada = a.DataCriacao ? new Date(a.DataCriacao).toLocaleDateString('pt-BR') : '';
+                    return `
+                    <div onclick="openAvisoDetalhes('${a.ID || a.id}')" class="bg-white dark:bg-[#1C1C1E] p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:scale-[0.98] transition-transform">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="font-bold text-iosBlue truncate pr-2">${a.Titulo || a.titulo}</h4>
+                            <span class="text-[10px] text-gray-400 whitespace-nowrap">${dataFormatada}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 line-clamp-1">${a.Descricao || a.descricao}</p>
+                    </div>`;
+                }).join('');
+            }
+            openModal('modalAvisosHistorico');
+        }
+
+        function openAvisoDetalhes(id) {
+            const a = appState.avisos.find(x => (x.ID || x.id) === id);
+            if(!a) return;
+
+            document.getElementById('det_aviso_titulo').innerText = a.Titulo || a.titulo;
+            document.getElementById('det_aviso_desc').innerText = a.Descricao || a.descricao;
+            document.getElementById('det_aviso_data').innerText = a.DataCriacao ? new Date(a.DataCriacao).toLocaleDateString('pt-BR') : '';
+
+            let alvo = a.Alvo || a.alvo;
+            let recebedores = [];
+            try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
+            try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
+
+            let usuariosAlvo = [];
+            if(alvo === 'todos') {
+                usuariosAlvo = appState.usuarios.filter(u => (u.ID || u.id) !== (a.CriadoPor || a.criadopor));
+            } else if (Array.isArray(alvo)) {
+                usuariosAlvo = appState.usuarios.filter(u => alvo.includes(u.ID || u.id));
+            }
+
+            let confirmaram = [];
+            let pendentes = [];
+
+            usuariosAlvo.forEach(u => {
+                const uid = u.ID || u.id;
+                if(recebedores.includes(uid)) confirmaram.push(u);
+                else pendentes.push(u);
+            });
+
+            const htmlUser = (u) => `
+                <div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
+                    <p class="text-sm font-semibold">${u.Nome}</p>
+                </div>`;
+
+            document.getElementById('det_aviso_confirmaram').innerHTML = confirmaram.length > 0 ? confirmaram.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Ninguém confirmou ainda.</p>';
+            document.getElementById('det_aviso_pendentes').innerHTML = pendentes.length > 0 ? pendentes.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Todos confirmaram!</p>';
+
+            openModal('modalAvisoDetalhes');
+        }
+
+        async function iniciarDemanda(fluxoId) {
+            const btn = document.getElementById('btn_iniciar_' + fluxoId);
+            if(btn) {
+                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
+                btn.disabled = true;
+            }
+
+            const res = await apiRequest({ action: 'iniciarDemandaFluxo', data: { id: fluxoId } });
+            
+            if(res.success) {
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                    
+                    if(fluxoObj[etapaAtualIdx]) {
+                        fluxoObj[etapaAtualIdx].iniciadaEm = new Date().toISOString();
+                    }
+                    
+                    f.Fluxo = JSON.stringify(fluxoObj);
+                    f.fluxo = f.Fluxo;
+                    f.Status = 'em andamento';
+                    f.status = 'em andamento';
+                    
+                    renderAll();
+                }
+            } else {
+                alert(res.error || "Falha ao iniciar a demanda.");
+            }
+            forceSync();
+        }
+
         function renderTarefas() {
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo;
-            let tarefasAtivas = tarefas.filter(f => (f.Status || f.status) !== 'concluida');
+            
+            // FILTROS DE DEMANDAS
+            let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
+            let filtroData = document.getElementById('filtroDataTarefa') ? document.getElementById('filtroDataTarefa').value : '';
+
+            let tarefasAtivas = tarefas.filter(f => {
+                if ((f.Status || f.status) === 'concluida') return false;
+                
+                if (filtroAssunto) {
+                    let text = ((f.Titulo || f.titulo || '') + ' ' + (f.Descricao || f.descricao || '')).toLowerCase();
+                    if (!text.includes(filtroAssunto)) return false;
+                }
+                if (filtroData) {
+                    let prazo = f.Prazo || f.prazo || "";
+                    if (!prazo.startsWith(filtroData)) return false;
+                }
+                return true;
+            });
             
             if(tarefasAtivas.length === 0) {
                 list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
@@ -1170,6 +1348,7 @@
                     const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
                     const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído', usuarioId: null };
+                    const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     
                     const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
                     const userAtual = appState.usuarios.find(u => (u.ID || u.id) === usuarioAtualVal);
@@ -1177,42 +1356,15 @@
                     
                     const isMinhaVez = (usuarioAtualVal === currentUser.ID);
 
-                    let anexosHtml = '';
-                    histArr.forEach(h => {
-                        if(h.fileUrl) {
-                            const isVideo = h.fileType && h.fileType.includes('video');
-                            const icon = isVideo ? 'ph-video-camera' : 'ph-image';
-                            const safeUrl = h.fileUrl.replace(/'/g, "\\'");
-                            const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
-                            const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
-                            
-                            let thumbUrl = safeUrl;
-                            const driveMatch = safeUrl.match(/[-\w]{25,}/);
-                            if(safeUrl.includes('drive.google.com') && driveMatch) {
-                                thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
-                            }
-
-                            anexosHtml += `
-                            <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
-                                <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                                    <i class="ph-fill ${icon} text-4xl mb-1"></i>
-                                </div>
-                                <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
-                                ${isVideo ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
-                                <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
-                                    <p class="text-white text-[11px] font-semibold truncate flex-1 pr-2">${safeName}</p>
-                                    <i class="ph-bold ph-download-simple text-white text-sm"></i>
-                                </div>
-                            </div>`;
-                        }
-                    });
+                    let anexosHtml = renderAnexos(histArr);
 
                     return `
                     <div class="glass-panel ios-card p-5 relative ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}">
                         <div class="flex justify-between items-start mb-2">
-                            <div class="flex items-center gap-2">
+                            <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
-                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                                ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
                             </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
@@ -1250,9 +1402,16 @@
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
+                                
+                                ${!foiIniciada ? `
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-play"></i> Iniciar Demanda
+                                </button>
+                                ` : `
                                 <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
+                                `}
                             </div>
                         ` : ''}
                     </div>`;
@@ -1260,19 +1419,6 @@
             });
 
             list.innerHTML = html;
-        }
-
-        function verificarNotificacoes() {
-            const list = appState.tarefasFluxo;
-            const hasPendente = list.some(f => {
-                const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
-                return usuarioAtualVal === currentUser.ID && (f.Status || f.status) !== 'concluida';
-            });
-            const badge = document.getElementById('badgeTarefa');
-            if(badge) {
-                if(hasPendente) badge.classList.remove('hidden');
-                else badge.classList.add('hidden');
-            }
         }
 
         function renderConcluidas() { 
@@ -1287,35 +1433,7 @@
                 
                 let histArr = [];
                 try { histArr = JSON.parse(t.Historico || t.historico || "[]"); } catch(e){}
-                let anexosHtml = '';
-                histArr.forEach(h => {
-                    if(h.fileUrl) {
-                        const isVideo = h.fileType && h.fileType.includes('video');
-                        const icon = isVideo ? 'ph-video-camera' : 'ph-image';
-                        const safeUrl = h.fileUrl.replace(/'/g, "\\'");
-                        const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
-                        const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
-                        
-                        let thumbUrl = safeUrl;
-                        const driveMatch = safeUrl.match(/[-\w]{25,}/);
-                        if(safeUrl.includes('drive.google.com') && driveMatch) {
-                            thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
-                        }
-
-                        anexosHtml += `
-                        <div class="mt-3 mb-2 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
-                                <i class="ph-fill ${icon} text-4xl mb-1"></i>
-                            </div>
-                            <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
-                            ${isVideo ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
-                            <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
-                                <p class="text-white text-[11px] font-semibold truncate flex-1 pr-2">${safeName}</p>
-                                <i class="ph-bold ph-download-simple text-white text-sm"></i>
-                            </div>
-                        </div>`;
-                    }
-                });
+                let anexosHtml = renderAnexos(histArr);
 
                 return `
                 <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative">
@@ -1674,9 +1792,9 @@
 
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
-            document.getElementById('ce_file_base64').value = '';
-            document.getElementById('ce_file_mime').value = '';
-            document.getElementById('ce_file_name').value = '';
+            ce_files_array = [];
+            document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
+            document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
             
             const uploadArea = document.getElementById('ce_upload_area');
             const descArea = document.getElementById('ce_desc_area');
@@ -1688,8 +1806,6 @@
             } else {
                 if(uploadArea) uploadArea.style.display = 'flex';
                 if(descArea) descArea.innerText = 'Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).';
-                document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar arquivo';
-                document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
                 document.getElementById('ce_btn_text').innerText = 'Confirmar e Avançar';
             }
 
@@ -1697,21 +1813,24 @@
         }
 
         function previewConcluirArquivo(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
 
-            document.getElementById('ce_nome_arquivo').innerText = file.name;
-            const isVideo = file.type.startsWith('video/');
-            document.getElementById('ce_icone').className = isVideo ? 'ph-bold ph-video-camera text-4xl text-iosBlue mb-2' : 'ph-bold ph-image text-4xl text-iosBlue mb-2';
+            ce_files_array = [];
+            document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
+            document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const base64Data = e.target.result.split(',')[1];
-                document.getElementById('ce_file_base64').value = base64Data;
-                document.getElementById('ce_file_mime').value = file.type;
-                document.getElementById('ce_file_name').value = file.name;
-            };
-            reader.readAsDataURL(file);
+            Array.from(files).forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    ce_files_array.push({
+                        base64: e.target.result.split(',')[1],
+                        mimeType: file.type,
+                        fileName: file.name
+                    });
+                };
+                reader.readAsDataURL(file);
+            });
         }
 
         async function submitAvancarEtapa(e) {
@@ -1719,15 +1838,10 @@
             setBtnLoading('ce_btn', true);
             
             const fluxoId = document.getElementById('ce_tarefa_id').value;
-            const fileData = {
-                base64: document.getElementById('ce_file_base64').value,
-                mimeType: document.getElementById('ce_file_mime').value,
-                fileName: document.getElementById('ce_file_name').value
-            };
-
             const payloadData = { id: fluxoId };
-            if (fileData.base64) {
-                payloadData.file = fileData;
+            
+            if (ce_files_array.length > 0) {
+                payloadData.files = ce_files_array;
             }
 
             const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
@@ -1742,10 +1856,14 @@
                     let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                     let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
                     
-                    if(fileData.base64) {
-                        logConclusao.fileUrl = 'data:' + fileData.mimeType + ';base64,' + fileData.base64;
-                        logConclusao.fileName = fileData.fileName;
-                        logConclusao.fileType = fileData.mimeType;
+                    if(ce_files_array.length > 0) {
+                        logConclusao.files = ce_files_array.map(arq => {
+                           return {
+                               url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
+                               name: arq.fileName,
+                               type: arq.mimeType
+                           }
+                        });
                     }
                     histArr.push(logConclusao);
                     f.Historico = JSON.stringify(histArr);
@@ -1767,12 +1885,76 @@
                     renderAll();
                 }
             } else {
-                alert(res.error || "Falha no envio do arquivo. O Google Drive não conseguiu salvar a imagem. Verifique se o backend está na versão correta.");
+                alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
             }
 
             closeModal('modalConcluirEtapa');
             forceSync(); 
             setBtnLoading('ce_btn', false);
+        }
+
+        // --- Histórico de Avisos ---
+        function openAvisosHistorico() {
+            const container = document.getElementById('lista_avisos_historico');
+            if(!appState.avisos || appState.avisos.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 text-sm mt-10">Nenhum aviso encontrado.</p>`;
+            } else {
+                let avisosSorted = [...appState.avisos].reverse();
+                container.innerHTML = avisosSorted.map(a => {
+                    const dataFormatada = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
+                    return `
+                    <div onclick="openAvisoDetalhes('${a.ID || a.id}')" class="bg-white dark:bg-[#1C1C1E] p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:scale-[0.98] transition-transform">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="font-bold text-iosBlue truncate pr-2">${a.Titulo || a.titulo}</h4>
+                            <span class="text-[10px] text-gray-400 whitespace-nowrap">${dataFormatada}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 line-clamp-1">${a.Descricao || a.descricao}</p>
+                    </div>`;
+                }).join('');
+            }
+            openModal('modalAvisosHistorico');
+        }
+
+        function openAvisoDetalhes(id) {
+            const a = appState.avisos.find(x => (x.ID || x.id) === id);
+            if(!a) return;
+
+            document.getElementById('det_aviso_titulo').innerText = a.Titulo || a.titulo;
+            document.getElementById('det_aviso_desc').innerText = a.Descricao || a.descricao;
+            document.getElementById('det_aviso_data').innerText = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
+
+            let alvo = a.Alvo || a.alvo;
+            let recebedores = [];
+            try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
+            try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
+
+            let usuariosAlvo = [];
+            const criador = a.CriadoPor || a.criadopor;
+            if(alvo === 'todos') {
+                usuariosAlvo = appState.usuarios.filter(u => (u.ID || u.id) !== criador);
+            } else if (Array.isArray(alvo)) {
+                usuariosAlvo = appState.usuarios.filter(u => alvo.includes(u.ID || u.id));
+            }
+
+            let confirmaram = [];
+            let pendentes = [];
+
+            usuariosAlvo.forEach(u => {
+                const uid = u.ID || u.id;
+                if(recebedores.includes(uid)) confirmaram.push(u);
+                else pendentes.push(u);
+            });
+
+            const htmlUser = (u) => `
+                <div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
+                    <p class="text-sm font-semibold">${u.Nome}</p>
+                </div>`;
+
+            document.getElementById('det_aviso_confirmaram').innerHTML = confirmaram.length > 0 ? confirmaram.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Ninguém confirmou ainda.</p>';
+            document.getElementById('det_aviso_pendentes').innerHTML = pendentes.length > 0 ? pendentes.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Todos confirmaram!</p>';
+
+            openModal('modalAvisoDetalhes');
         }
 
         // NOVO: Funções para retornar etapa
@@ -1814,6 +1996,8 @@
                 if(fIdx > -1) {
                     let f = appState.tarefasFluxo[fIdx];
                     let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                    if(fluxoObj[stepIndex]) { delete fluxoObj[stepIndex].iniciadaEm; }
+                    f.Fluxo = JSON.stringify(fluxoObj); f.fluxo = f.Fluxo;
                     
                     let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
                     histArr.push({ 
@@ -1827,8 +2011,8 @@
                     f.Etapaatual = stepIndex;
                     f.UsuarioAtual = fluxoObj[stepIndex].usuarioId;
                     f.Usuarioatual = fluxoObj[stepIndex].usuarioId;
-                    f.Status = 'em andamento';
-                    f.status = 'em andamento';
+                    f.Status = 'pendente';
+                    f.status = 'pendente';
                     
                     renderAll();
                 }
@@ -1894,34 +2078,8 @@
 
             document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
                 const date = new Date(h.data).toLocaleString('pt-BR');
-                let anexoHtml = '';
-                if(h.fileUrl) {
-                    const isVideo = h.fileType && h.fileType.includes('video');
-                    const icon = isVideo ? 'ph-video-camera' : 'ph-image';
-                    const safeUrl = h.fileUrl.replace(/'/g, "\\'");
-                    const safeName = h.fileName ? h.fileName.replace(/'/g, "\\'") : 'Anexo';
-                    const safeType = h.fileType ? h.fileType.replace(/'/g, "\\'") : '';
-                    
-                    let thumbUrl = safeUrl;
-                    const driveMatch = safeUrl.match(/[-\w]{25,}/);
-                    if(safeUrl.includes('drive.google.com') && driveMatch) {
-                        thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
-                    }
-
-                    anexoHtml = `
-                    <div class="mt-2 relative w-full h-24 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-all border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskFile('${safeUrl}', '${safeName}', '${safeType}')">
-                        <div class="absolute inset-0 flex items-center justify-center text-gray-400">
-                            <i class="ph-fill ${icon} text-2xl"></i>
-                        </div>
-                        <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
-                        ${isVideo ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-3xl text-white drop-shadow-md"></i></div>` : ''}
-                        <div class="absolute bottom-0 left-0 w-full p-1.5 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
-                            <p class="text-white text-[9px] font-semibold truncate flex-1 pr-2">${safeName}</p>
-                            <i class="ph-bold ph-download-simple text-white text-sm"></i>
-                        </div>
-                    </div>`;
-                }
-                return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${date}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexoHtml}</div>`;
+                let anexosHtml = renderAnexos([h]);
+                return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${date}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexosHtml}</div>`;
             }).join('') || 'Sem histórico';
 
             openModal('modalDetalheFluxo');
