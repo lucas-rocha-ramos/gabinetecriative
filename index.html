@@ -8,14 +8,14 @@
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Team">
-    <link rel="apple-touch-icon" href="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png">
+    <meta name="apple-mobile-web-app-title" content="Gabinete Criative">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png">
     <link rel="manifest" href="manifest.json">
 
     <link rel="preconnect" href="https://drive.google.com">
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
-    <title>Team Gov - Gestão Inteligênte</title>
+    <title>Gabinete Criative - Gestão Inteligênte</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -117,19 +117,19 @@
 
     <div id="splashScreen" class="fixed inset-0 z-[300] flex flex-col items-center justify-center bg-[#0f0f11] transition-opacity duration-700">
         <div class="relative flex items-center justify-center w-72 h-72 mb-6 animate-fade-in">
-            <img src="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png" alt="Logo Graça Criativa" class="w-full h-full object-contain drop-shadow-2xl">
+            <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" alt="Logo Graça Criativa" class="w-full h-full object-contain drop-shadow-2xl">
         </div>
-        <h1 class="text-4xl font-extrabold tracking-tight text-white"></h1>
-        <p class="text-gray-400 mt-2 font-medium tracking-widest uppercase text-xs">Gestão Inteligente</p>
+        <h1 class="text-4xl font-extrabold tracking-tight text-white">Gabinete Criative</h1>
+        <p class="text-gray-400 mt-2 font-medium tracking-widest uppercase text-xs">Controle de Mídia</p>
     </div>
 
     <div id="loginScreen" class="fixed inset-0 z-[200] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col items-center justify-center p-6 transition-opacity duration-500">
         <div class="w-full max-w-sm">
             <div class="flex justify-center mb-8">
-                <img src="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png" class="w-32 h-32 object-contain dark:invert-0 invert" alt="Logo">
+                <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-32 h-32 object-contain dark:invert-0 invert" alt="Logo">
             </div>
             <h1 class="text-3xl font-extrabold text-center mb-2">Bem-vindo</h1>
-            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas demandas</p>
+            <p class="text-center text-gray-500 mb-8">Faça login para acessar suas tarefas</p>
             
             <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
                 <input type="email" id="login_email" placeholder="E-mail" class="ios-input" required>
@@ -176,7 +176,7 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Progresso Geral</h2>
                     <p class="text-4xl font-extrabold mt-1" id="dashPercent">0%</p>
-                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span>demandas</p>
+                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> tarefas</p>
                 </div>
                 <div class="relative w-28 h-28">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -207,7 +207,7 @@
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
             <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
+                <h1 class="text-3xl font-extrabold tracking-tight">Tarefas</h1>
             </div>
             <div id="tarefasList" class="space-y-4">
                 </div>
@@ -215,7 +215,7 @@
 
         <div id="view-concluidas" class="view-section hidden space-y-4">
             <h1 class="text-3xl font-extrabold tracking-tight mb-4">Concluídas</h1>
-            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar demandas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
+            <input type="text" id="searchConcluidas" onkeyup="renderConcluidas()" placeholder="Pesquisar tarefas..." class="ios-input py-3 px-4 rounded-xl text-sm mb-2 shadow-sm">
             <div id="concluidasList" class="space-y-4">
                 </div>
         </div>
@@ -291,9 +291,9 @@
             </div>
 
             <div class="flex flex-col items-center justify-center mt-12 text-gray-400">
-                <img src="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png" class="w-16 h-16 opacity-50 mb-2 grayscale" alt="Logo">
-                <p class="text-xs font-medium uppercase tracking-widest">Gestão Inteligente</p>
-                <p class="text-[10px]">Versão 2.6 • By Lucas Rocha</p>
+                <img src="https://i.ibb.co/1YRr2m9X/Logo-Gabinete.png" class="w-16 h-16 opacity-50 mb-2 grayscale" alt="Logo">
+                <p class="text-xs font-medium uppercase tracking-widest">Gabinete Criative</p>
+                <p class="text-[10px]">Versão 2.6 • Pro WhatsApp</p>
             </div>
         </div>
 
@@ -304,7 +304,7 @@
             <i class="ph-fill ph-squares-four text-2xl"></i><span class="text-[9px] font-semibold uppercase">Início</span>
         </button>
         <button onclick="switchTab('tarefas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors relative" data-tab="tarefas">
-            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Demandas</span>
+            <i class="ph-fill ph-list-bullets text-2xl"></i><span class="text-[9px] font-semibold uppercase">Tarefas</span>
             <span id="badgeTarefa" class="absolute top-0 right-2 w-2.5 h-2.5 bg-red-500 rounded-full hidden"></span>
         </button>
         <button onclick="switchTab('concluidas')" class="nav-item flex flex-col items-center gap-1 min-w-[60px] flex-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors" data-tab="concluidas">
@@ -409,7 +409,7 @@
                 <p id="perf_funcao" class="text-gray-500 text-sm">Função</p>
             </div>
             <div class="p-4">
-                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Demandas Atuais</h3>
+                <h3 class="text-sm font-bold text-gray-500 uppercase tracking-widest mb-4 px-2">Tarefas Atuais</h3>
                 <div id="perf_tarefas_list" class="space-y-3">
                     </div>
             </div>
@@ -597,7 +597,7 @@
     </div>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4OerHYrzFpGHKdkDsy-_Dd5DZLYXF-34hYv1fBZ8A4ty0D6a8Bd963bTRk9FEJuLa/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbw2GKrzeOutjJAtx6VzIWBsd2vQ0NkUPVoDSM23SnOfa9w2KYU8LLeKp2-VocfXcZ9U/exec"; 
 
         let editingItemId = null;
         let currentGalleryFiles = [];
@@ -882,7 +882,7 @@
             const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma tarefa ativa no momento.</p>`;
             } else {
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
@@ -1132,7 +1132,7 @@
             let tarefasAtivas = tarefas.filter(f => (f.Status || f.status) !== 'concluida');
             
             if(tarefasAtivas.length === 0) {
-                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
+                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma tarefa ativa.</p></div>`;
                 return;
             }
 
@@ -1281,7 +1281,7 @@
             let concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida');
             if(search) concluidas = concluidas.filter(t => (t.Titulo || t.titulo).toLowerCase().includes(search));
             
-            if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma demanda encontrada.</p>`; return; }
+            if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma tarefa encontrada.</p>`; return; }
             list.innerHTML = concluidas.map(t => {
                 const idVal = t.ID !== undefined ? t.ID : t.id;
                 
