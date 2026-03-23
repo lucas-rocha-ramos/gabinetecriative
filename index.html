@@ -882,7 +882,7 @@
             const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma tarefa ativa no momento.</p>`;
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
             } else {
                 list.innerHTML = userTarefas.map(f => {
                     let fluxoObj = [];
