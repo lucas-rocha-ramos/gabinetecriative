@@ -1281,7 +1281,7 @@
             let concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida');
             if(search) concluidas = concluidas.filter(t => (t.Titulo || t.titulo).toLowerCase().includes(search));
             
-            if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma tarefa encontrada.</p>`; return; }
+            if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma demanda encontrada.</p>`; return; }
             list.innerHTML = concluidas.map(t => {
                 const idVal = t.ID !== undefined ? t.ID : t.id;
                 
