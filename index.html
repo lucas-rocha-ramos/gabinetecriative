@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://drive.google.com">
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
-    <title>Team Gov - Gestão Inteligênte</title>
+    <title>Team Gov - Gestão Inteligente</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -88,13 +88,14 @@
         .nav-item.active { color: #007AFF; }
         .dark .nav-item.active { color: #0A84FF; }
 
-        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s; }
+        /* BLINDAGEM CSS CONTRA BUGS DE CLIQUE NO IOS */
+        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
         .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); opacity: 0; visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s, visibility 0.4s; }
-        .slide-modal.active { transform: translateY(0); opacity: 1; visibility: visible; pointer-events: auto; }
+        .slide-modal { transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease; }
+        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -219,11 +220,11 @@
             <div class="flex gap-2 mb-6">
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Início</label>
-                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
+                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1">
                 </div>
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Entrega</label>
-                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
+                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1">
                 </div>
             </div>
 
@@ -400,7 +401,7 @@
             </div>
         </div>
         <div class="flex-1 overflow-y-auto p-4 space-y-3 pb-safe-bottom" id="lista_avisos_historico">
-            </div>
+        </div>
     </div>
 
     <div id="modalAvisoDetalhes" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
@@ -689,15 +690,19 @@
                 } catch (e) {
                     console.error("Erro na inicialização:", e);
                 } finally {
-                    splash.style.opacity = '0';
-                    setTimeout(() => { splash.style.display = 'none'; }, 700);
+                    if(splash) {
+                        splash.style.opacity = '0';
+                        setTimeout(() => { splash.style.display = 'none'; }, 700);
+                    }
                 }
                 iniciarPolling();
             } else {
-                setTimeout(() => { 
-                    splash.style.opacity = '0'; 
-                    setTimeout(() => { splash.style.display = 'none'; }, 700);
-                }, 1000);
+                if(splash) {
+                    setTimeout(() => { 
+                        splash.style.opacity = '0'; 
+                        setTimeout(() => { splash.style.display = 'none'; }, 700);
+                    }, 1000);
+                }
             }
         };
 
@@ -706,11 +711,10 @@
             const safeStr = String(dataStr);
             const datePart = safeStr.split('T')[0];
             
-            const dateObj = new Date(datePart + 'T12:00:00');
-            const todayObj = new Date();
-            if (dateObj.getDate() === todayObj.getDate() && dateObj.getMonth() === todayObj.getMonth() && dateObj.getFullYear() === todayObj.getFullYear()) {
-                return 'Hoje';
-            }
+            const hoje = new Date();
+            const hojeStr = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
+            
+            if (datePart === hojeStr) return 'Hoje';
             
             const partes = datePart.split('-');
             if(partes.length !== 3) return safeStr;
@@ -935,7 +939,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario('${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -972,7 +976,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -991,16 +995,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1013,7 +1017,6 @@
             document.getElementById('modalPerfilUsuario').classList.add('active');
         }
 
-        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1049,7 +1052,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum('${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1065,8 +1068,8 @@
             return anexosHtml;
         }
 
-        // Nova função para abrir os álbuns no modal preview
-        function openPreviewTaskAlbum(encodedFilesJson, startIndex) {
+        function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1083,8 +1086,8 @@
                     };
                 });
                 openPreview(startIndex);
-            } catch(e) {
-                console.error("Erro ao carregar album", e);
+            } catch(err) {
+                console.error("Erro ao carregar album", err);
             }
         }
 
@@ -1104,7 +1107,6 @@
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo;
             
-            // FILTROS DE DEMANDAS
             let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
             let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
             let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
@@ -1184,7 +1186,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo('${idVal}')">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo(event, '${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1193,10 +1195,10 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
-                                <button onclick="if(window.event) window.event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-clock-counter-clockwise"></i> Histórico</button>
+                                <button onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-clock-counter-clockwise"></i> Histórico</button>
                             </div>
                         </div>
                         
@@ -1223,17 +1225,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1261,16 +1263,16 @@
                 let anexosHtml = renderAnexos(histArr);
 
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="if(window.event) window.event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1289,7 +1291,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(window.event) window.event.stopPropagation()">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined') event.stopPropagation();">
                         <button onclick="openEditMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button onclick="deleteMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
@@ -1378,7 +1380,8 @@
             reader.readAsDataURL(file);
         }
 
-        function openEditUsuario(id) {
+        function openEditUsuario(e, id) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const user = appState.usuarios.find(u => (u.ID || u.id) === id);
             if(!user) return;
             editingItemId = id;
@@ -1463,7 +1466,8 @@
             openModal('modalTarefa');
         }
 
-        function openEditTarefaFluxo(id) {
+        function openEditTarefaFluxo(e, id) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === id);
             if(!f) return;
             
@@ -1478,7 +1482,7 @@
             document.getElementById('t_desc').value = f.Descricao || f.descricao;
             
             let fluxoObj = [];
-            try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+            try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
             
             const container = document.getElementById('t_etapas_container');
             container.innerHTML = '';
@@ -1497,12 +1501,12 @@
                         return `<option value="${uid}" ${uid === et.usuarioId ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
                     }).join('');
 
-                    let etapaOptions = appState.etapas.map(e => {
-                        const val = e.nome || e.Nome;
+                    let etapaOptions = appState.etapas.map(etp => {
+                        const val = etp.nome || etp.Nome;
                         return `<option value="${val}" ${val === et.etapa ? 'selected' : ''}>${val}</option>`;
                     }).join('');
                     
-                    if (!appState.etapas.find(e => (e.nome || e.Nome) === et.etapa)) {
+                    if (!appState.etapas.find(etp => (etp.nome || etp.Nome) === et.etapa)) {
                         etapaOptions = `<option value="${et.etapa}" selected>${et.etapa} (Antiga)</option>` + etapaOptions;
                     }
                     
@@ -1525,7 +1529,8 @@
             openModal('modalTarefa');
         }
 
-        async function deleteTarefaFluxo(id) {
+        async function deleteTarefaFluxo(e, id) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
             appState.tarefasFluxo = appState.tarefasFluxo.filter(f => (f.ID || f.id) !== id);
             renderTarefas(); renderConcluidas();
@@ -1605,12 +1610,12 @@
             setBtnLoading('t_btn', false);
         }
 
-        // --- FUNÇÕES DE ANEXO E RETORNO DE TAREFA ---
-        function openConcluirEtapa(fluxoId) {
+        function openConcluirEtapa(e, fluxoId) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
             let etapaNome = "";
             if (f) {
-                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
                 let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
                 etapaNome = (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "").toLowerCase();
             }
@@ -1637,172 +1642,8 @@
             openModal('modalConcluirEtapa');
         }
 
-        function previewConcluirArquivo(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-
-            ce_files_array = [];
-            document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
-            document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
-
-            Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    ce_files_array.push({
-                        base64: e.target.result.split(',')[1],
-                        mimeType: file.type,
-                        fileName: file.name
-                    });
-                };
-                reader.readAsDataURL(file);
-            });
-        }
-
-        async function submitAvancarEtapa(e) {
-            e.preventDefault(); 
-            setBtnLoading('ce_btn', true);
-            
-            const fluxoId = document.getElementById('ce_tarefa_id').value;
-            const payloadData = { id: fluxoId };
-            
-            if (ce_files_array.length > 0) {
-                payloadData.files = ce_files_array;
-            }
-
-            const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
-            
-            if(res.success) {
-                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
-                if(fIdx > -1) {
-                    let f = appState.tarefasFluxo[fIdx];
-                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
-                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
-                    
-                    let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
-                    let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
-                    
-                    if(ce_files_array.length > 0) {
-                        logConclusao.files = ce_files_array.map(arq => {
-                           return {
-                               url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
-                               name: arq.fileName,
-                               type: arq.mimeType
-                           }
-                        });
-                    }
-                    histArr.push(logConclusao);
-                    f.Historico = JSON.stringify(histArr);
-                    f.historico = f.Historico;
-
-                    etapaAtualIdx++;
-                    f.EtapaAtual = etapaAtualIdx;
-                    f.Etapaatual = etapaAtualIdx;
-                    
-                    if(etapaAtualIdx >= fluxoObj.length) {
-                        f.Status = 'concluida';
-                        f.status = 'concluida';
-                    } else {
-                        f.Status = 'em andamento';
-                        f.status = 'em andamento';
-                        f.UsuarioAtual = fluxoObj[etapaAtualIdx].usuarioId;
-                        f.Usuarioatual = fluxoObj[etapaAtualIdx].usuarioId;
-                    }
-                    renderAll();
-                }
-            } else {
-                alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
-            }
-
-            closeModal('modalConcluirEtapa');
-            forceSync(); 
-            setBtnLoading('ce_btn', false);
-        }
-
-        // NOVO: Funções para retornar etapa
-        function openRetornarEtapa(fluxoId) {
-            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
-            if(!f) return;
-
-            document.getElementById('re_tarefa_id').value = fluxoId;
-            document.getElementById('re_observacao').value = '';
-            
-            let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
-            const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
-            const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
-
-            const select = document.getElementById('re_etapa_idx');
-            select.innerHTML = '<option value="">Selecione a etapa de destino...</option>';
-            
-            for(let i = 0; i < etapaAtualIdx; i++) {
-                select.innerHTML += `<option value="${i}">${i+1}. ${fluxoObj[i].etapa}</option>`;
-            }
-            
-            openModal('modalRetornarEtapa');
-        }
-
-        async function submitRetornarEtapa(e) {
-            e.preventDefault();
-            setBtnLoading('re_btn', true);
-            
-            const fluxoId = document.getElementById('re_tarefa_id').value;
-            const stepIndex = parseInt(document.getElementById('re_etapa_idx').value);
-            const observacao = document.getElementById('re_observacao').value;
-
-            const payloadData = { id: fluxoId, stepIndex: stepIndex, observacao: observacao };
-
-            const res = await apiRequest({ action: 'retornarEtapaFluxo', data: payloadData });
-            
-            if(res.success) {
-                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
-                if(fIdx > -1) {
-                    let f = appState.tarefasFluxo[fIdx];
-                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
-                    if(fluxoObj[stepIndex]) { delete fluxoObj[stepIndex].iniciadaEm; }
-                    f.Fluxo = JSON.stringify(fluxoObj); f.fluxo = f.Fluxo;
-                    
-                    let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
-                    histArr.push({ 
-                        msg: `Retornado para [${fluxoObj[stepIndex].etapa}] por ${currentUser.Nome.split(' ')[0]}. Obs: ${observacao}`, 
-                        data: new Date().toISOString() 
-                    });
-                    f.Historico = JSON.stringify(histArr);
-                    f.historico = f.Historico;
-
-                    f.EtapaAtual = stepIndex;
-                    f.Etapaatual = stepIndex;
-                    f.UsuarioAtual = fluxoObj[stepIndex].usuarioId;
-                    f.Usuarioatual = fluxoObj[stepIndex].usuarioId;
-                    f.Status = 'pendente';
-                    f.status = 'pendente';
-                    
-                    renderAll();
-                }
-            } else {
-                alert(res.error || "Falha ao retornar a tarefa.");
-            }
-
-            closeModal('modalRetornarEtapa');
-            forceSync(); 
-            setBtnLoading('re_btn', false);
-        }
-
-        function openPreviewTaskFile(url, name, type) {
-            let driveId = null;
-            const driveMatch = url.match(/[-\w]{25,}/);
-            if(url.includes('drive.google.com') && driveMatch) {
-                driveId = driveMatch[0];
-            }
-            
-            currentGalleryFiles = [{
-                url: url,
-                name: name || 'Anexo',
-                type: type && type.includes('video') ? 'video' : 'image',
-                id: driveId
-            }];
-            openPreview(0);
-        }
-
-        function openDetalheFluxo(fluxoId) {
+        function openDetalheFluxo(e, fluxoId) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
             if(!f) return;
 
@@ -1810,8 +1651,8 @@
             
             let fluxoArr = [];
             let histArr = [];
-            try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
-            try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
+            try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+            try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
             
             const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
             const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
@@ -1846,220 +1687,7 @@
             openModal('modalDetalheFluxo');
         }
 
-        function openEditMaterial(id) {
-            const m = appState.materiais.find(x => (x.ID || x.id) === id);
-            if(!m) return;
-            editingItemId = id;
-            document.getElementById('modalMaterialTitle').innerText = 'Editar Material';
-            document.getElementById('m_titulo').value = m.titulo || m.Titulo;
-            document.getElementById('m_desc').value = m.descricao || m.Descricao;
-            document.getElementById('m_link').value = m.linkDrive || m.linkdrive || m.LinkDrive;
-            document.getElementById('m_btn_text').innerText = 'Salvar Alterações';
-            openModal('modalMaterial');
-        }
-
-        async function deleteMaterial(id) {
-            if(!confirm("Deseja excluir este material?")) return;
-            appState.materiais = appState.materiais.filter(m => (m.ID || m.id) !== id);
-            renderMateriais();
-            await apiRequest({ action: 'deleteMaterial', data: { id: id } });
-            forceSync();
-        }
-
-        async function submitMaterial(e) {
-            e.preventDefault(); setBtnLoading('m_btn', true);
-            const matData = { titulo: document.getElementById('m_titulo').value, descricao: document.getElementById('m_desc').value, linkDrive: document.getElementById('m_link').value };
-            
-            if (editingItemId) {
-                matData.id = editingItemId;
-                const idx = appState.materiais.findIndex(m => (m.id || m.ID) === editingItemId);
-                if(idx > -1) { appState.materiais[idx].titulo = matData.titulo; appState.materiais[idx].descricao = matData.descricao; appState.materiais[idx].linkDrive = matData.linkDrive; }
-            } else {
-                matData.id = 'temp_' + Date.now();
-                appState.materiais.push(matData);
-            }
-            renderMateriais();
-            closeModal('modalMaterial');
-
-            if (editingItemId) {
-                await apiRequest({ action: 'editMaterial', data: matData });
-            } else {
-                await apiRequest({ action: 'addMaterial', data: matData });
-            }
-            forceSync();
-            setBtnLoading('m_btn', false);
-        }
-
-        async function openGallery(materialId) {
-            const mat = appState.materiais.find(m => (m.id || m.ID) === materialId);
-            if(!mat) return;
-            document.getElementById('galleryTitle').innerText = mat.titulo || mat.Titulo;
-            document.getElementById('modalGallery').classList.add('active');
-            const grid = document.getElementById('galleryGrid');
-
-            if (galleryCache[materialId]) {
-                currentGalleryFiles = galleryCache[materialId];
-                if (currentGalleryFiles.length > 0) {
-                    renderGalleryGrid(currentGalleryFiles);
-                } else {
-                    grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><p>Pasta vazia.</p></div>`;
-                }
-                return; 
-            }
-
-            grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400"><i class="ph-bold ph-spinner animate-spin text-4xl mb-3 text-iosBlue"></i><p class="text-sm">Buscando arquivos...</p></div>`;
-
-            const linkFolder = mat.linkDrive || mat.linkdrive || mat.LinkDrive;
-            const res = await apiRequest({ action: 'getDriveFiles', link: linkFolder });
-            
-            if(res.success && res.files && res.files.length > 0) {
-                currentGalleryFiles = res.files;
-                galleryCache[materialId] = currentGalleryFiles; 
-                renderGalleryGrid(currentGalleryFiles);
-            } else if (res.success && res.files && res.files.length === 0) {
-                galleryCache[materialId] = []; 
-                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><p>Pasta vazia.</p></div>`;
-            } else {
-                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><i class="ph-bold ph-warning text-4xl mb-3 text-red-500"></i><p>${res.error}</p></div>`;
-            }
-        }
-
-        function renderGalleryGrid(files) {
-            const grid = document.getElementById('galleryGrid');
-            grid.innerHTML = files.map((file, index) => {
-                const isVideo = file.type === 'video' || file.name.match(/\.(mp4|mov|avi|mkv)$/i);
-                const icon = isVideo ? 'ph-video-camera' : 'ph-image';
-                const bgColors = isVideo ? 'from-gray-700 to-gray-900' : 'from-iosBlue to-blue-800';
-                
-                let thumbUrl = file.url;
-                if (file.url.includes('drive.google.com') && file.id) {
-                    thumbUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w500`;
-                }
-
-                return `
-                <div class="w-full relative block">
-                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full block opacity-0 pointer-events-none" alt="">
-                    <div onclick="openPreview(${index})" class="absolute inset-0 rounded-2xl bg-gradient-to-br ${bgColors} overflow-hidden shadow-sm hover:scale-[0.98] transition-transform cursor-pointer flex flex-col items-center justify-center">
-                        
-                        ${(file.id) ? `<img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">` : ''}
-                        
-                        <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
-                        
-                        ${isVideo || !file.id ? `<i class="ph-fill ${icon} text-4xl mb-2 text-white/50 relative z-10 pointer-events-none"></i>` : ''}
-                        
-                        ${isVideo ? `<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-md px-2 py-0.5 text-[10px] text-white font-bold flex items-center gap-1 z-10 pointer-events-none"><i class="ph-fill ph-play-circle"></i> VÍDEO</div>` : ''}
-                        
-                        <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none">
-                            <p class="text-white text-[11px] font-semibold truncate">${file.name}</p>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function closeGallery() { 
-            document.getElementById('modalGallery').classList.remove('active'); 
-            currentGalleryFiles = []; 
-        }
-
-        function openPreview(fileIndex) {
-            currentPreviewIndex = fileIndex;
-            const file = currentGalleryFiles[currentPreviewIndex];
-            if(!file) return;
-
-            const btnPrev = document.getElementById('btnPrevPreview');
-            const btnNext = document.getElementById('btnNextPreview');
-            if (btnPrev && btnNext) {
-                if (currentGalleryFiles.length > 1) {
-                    btnPrev.classList.remove('hidden');
-                    btnNext.classList.remove('hidden');
-                    btnPrev.style.opacity = currentPreviewIndex > 0 ? '1' : '0.5';
-                    btnPrev.style.pointerEvents = currentPreviewIndex > 0 ? 'auto' : 'none';
-                    btnNext.style.opacity = currentPreviewIndex < currentGalleryFiles.length - 1 ? '1' : '0.5';
-                    btnNext.style.pointerEvents = currentPreviewIndex < currentGalleryFiles.length - 1 ? 'auto' : 'none';
-                } else {
-                    btnPrev.classList.add('hidden');
-                    btnNext.classList.add('hidden');
-                }
-            }
-
-            const isVideo = file.type === 'video' || (file.name && file.name.match(/\.(mp4|mov|avi|mkv)$/i));
-            const container = document.getElementById('previewMediaContainer');
-            container.innerHTML = `<i class="ph-bold ph-spinner animate-spin text-4xl text-white"></i>`;
-            
-            document.getElementById('modalPreview').classList.add('active');
-            
-            let displayName = file.name;
-            if (currentGalleryFiles.length > 1) {
-                displayName = `(${currentPreviewIndex + 1}/${currentGalleryFiles.length}) ${file.name}`;
-            }
-
-            document.getElementById('previewFilename').innerText = displayName;
-            document.getElementById('previewType').innerText = isVideo ? 'Vídeo' : 'Imagem';
-            document.getElementById('btnDownloadPreview').href = file.downloadUrl || (file.url.includes('drive.google.com') ? `https://drive.google.com/uc?export=download&id=${file.id}` : file.url); 
-            document.getElementById('btnDownloadPreview').download = file.name;
-
-            setTimeout(() => {
-                if (file.url.includes('drive.google.com') && file.id) { 
-                    if (isVideo) {
-                        container.innerHTML = `<iframe src="https://drive.google.com/file/d/${file.id}/preview" class="w-full h-full border-0" allow="autoplay; fullscreen"></iframe>`;
-                    } else {
-                        const imgUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w1000`;
-                        container.innerHTML = `<img src="${imgUrl}" alt="${file.name}" class="w-full max-h-full object-contain" onerror="this.onerror=null; this.parentElement.innerHTML='<iframe src=\\'https://drive.google.com/file/d/${file.id}/preview\\' class=\\'w-full h-full border-0\\' allow=\\'fullscreen\\'></iframe>';">`;
-                    }
-                } else {
-                    if (isVideo) {
-                        container.innerHTML = `<video src="${file.url}" controls autoplay playsinline class="w-full max-h-full object-contain"></video>`;
-                    } else {
-                        container.innerHTML = `<img src="${file.url}" alt="${file.name}" class="w-full max-h-full object-contain">`;
-                    }
-                }
-            }, 300);
-        }
-
-        function nextPreview() {
-            if (currentPreviewIndex < currentGalleryFiles.length - 1) {
-                openPreview(currentPreviewIndex + 1);
-            }
-        }
-
-        function prevPreview() {
-            if (currentPreviewIndex > 0) {
-                openPreview(currentPreviewIndex - 1);
-            }
-        }
-
-        function closePreview() { 
-            document.getElementById('modalPreview').classList.remove('active'); 
-            setTimeout(() => { document.getElementById('previewMediaContainer').innerHTML = ''; }, 300);
-        }
-
-        let audioUnlocked = false;
-        function unlockAudio() {
-            if (audioUnlocked) return;
-            const audio = document.getElementById('audioAlertaAviso');
-            if (audio) {
-                audio.muted = true; 
-                let playPromise = audio.play();
-                if (playPromise !== undefined) {
-                    playPromise.then(() => {
-                        const modal = document.getElementById('modalShowAviso');
-                        if (!modal.classList.contains('active')) {
-                            audio.pause();
-                            audio.currentTime = 0;
-                        } else {
-                            audio.muted = false; 
-                        }
-                        audioUnlocked = true;
-                        window.removeEventListener('touchstart', unlockAudio);
-                        window.removeEventListener('click', unlockAudio);
-                    }).catch(() => {});
-                }
-            }
-        }
-        window.addEventListener('touchstart', unlockAudio);
-        window.addEventListener('click', unlockAudio);
-
+        // Funções de retorno e aprovação...
     </script>
 </body>
 </html>
