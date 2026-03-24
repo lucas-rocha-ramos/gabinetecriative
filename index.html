@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://drive.google.com">
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
-    <title>Team Gov - Gestão Inteligênte</title>
+    <title>Team Gov - Gestão Inteligente</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -88,14 +88,13 @@
         .nav-item.active { color: #007AFF; }
         .dark .nav-item.active { color: #0A84FF; }
 
-        /* Ajuste de Modais (Correção de Cliques) */
-        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease; }
-        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal.active { transform: translateY(0); }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -215,7 +214,19 @@
                 <button id="tabPraVoce" onclick="setFiltroVisao('pra_voce')" class="flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all">Pra você</button>
                 <button id="tabEquipe" onclick="setFiltroVisao('equipe')" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all">Equipe</button>
             </div>
-            
+
+            <input type="text" id="filtroAssuntoTarefa" onkeyup="renderTarefas()" placeholder="Filtrar por assunto..." class="ios-input py-3 px-4 text-sm shadow-sm mb-2">
+            <div class="flex gap-2 mb-6">
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Início</label>
+                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Entrega</label>
+                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
+                </div>
+            </div>
+
             <div id="tarefasList" class="space-y-4">
                 </div>
         </div>
@@ -340,15 +351,16 @@
             </div>
             <form id="formConcluirEtapa" onsubmit="submitAvancarEtapa(event)" class="space-y-4">
                 <input type="hidden" id="ce_tarefa_id">
-                
-                <div id="ce_upload_container">
-                    <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
-                    <input type="file" id="ce_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewConcluirArquivo(event)">
-                    <div id="ce_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
-                        <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
-                        <p id="ce_nome_arquivo" class="text-sm font-semibold text-center truncate w-full px-4 text-gray-600 dark:text-gray-300">Clique para selecionar os arquivos</p>
-                    </div>
+                <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
+
+                <input type="file" id="ce_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewConcluirArquivo(event)">
+                <div id="ce_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
+                    <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
+                    <p id="ce_nome_arquivo" class="text-sm font-semibold text-center truncate w-full px-4 text-gray-600 dark:text-gray-300">Clique para selecionar os arquivos</p>
                 </div>
+                <input type="hidden" id="ce_file_base64">
+                <input type="hidden" id="ce_file_mime">
+                <input type="hidden" id="ce_file_name">
 
                 <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
@@ -628,7 +640,7 @@
         <div id="galleryGrid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 pb-safe-bottom content-start"></div>
     </div>
 
-    <div id="modalPreview" class="slide-modal fixed inset-0 z-[90] bg-black flex flex-col">
+    <div id="modalPreview" class="slide-modal fixed inset-0 z-[70] bg-black flex flex-col">
         <div class="pt-safe-top w-full z-10 shrink-0">
             <div class="flex items-center justify-between px-4 py-3">
                 <button onclick="closePreview()" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white"><i class="ph-bold ph-x text-xl"></i></button>
@@ -918,7 +930,12 @@
                 list.innerHTML = `<p class="text-center text-gray-500 mt-10">Nenhum usuário.</p>`; return;
             }
             
-            list.innerHTML = appState.usuarios.map(u => `
+            let sortedUsuarios = [...appState.usuarios].sort((a, b) => {
+                if(a.IsOnline === b.IsOnline) return 0;
+                return a.IsOnline ? -1 : 1;
+            });
+            
+            list.innerHTML = sortedUsuarios.map(u => `
                 <div class="glass-panel ios-card p-4 flex items-center justify-between cursor-pointer active:scale-95 transition-transform" onclick="openPerfilUsuario('${u.ID || u.id}')">
                     <div class="flex items-center gap-3">
                         <div class="relative">
@@ -1044,7 +1061,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum('${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1060,8 +1077,7 @@
             return anexosHtml;
         }
 
-        function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openPreviewTaskAlbum(encodedFilesJson, startIndex) {
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1132,6 +1148,8 @@
                 list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
                 return;
             }
+
+            tarefasAtivas.reverse();
 
             const grouped = {};
             tarefasAtivas.forEach(f => {
@@ -1281,7 +1299,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(window.event) window.event.stopPropagation()">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(window.event) window.event.stopPropagation();">
                         <button onclick="openEditMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button onclick="deleteMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
