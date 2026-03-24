@@ -10,16 +10,12 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Team">
     <link rel="apple-touch-icon" href="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png">
-    
-    <link rel="icon" type="image/png" href="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png">
-    <link rel="shortcut icon" href="https://i.ibb.co/GNDqbxn/Logo-Sistema-v2.png">
-
     <link rel="manifest" href="manifest.json">
 
     <link rel="preconnect" href="https://drive.google.com">
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
-    <title>Team Gov - Gestão Inteligente</title>
+    <title>Team Gov - Gestão Inteligênte</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -92,13 +88,13 @@
         .nav-item.active { color: #007AFF; }
         .dark .nav-item.active { color: #0A84FF; }
 
-        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease; }
-        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal.active { transform: translateY(0); }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -180,7 +176,7 @@
                 <div>
                     <h2 class="text-lg font-semibold text-gray-500 dark:text-gray-400">Progresso Geral</h2>
                     <p class="text-4xl font-extrabold mt-1" id="dashPercent">0%</p>
-                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span> demandas</p>
+                    <p class="text-sm text-gray-500 mt-2"><span id="dashCompleted">0</span> de <span id="dashTotal">0</span>demandas</p>
                 </div>
                 <div class="relative w-28 h-28">
                     <svg class="w-full h-full" viewBox="0 0 100 100">
@@ -210,27 +206,9 @@
         </div>
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
             </div>
-            
-            <div class="flex p-1 bg-gray-200 dark:bg-gray-800 rounded-xl mb-4">
-                <button id="tabPraVoce" onclick="setFiltroVisao('pra_voce')" class="flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all">Pra você</button>
-                <button id="tabEquipe" onclick="setFiltroVisao('equipe')" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all">Equipe</button>
-            </div>
-
-            <input type="text" id="filtroAssuntoTarefa" onkeyup="renderTarefas()" placeholder="Filtrar por assunto..." class="ios-input py-3 px-4 text-sm shadow-sm mb-2">
-            <div class="flex gap-2 mb-6">
-                <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Início</label>
-                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
-                </div>
-                <div class="flex-1">
-                    <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Entrega</label>
-                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
-                </div>
-            </div>
-
             <div id="tarefasList" class="space-y-4">
                 </div>
         </div>
@@ -252,10 +230,7 @@
         <div id="view-equipe" class="view-section hidden space-y-4">
             <div class="flex justify-between items-center mb-6">
                 <h1 class="text-3xl font-extrabold tracking-tight">Equipe</h1>
-                <div class="flex gap-2">
-                    <button onclick="openAvisosHistorico()" class="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm active:scale-95 transition-transform"><i class="ph-bold ph-clock-counter-clockwise text-lg"></i> Histórico</button>
-                    <button onclick="openCreateAviso()" class="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg active:scale-95 transition-transform admin-only"><i class="ph-bold ph-bell-ringing text-lg"></i> Criar Aviso</button>
-                </div>
+                <button onclick="openCreateAviso()" class="bg-red-500 text-white px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg active:scale-95 transition-transform admin-only"><i class="ph-bold ph-bell-ringing text-lg"></i> Criar Aviso</button>
             </div>
             <div id="equipeList" class="space-y-3">
                 </div>
@@ -374,6 +349,10 @@
                         <div id="ce_progress_bar" class="bg-iosBlue h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
+                
+                <div id="ce_apenas_avancar_container" style="display:none;">
+                    <p class="text-sm text-gray-500 mb-4 text-center">Deseja aprovar e enviar esta demanda para a próxima etapa?</p>
+                </div>
 
                 <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
@@ -410,7 +389,7 @@
     <div id="modalAvisosHistorico" class="slide-modal fixed inset-0 z-[70] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisosHistorico')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisosHistorico').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Histórico de Avisos</h2>
                 <div class="w-16"></div>
             </div>
@@ -422,7 +401,7 @@
     <div id="modalAvisoDetalhes" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisoDetalhes')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisoDetalhes').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Detalhes</h2>
                 <div class="w-16"></div>
             </div>
@@ -466,7 +445,7 @@
     <div id="modalPerfilUsuario" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalPerfilUsuario')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalPerfilUsuario').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Perfil</h2>
                 <div class="w-16"></div>
             </div>
@@ -531,10 +510,96 @@
         </div>
     </div>
 
+    <div id="modalTarefa" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold" id="modalTarefaTitle">Nova Tarefa</h2>
+                <button onclick="closeModal('modalTarefa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formTarefa" onsubmit="submitTarefa(event)" class="space-y-4">
+                <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-500 font-bold uppercase ml-1">Prazo de Entrega</label>
+                        <input type="date" id="t_prazo" class="ios-input mt-1">
+                    </div>
+                </div>
+                <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
+                
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4">
+                    <h3 class="font-bold mb-3 text-sm uppercase tracking-wide">Etapas do Fluxo</h3>
+                    <div id="t_etapas_container" class="space-y-3 mb-3">
+                        </div>
+                    <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
+                </div>
+
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="t_btn_text">Salvar Tarefa</span><i id="t_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalMaterial" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalMaterialTitle" class="text-xl font-bold">Vincular Material</h2>
+                <button onclick="closeModal('modalMaterial')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formMaterial" onsubmit="submitMaterial(event)" class="space-y-4">
+                <input type="text" id="m_titulo" placeholder="Título da Pasta/Arquivo" class="ios-input" required>
+                <textarea id="m_desc" placeholder="Descrição..." class="ios-input h-20 resize-none" required></textarea>
+                <input type="url" id="m_link" placeholder="Link do Google Drive" class="ios-input" required>
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 flex justify-center items-center gap-2"><span id="m_btn_text">Salvar Vínculo</span><i id="m_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalUsuario" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalUsuarioTitle" class="text-xl font-bold">Novo Membro</h2>
+                <button onclick="closeModal('modalUsuario')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formUsuario" onsubmit="submitUsuario(event)" class="space-y-4">
+                <div class="flex justify-center mb-2">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('u_foto_file').click()">
+                        <img id="u_preview_foto" src="https://ui-avatars.com/api/?name=U&background=random" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800 transition-opacity group-hover:opacity-70">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                            <i class="ph-bold ph-camera text-white text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="u_foto_file" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+                <input type="hidden" id="u_foto_base64">
+                <input type="hidden" id="u_foto_mime">
+                <input type="hidden" id="u_foto_url">
+                
+                <input type="text" id="u_nome" placeholder="Nome Completo" class="ios-input" required>
+                <input type="text" id="u_funcao" placeholder="Função (Ex: Editor, Câmera)" class="ios-input" required>
+                <input type="tel" id="u_whatsapp" placeholder="Nº WhatsApp (Ex: 5565999999999)" class="ios-input" required>
+                <input type="email" id="u_email" placeholder="E-mail de Login" class="ios-input" required>
+                <input type="password" id="u_senha" placeholder="Senha" class="ios-input">
+                
+                <select id="u_tipo" class="ios-input appearance-none">
+                    <option value="usuario">Usuário Comum</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="u_btn_text">Salvar Usuário</span>
+                    <i id="u_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalDetalheFluxo" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalDetalheFluxo')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalDetalheFluxo').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2" id="det_f_titulo">Detalhes da Tarefa</h2>
                 <div class="w-16"></div>
             </div>
@@ -596,7 +661,6 @@
         let pollingInterval = null;
         let ce_files_array = []; 
         let currentPreviewIndex = 0;
-        let currentFiltroVisao = 'pra_voce';
 
         let appState = { 
             currentTab: 'inicio', 
@@ -621,19 +685,15 @@
                 } catch (e) {
                     console.error("Erro na inicialização:", e);
                 } finally {
-                    if(splash) {
-                        splash.style.opacity = '0';
-                        setTimeout(() => { splash.style.display = 'none'; }, 700);
-                    }
+                    splash.style.opacity = '0';
+                    setTimeout(() => { splash.style.display = 'none'; }, 700);
                 }
                 iniciarPolling();
             } else {
-                if(splash) {
-                    setTimeout(() => { 
-                        splash.style.opacity = '0'; 
-                        setTimeout(() => { splash.style.display = 'none'; }, 700);
-                    }, 1000);
-                }
+                setTimeout(() => { 
+                    splash.style.opacity = '0'; 
+                    setTimeout(() => { splash.style.display = 'none'; }, 700);
+                }, 1000);
             }
         };
 
@@ -641,12 +701,8 @@
             if(!dataStr) return '';
             const safeStr = String(dataStr);
             const datePart = safeStr.split('T')[0];
-            
-            const hoje = new Date();
-            const hojeStr = hoje.getFullYear() + '-' + String(hoje.getMonth() + 1).padStart(2, '0') + '-' + String(hoje.getDate()).padStart(2, '0');
-            
-            if (datePart === hojeStr) return 'Hoje';
-            
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (datePart === todayStr) return 'Hoje';
             const partes = datePart.split('-');
             if(partes.length !== 3) return safeStr;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -875,7 +931,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario('${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -912,7 +968,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -931,16 +987,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -981,7 +1037,7 @@
                     thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
                 }
 
-                const encodedFiles = encodeURIComponent(JSON.stringify(itemsParaRenderizar)).replace(/'/g, "%27");
+                const encodedFiles = encodeURIComponent(JSON.stringify(itemsParaRenderizar));
                 const hasMultiple = itemsParaRenderizar.length > 1;
                 
                 const badgeExtra = hasMultiple ? `<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-md px-2 py-0.5 text-[10px] text-white font-bold z-20">+${itemsParaRenderizar.length - 1}</div>` : '';
@@ -989,7 +1045,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum('${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1006,8 +1062,7 @@
         }
 
         // Nova função para abrir os álbuns no modal preview
-        function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openPreviewTaskAlbum(encodedFilesJson, startIndex) {
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1024,9 +1079,271 @@
                     };
                 });
                 openPreview(startIndex);
-            } catch(err) {
-                console.error("Erro ao carregar album", err);
+            } catch(e) {
+                console.error("Erro ao carregar album", e);
             }
+        }
+
+        // FUNÇÕES DE ETAPAS E AVISOS...
+        function openEtapasConfig() {
+            renderListaEtapas();
+            document.getElementById('modalEtapas').classList.add('active');
+        }
+
+        function renderListaEtapas() {
+            const list = document.getElementById('listaEtapas');
+            if(appState.etapas.length === 0) {
+                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`;
+                return;
+            }
+            list.innerHTML = appState.etapas.map(e => `
+                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
+                    <span class="font-medium text-sm">${e.nome || e.Nome}</span>
+                    <button onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 flex items-center justify-center text-red-500 bg-red-100 dark:bg-red-900/30 rounded-full hover:scale-95 transition-transform"><i class="ph-bold ph-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function submitEtapa(e) {
+            e.preventDefault();
+            setBtnLoading('btn_etapa', true);
+            const nome = document.getElementById('nova_etapa_nome').value;
+            const novaEtapa = { id: 'temp_' + Date.now(), nome: nome };
+            appState.etapas.push(novaEtapa);
+            renderListaEtapas();
+            document.getElementById('nova_etapa_nome').value = '';
+            
+            await apiRequest({ action: 'addEtapa', data: novaEtapa });
+            forceSync();
+            setBtnLoading('btn_etapa', false);
+        }
+
+        async function deleteEtapa(id) {
+            if(!confirm("Deseja remover esta etapa?")) return;
+            appState.etapas = appState.etapas.filter(e => (e.id || e.ID) !== id);
+            renderListaEtapas();
+            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
+            forceSync();
+        }
+
+        function openCreateAviso() {
+            document.getElementById('av_titulo').value = '';
+            document.getElementById('av_desc').value = '';
+            document.getElementById('av_alvo_tipo').value = 'todos';
+            toggleAlvoUsuarios();
+            
+            const container = document.getElementById('av_usuarios_lista');
+            container.innerHTML = appState.usuarios.filter(u => (u.ID || u.id) !== currentUser.ID).map(u => `
+                <label class="flex items-center gap-3 p-3 bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer">
+                    <input type="checkbox" value="${u.ID || u.id}" class="av_check_user w-5 h-5 text-iosBlue rounded focus:ring-iosBlue">
+                    <span class="text-sm font-semibold">${u.Nome}</span>
+                </label>
+            `).join('');
+            
+            document.getElementById('modalCreateAviso').classList.add('active');
+        }
+
+        function toggleAlvoUsuarios() {
+            const tipo = document.getElementById('av_alvo_tipo').value;
+            const lista = document.getElementById('av_usuarios_lista');
+            if(tipo === 'especificos') lista.classList.remove('hidden');
+            else lista.classList.add('hidden');
+        }
+
+        async function submitAviso(e) {
+            e.preventDefault();
+            setBtnLoading('av_btn', true);
+            
+            const tipo = document.getElementById('av_alvo_tipo').value;
+            let usuariosSelecionados = [];
+            if(tipo === 'especificos') {
+                document.querySelectorAll('.av_check_user:checked').forEach(el => usuariosSelecionados.push(el.value));
+                if(usuariosSelecionados.length === 0) {
+                    alert("Selecione pelo menos um usuário.");
+                    setBtnLoading('av_btn', false);
+                    return;
+                }
+            }
+            
+            const data = {
+                titulo: document.getElementById('av_titulo').value,
+                descricao: document.getElementById('av_desc').value,
+                alvoTipo: tipo,
+                alvoUsuarios: usuariosSelecionados
+            };
+
+            const res = await apiRequest({ action: 'addAviso', data: data });
+            if(res.success) {
+                closeModal('modalCreateAviso');
+                forceSync();
+            } else {
+                alert("Erro ao criar aviso.");
+            }
+            setBtnLoading('av_btn', false);
+        }
+
+        function verificarAvisosAlerta() {
+            if(!currentUser || !appState.avisos) return;
+            const modal = document.getElementById('modalShowAviso');
+            if(modal.classList.contains('active')) return; 
+            
+            const meusAvisos = appState.avisos.filter(a => {
+                let alvo = a.Alvo || a.alvo;
+                let recebedores = [];
+                
+                try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
+                try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
+                
+                const souAlvo = alvo === 'todos' || (Array.isArray(alvo) && alvo.includes(currentUser.ID));
+                const jaRecebi = Array.isArray(recebedores) && recebedores.includes(currentUser.ID);
+                
+                return souAlvo && !jaRecebi;
+            });
+
+            if(meusAvisos.length > 0) {
+                exibirAviso(meusAvisos[0]);
+            }
+        }
+
+        function exibirAviso(aviso) {
+            currentAvisoId = aviso.ID || aviso.id;
+            document.getElementById('show_aviso_titulo').innerText = aviso.Titulo || aviso.titulo;
+            document.getElementById('show_aviso_desc').innerText = aviso.Descricao || aviso.descricao;
+            
+            const modal = document.getElementById('modalShowAviso');
+            modal.classList.add('active');
+            
+            const audio = document.getElementById('audioAlertaAviso');
+            if(audio) {
+                audio.muted = false; 
+                audio.volume = 1;
+                audio.currentTime = 0;
+                audio.play().catch(e => console.log("Aguardando interação do usuário para tocar o áudio."));
+            }
+        }
+
+        async function confirmarRecebimentoAviso() {
+            if(!currentAvisoId) return;
+            setBtnLoading('conf_av_btn', true);
+            
+            const audio = document.getElementById('audioAlertaAviso');
+            if(audio) {
+                audio.pause();
+                audio.currentTime = 0;
+            }
+            
+            const aIdx = appState.avisos.findIndex(a => (a.ID || a.id) === currentAvisoId);
+            if(aIdx > -1) {
+                let rec = [];
+                try { rec = JSON.parse(appState.avisos[aIdx].Recebedores || appState.avisos[aIdx].recebedores || "[]"); } catch(e){}
+                rec.push(currentUser.ID);
+                appState.avisos[aIdx].Recebedores = JSON.stringify(rec);
+                appState.avisos[aIdx].recebedores = JSON.stringify(rec);
+            }
+            
+            document.getElementById('modalShowAviso').classList.remove('active');
+            await apiRequest({ action: 'confirmarAviso', data: { avisoId: currentAvisoId } });
+            
+            setBtnLoading('conf_av_btn', false);
+            currentAvisoId = null;
+            
+            setTimeout(verificarAvisosAlerta, 800);
+        }
+
+        function openAvisosHistorico() {
+            const container = document.getElementById('lista_avisos_historico');
+            if(!appState.avisos || appState.avisos.length === 0) {
+                container.innerHTML = `<p class="text-center text-gray-500 text-sm mt-10">Nenhum aviso encontrado.</p>`;
+            } else {
+                let avisosSorted = [...appState.avisos].reverse();
+                container.innerHTML = avisosSorted.map(a => {
+                    const dataFormatada = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
+                    return `
+                    <div onclick="openAvisoDetalhes('${a.ID || a.id}')" class="bg-white dark:bg-[#1C1C1E] p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:scale-[0.98] transition-transform">
+                        <div class="flex justify-between items-center mb-1">
+                            <h4 class="font-bold text-iosBlue truncate pr-2">${a.Titulo || a.titulo}</h4>
+                            <span class="text-[10px] text-gray-400 whitespace-nowrap">${dataFormatada}</span>
+                        </div>
+                        <p class="text-xs text-gray-500 line-clamp-1">${a.Descricao || a.descricao}</p>
+                    </div>`;
+                }).join('');
+            }
+            document.getElementById('modalAvisosHistorico').classList.add('active');
+        }
+
+        function openAvisoDetalhes(id) {
+            const a = appState.avisos.find(x => (x.ID || x.id) === id);
+            if(!a) return;
+
+            document.getElementById('det_aviso_titulo').innerText = a.Titulo || a.titulo;
+            document.getElementById('det_aviso_desc').innerText = a.Descricao || a.descricao;
+            document.getElementById('det_aviso_data').innerText = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
+
+            let alvo = a.Alvo || a.alvo;
+            let recebedores = [];
+            try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
+            try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
+
+            let usuariosAlvo = [];
+            const criador = a.CriadoPor || a.criadopor;
+            if(alvo === 'todos') {
+                usuariosAlvo = appState.usuarios.filter(u => (u.ID || u.id) !== criador);
+            } else if (Array.isArray(alvo)) {
+                usuariosAlvo = appState.usuarios.filter(u => alvo.includes(u.ID || u.id));
+            }
+
+            let confirmaram = [];
+            let pendentes = [];
+
+            usuariosAlvo.forEach(u => {
+                const uid = u.ID || u.id;
+                if(recebedores.includes(uid)) confirmaram.push(u);
+                else pendentes.push(u);
+            });
+
+            const htmlUser = (u) => `
+                <div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
+                    <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
+                    <p class="text-sm font-semibold">${u.Nome}</p>
+                </div>`;
+
+            document.getElementById('det_aviso_confirmaram').innerHTML = confirmaram.length > 0 ? confirmaram.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Ninguém confirmou ainda.</p>';
+            document.getElementById('det_aviso_pendentes').innerHTML = pendentes.length > 0 ? pendentes.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Todos confirmaram!</p>';
+
+            document.getElementById('modalAvisoDetalhes').classList.add('active');
+        }
+
+        async function iniciarDemanda(fluxoId) {
+            const btn = document.getElementById('btn_iniciar_' + fluxoId);
+            if(btn) {
+                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
+                btn.disabled = true;
+            }
+
+            const res = await apiRequest({ action: 'iniciarDemandaFluxo', data: { id: fluxoId } });
+            
+            if(res.success) {
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                    
+                    if(fluxoObj[etapaAtualIdx]) {
+                        fluxoObj[etapaAtualIdx].iniciadaEm = new Date().toISOString();
+                    }
+                    
+                    f.Fluxo = JSON.stringify(fluxoObj);
+                    f.fluxo = f.Fluxo;
+                    f.Status = 'em andamento';
+                    f.status = 'em andamento';
+                    
+                    renderAll();
+                }
+            } else {
+                alert(res.error || "Falha ao iniciar a demanda.");
+            }
+            forceSync();
         }
 
         function setFiltroVisao(visao) {
@@ -1045,7 +1362,6 @@
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo;
             
-            // FILTROS DE DEMANDAS
             let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
             let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
             let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
@@ -1080,7 +1396,6 @@
                 return;
             }
 
-            // Inverte a ordem das demandas para mostrar a mais recente primeiro
             tarefasAtivas.reverse();
 
             const grouped = {};
@@ -1128,7 +1443,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1137,8 +1452,8 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1166,17 +1481,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1204,7 +1519,7 @@
                 let anexosHtml = renderAnexos(histArr);
 
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
@@ -1212,7 +1527,7 @@
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="if(typeof event !== 'undefined') { event.stopPropagation(); } deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1320,8 +1635,7 @@
             reader.readAsDataURL(file);
         }
 
-        function openEditUsuario(e, id) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openEditUsuario(id) {
             const user = appState.usuarios.find(u => (u.ID || u.id) === id);
             if(!user) return;
             editingItemId = id;
@@ -1406,8 +1720,7 @@
             openModal('modalTarefa');
         }
 
-        function openEditTarefaFluxo(e, id) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openEditTarefaFluxo(id) {
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === id);
             if(!f) return;
             
@@ -1469,8 +1782,7 @@
             openModal('modalTarefa');
         }
 
-        async function deleteTarefaFluxo(e, id) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function deleteTarefaFluxo(id) {
             if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
             appState.tarefasFluxo = appState.tarefasFluxo.filter(f => (f.ID || f.id) !== id);
             renderTarefas(); renderConcluidas();
@@ -1550,9 +1862,7 @@
             setBtnLoading('t_btn', false);
         }
 
-        // --- FUNÇÕES DE ANEXO E RETORNO DE TAREFA ---
-        function openConcluirEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openConcluirEtapa(fluxoId) {
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
             let etapaNome = "";
             if (f) {
@@ -1664,8 +1974,7 @@
             setBtnLoading('ce_btn', false);
         }
 
-        function openRetornarEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openRetornarEtapa(fluxoId) {
             const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
             if(!f) return;
 
@@ -1732,8 +2041,7 @@
             setBtnLoading('re_btn', false);
         }
 
-        async function iniciarDemanda(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function iniciarDemanda(fluxoId) {
             const btn = document.getElementById('btn_iniciar_' + fluxoId);
             if(btn) {
                 btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
@@ -1845,9 +2153,8 @@
             openPreview(0);
         }
 
-        function openDetalheFluxo(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
-            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+        function openDetalheFluxo(id) {
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === id);
             if(!f) return;
 
             document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
