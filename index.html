@@ -93,8 +93,8 @@
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
-        .slide-modal.active { transform: translateY(0); }
+        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s; visibility: hidden; pointer-events: none; }
+        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -148,7 +148,7 @@
         <i class="ph-bold ph-plus text-2xl"></i>
     </button>
 
-    <main class="px-4 max-w-3xl mx-auto min-h-screen pb-40">
+    <main class="px-4 max-w-3xl mx-auto min-h-screen pb-52">
         
         <div class="sticky top-0 z-40 pt-safe-top pb-4 -mx-4 px-4 bg-[#f2f2f7]/90 dark:bg-[#000000]/90 backdrop-blur-xl flex items-center justify-between mb-2">
             <div class="flex items-center gap-3">
@@ -206,7 +206,7 @@
         </div>
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
-            <div class="flex justify-between items-center mb-2">
+            <div class="flex justify-between items-center mb-4">
                 <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
             </div>
             
@@ -219,11 +219,11 @@
             <div class="flex gap-2 mb-6">
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Início</label>
-                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1">
+                    <input type="date" id="filtroDataInicioTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
                 </div>
                 <div class="flex-1">
                     <label class="text-xs text-gray-500 font-bold uppercase ml-1">Data de Entrega</label>
-                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1">
+                    <input type="date" id="filtroDataEntregaTarefa" onchange="renderTarefas()" class="ios-input py-3 px-4 text-sm shadow-sm mt-1 appearance-none bg-white dark:bg-[#1C1C1E] min-h-[48px] block w-full">
                 </div>
             </div>
 
@@ -972,7 +972,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1041,7 +1041,7 @@
                     thumbUrl = `https://drive.google.com/thumbnail?id=${driveMatch[0]}&sz=w500`;
                 }
 
-                const encodedFiles = encodeURIComponent(JSON.stringify(itemsParaRenderizar));
+                const encodedFiles = encodeURIComponent(JSON.stringify(itemsParaRenderizar)).replace(/'/g, "%27");
                 const hasMultiple = itemsParaRenderizar.length > 1;
                 
                 const badgeExtra = hasMultiple ? `<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-md px-2 py-0.5 text-[10px] text-white font-bold z-20">+${itemsParaRenderizar.length - 1}</div>` : '';
@@ -1603,38 +1603,6 @@
             if(!res.success) { console.error("Erro: " + res.error); }
             forceSync();
             setBtnLoading('t_btn', false);
-        }
-
-        // --- FUNÇÕES DE ANEXO E RETORNO DE TAREFA ---
-        function openConcluirEtapa(fluxoId) {
-            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
-            let etapaNome = "";
-            if (f) {
-                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
-                let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
-                etapaNome = (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "").toLowerCase();
-            }
-
-            document.getElementById('ce_tarefa_id').value = fluxoId;
-            document.getElementById('ce_arquivo').value = '';
-            ce_files_array = [];
-            document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
-            document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
-            
-            const uploadArea = document.getElementById('ce_upload_area');
-            const descArea = document.getElementById('ce_desc_area');
-            
-            if(etapaNome.includes('aprova') || etapaNome.includes('revis')) {
-                if(uploadArea) uploadArea.style.display = 'none';
-                if(descArea) descArea.innerText = 'Deseja confirmar a aprovação e avançar a tarefa?';
-                document.getElementById('ce_btn_text').innerText = 'Aprovar';
-            } else {
-                if(uploadArea) uploadArea.style.display = 'flex';
-                if(descArea) descArea.innerText = 'Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).';
-                document.getElementById('ce_btn_text').innerText = 'Confirmar e Avançar';
-            }
-
-            openModal('modalConcluirEtapa');
         }
 
         function previewConcluirArquivo(event) {
