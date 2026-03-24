@@ -15,7 +15,7 @@
     <link rel="preconnect" href="https://drive.google.com">
     <link rel="preconnect" href="https://lh3.googleusercontent.com">
 
-    <title>Team Gov - Gestão Inteligênte</title>
+    <title>Team Gov - Gestão Inteligente</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -206,10 +206,15 @@
         </div>
 
         <div id="view-tarefas" class="view-section hidden space-y-4">
-            <div class="flex justify-between items-center mb-4">
+            <div class="flex justify-between items-center mb-2">
                 <h1 class="text-3xl font-extrabold tracking-tight">Demandas</h1>
             </div>
             
+            <div class="flex p-1 bg-gray-200 dark:bg-gray-800 rounded-xl mb-4">
+                <button id="tabPraVoce" onclick="setFiltroVisao('pra_voce')" class="flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all">Pra você</button>
+                <button id="tabEquipe" onclick="setFiltroVisao('equipe')" class="flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all">Equipe</button>
+            </div>
+
             <input type="text" id="filtroAssuntoTarefa" onkeyup="renderTarefas()" placeholder="Filtrar por assunto..." class="ios-input py-3 px-4 text-sm shadow-sm mb-2">
             <div class="flex gap-2 mb-6">
                 <div class="flex-1">
@@ -659,6 +664,7 @@
         let pollingInterval = null;
         let ce_files_array = []; 
         let currentPreviewIndex = 0;
+        let currentFiltroVisao = 'pra_voce';
 
         let appState = { 
             currentTab: 'inicio', 
@@ -699,8 +705,13 @@
             if(!dataStr) return '';
             const safeStr = String(dataStr);
             const datePart = safeStr.split('T')[0];
-            const todayStr = new Date().toISOString().split('T')[0];
-            if (datePart === todayStr) return 'Hoje';
+            
+            const dateObj = new Date(datePart + 'T12:00:00');
+            const todayObj = new Date();
+            if (dateObj.getDate() === todayObj.getDate() && dateObj.getMonth() === todayObj.getMonth() && dateObj.getFullYear() === todayObj.getFullYear()) {
+                return 'Hoje';
+            }
+            
             const partes = datePart.split('-');
             if(partes.length !== 3) return safeStr;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
@@ -961,7 +972,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -980,16 +991,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1002,7 +1013,7 @@
             document.getElementById('modalPerfilUsuario').classList.add('active');
         }
 
-        // Nova função isolada para renderizar os cartões de anexos com suporte a álbuns
+        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1038,7 +1049,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskAlbum('${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="event.stopPropagation(); openPreviewTaskAlbum('${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1077,271 +1088,23 @@
             }
         }
 
-        function openEtapasConfig() {
-            renderListaEtapas();
-            openModal('modalEtapas');
-        }
-
-        function renderListaEtapas() {
-            const list = document.getElementById('listaEtapas');
-            if(appState.etapas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`;
-                return;
-            }
-            list.innerHTML = appState.etapas.map(e => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                    <span class="font-medium text-sm">${e.nome || e.Nome}</span>
-                    <button onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 flex items-center justify-center text-red-500 bg-red-100 dark:bg-red-900/30 rounded-full hover:scale-95 transition-transform"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            `).join('');
-        }
-
-        async function submitEtapa(e) {
-            e.preventDefault();
-            setBtnLoading('btn_etapa', true);
-            const nome = document.getElementById('nova_etapa_nome').value;
-            const novaEtapa = { id: 'temp_' + Date.now(), nome: nome };
-            appState.etapas.push(novaEtapa);
-            renderListaEtapas();
-            document.getElementById('nova_etapa_nome').value = '';
-            
-            await apiRequest({ action: 'addEtapa', data: novaEtapa });
-            forceSync();
-            setBtnLoading('btn_etapa', false);
-        }
-
-        async function deleteEtapa(id) {
-            if(!confirm("Deseja remover esta etapa?")) return;
-            appState.etapas = appState.etapas.filter(e => (e.id || e.ID) !== id);
-            renderListaEtapas();
-            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
-            forceSync();
-        }
-
-        function openCreateAviso() {
-            document.getElementById('av_titulo').value = '';
-            document.getElementById('av_desc').value = '';
-            document.getElementById('av_alvo_tipo').value = 'todos';
-            toggleAlvoUsuarios();
-            
-            const container = document.getElementById('av_usuarios_lista');
-            container.innerHTML = appState.usuarios.filter(u => (u.ID || u.id) !== currentUser.ID).map(u => `
-                <label class="flex items-center gap-3 p-3 bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer">
-                    <input type="checkbox" value="${u.ID || u.id}" class="av_check_user w-5 h-5 text-iosBlue rounded focus:ring-iosBlue">
-                    <span class="text-sm font-semibold">${u.Nome}</span>
-                </label>
-            `).join('');
-            
-            openModal('modalCreateAviso');
-        }
-
-        function toggleAlvoUsuarios() {
-            const tipo = document.getElementById('av_alvo_tipo').value;
-            const lista = document.getElementById('av_usuarios_lista');
-            if(tipo === 'especificos') lista.classList.remove('hidden');
-            else lista.classList.add('hidden');
-        }
-
-        async function submitAviso(e) {
-            e.preventDefault();
-            setBtnLoading('av_btn', true);
-            
-            const tipo = document.getElementById('av_alvo_tipo').value;
-            let usuariosSelecionados = [];
-            if(tipo === 'especificos') {
-                document.querySelectorAll('.av_check_user:checked').forEach(el => usuariosSelecionados.push(el.value));
-                if(usuariosSelecionados.length === 0) {
-                    alert("Selecione pelo menos um usuário.");
-                    setBtnLoading('av_btn', false);
-                    return;
-                }
-            }
-            
-            const data = {
-                titulo: document.getElementById('av_titulo').value,
-                descricao: document.getElementById('av_desc').value,
-                alvoTipo: tipo,
-                alvoUsuarios: usuariosSelecionados
-            };
-
-            const res = await apiRequest({ action: 'addAviso', data: data });
-            if(res.success) {
-                closeModal('modalCreateAviso');
-                forceSync();
+        function setFiltroVisao(visao) {
+            currentFiltroVisao = visao;
+            if(visao === 'pra_voce') {
+                document.getElementById('tabPraVoce').className = 'flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all';
+                document.getElementById('tabEquipe').className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all';
             } else {
-                alert("Erro ao criar aviso.");
+                document.getElementById('tabEquipe').className = 'flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all';
+                document.getElementById('tabPraVoce').className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all';
             }
-            setBtnLoading('av_btn', false);
-        }
-
-        function verificarAvisosAlerta() {
-            if(!currentUser || !appState.avisos) return;
-            const modal = document.getElementById('modalShowAviso');
-            if(modal.classList.contains('active')) return; 
-            
-            const meusAvisos = appState.avisos.filter(a => {
-                let alvo = a.Alvo || a.alvo;
-                let recebedores = [];
-                
-                try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
-                try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
-                
-                const souAlvo = alvo === 'todos' || (Array.isArray(alvo) && alvo.includes(currentUser.ID));
-                const jaRecebi = Array.isArray(recebedores) && recebedores.includes(currentUser.ID);
-                
-                return souAlvo && !jaRecebi;
-            });
-
-            if(meusAvisos.length > 0) {
-                exibirAviso(meusAvisos[0]);
-            }
-        }
-
-        function exibirAviso(aviso) {
-            currentAvisoId = aviso.ID || aviso.id;
-            document.getElementById('show_aviso_titulo').innerText = aviso.Titulo || aviso.titulo;
-            document.getElementById('show_aviso_desc').innerText = aviso.Descricao || aviso.descricao;
-            
-            const modal = document.getElementById('modalShowAviso');
-            modal.classList.add('active');
-            
-            const audio = document.getElementById('audioAlertaAviso');
-            if(audio) {
-                audio.muted = false; 
-                audio.volume = 1;
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log("Aguardando interação do usuário para tocar o áudio."));
-            }
-        }
-
-        async function confirmarRecebimentoAviso() {
-            if(!currentAvisoId) return;
-            setBtnLoading('conf_av_btn', true);
-            
-            const audio = document.getElementById('audioAlertaAviso');
-            if(audio) {
-                audio.pause();
-                audio.currentTime = 0;
-            }
-            
-            const aIdx = appState.avisos.findIndex(a => (a.ID || a.id) === currentAvisoId);
-            if(aIdx > -1) {
-                let rec = [];
-                try { rec = JSON.parse(appState.avisos[aIdx].Recebedores || appState.avisos[aIdx].recebedores || "[]"); } catch(e){}
-                rec.push(currentUser.ID);
-                appState.avisos[aIdx].Recebedores = JSON.stringify(rec);
-                appState.avisos[aIdx].recebedores = JSON.stringify(rec);
-            }
-            
-            document.getElementById('modalShowAviso').classList.remove('active');
-            await apiRequest({ action: 'confirmarAviso', data: { avisoId: currentAvisoId } });
-            
-            setBtnLoading('conf_av_btn', false);
-            currentAvisoId = null;
-            
-            setTimeout(verificarAvisosAlerta, 800);
-        }
-
-        function openAvisosHistorico() {
-            const container = document.getElementById('lista_avisos_historico');
-            if(!appState.avisos || appState.avisos.length === 0) {
-                container.innerHTML = `<p class="text-center text-gray-500 text-sm mt-10">Nenhum aviso encontrado.</p>`;
-            } else {
-                let avisosSorted = [...appState.avisos].reverse();
-                container.innerHTML = avisosSorted.map(a => {
-                    const dataFormatada = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
-                    return `
-                    <div onclick="openAvisoDetalhes('${a.ID || a.id}')" class="bg-white dark:bg-[#1C1C1E] p-4 rounded-xl shadow-sm border border-gray-200 dark:border-gray-800 cursor-pointer hover:scale-[0.98] transition-transform">
-                        <div class="flex justify-between items-center mb-1">
-                            <h4 class="font-bold text-iosBlue truncate pr-2">${a.Titulo || a.titulo}</h4>
-                            <span class="text-[10px] text-gray-400 whitespace-nowrap">${dataFormatada}</span>
-                        </div>
-                        <p class="text-xs text-gray-500 line-clamp-1">${a.Descricao || a.descricao}</p>
-                    </div>`;
-                }).join('');
-            }
-            openModal('modalAvisosHistorico');
-        }
-
-        function openAvisoDetalhes(id) {
-            const a = appState.avisos.find(x => (x.ID || x.id) === id);
-            if(!a) return;
-
-            document.getElementById('det_aviso_titulo').innerText = a.Titulo || a.titulo;
-            document.getElementById('det_aviso_desc').innerText = a.Descricao || a.descricao;
-            document.getElementById('det_aviso_data').innerText = a.DataCriacao || a.datacriacao ? formatarDataPTBR(a.DataCriacao || a.datacriacao) : '';
-
-            let alvo = a.Alvo || a.alvo;
-            let recebedores = [];
-            try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
-            try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
-
-            let usuariosAlvo = [];
-            const criador = a.CriadoPor || a.criadopor;
-            if(alvo === 'todos') {
-                usuariosAlvo = appState.usuarios.filter(u => (u.ID || u.id) !== criador);
-            } else if (Array.isArray(alvo)) {
-                usuariosAlvo = appState.usuarios.filter(u => alvo.includes(u.ID || u.id));
-            }
-
-            let confirmaram = [];
-            let pendentes = [];
-
-            usuariosAlvo.forEach(u => {
-                const uid = u.ID || u.id;
-                if(recebedores.includes(uid)) confirmaram.push(u);
-                else pendentes.push(u);
-            });
-
-            const htmlUser = (u) => `
-                <div class="flex items-center gap-3 p-2 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
-                    <p class="text-sm font-semibold">${u.Nome}</p>
-                </div>`;
-
-            document.getElementById('det_aviso_confirmaram').innerHTML = confirmaram.length > 0 ? confirmaram.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Ninguém confirmou ainda.</p>';
-            document.getElementById('det_aviso_pendentes').innerHTML = pendentes.length > 0 ? pendentes.map(htmlUser).join('') : '<p class="text-xs text-gray-400 px-2">Todos confirmaram!</p>';
-
-            openModal('modalAvisoDetalhes');
-        }
-
-        async function iniciarDemanda(fluxoId) {
-            const btn = document.getElementById('btn_iniciar_' + fluxoId);
-            if(btn) {
-                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
-                btn.disabled = true;
-            }
-
-            const res = await apiRequest({ action: 'iniciarDemandaFluxo', data: { id: fluxoId } });
-            
-            if(res.success) {
-                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
-                if(fIdx > -1) {
-                    let f = appState.tarefasFluxo[fIdx];
-                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
-                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
-                    
-                    if(fluxoObj[etapaAtualIdx]) {
-                        fluxoObj[etapaAtualIdx].iniciadaEm = new Date().toISOString();
-                    }
-                    
-                    f.Fluxo = JSON.stringify(fluxoObj);
-                    f.fluxo = f.Fluxo;
-                    f.Status = 'em andamento';
-                    f.status = 'em andamento';
-                    
-                    renderAll();
-                }
-            } else {
-                alert(res.error || "Falha ao iniciar a demanda.");
-            }
-            forceSync();
+            renderTarefas();
         }
 
         function renderTarefas() {
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo;
             
+            // FILTROS DE DEMANDAS
             let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
             let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
             let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
@@ -1349,6 +1112,9 @@
             let tarefasAtivas = tarefas.filter(f => {
                 if ((f.Status || f.status) === 'concluida') return false;
                 
+                const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
+                if (currentFiltroVisao === 'pra_voce' && usuarioAtualVal !== currentUser.ID) return false;
+
                 if (filtroAssunto) {
                     let text = (String(f.Titulo || f.titulo || '') + ' ' + String(f.Descricao || f.descricao || '')).toLowerCase();
                     if (!text.includes(filtroAssunto)) return false;
@@ -1418,7 +1184,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1427,10 +1193,10 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="event.stopPropagation(); openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
-                                <button onclick="openDetalheFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-clock-counter-clockwise"></i> Histórico</button>
+                                <button onclick="event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-clock-counter-clockwise"></i> Histórico</button>
                             </div>
                         </div>
                         
@@ -1457,17 +1223,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1495,16 +1261,16 @@
                 let anexosHtml = renderAnexos(histArr);
 
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative">
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button onclick="event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <button onclick="deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -2018,6 +1784,182 @@
             closeModal('modalRetornarEtapa');
             forceSync(); 
             setBtnLoading('re_btn', false);
+        }
+
+        function openPreviewTaskFile(url, name, type) {
+            let driveId = null;
+            const driveMatch = url.match(/[-\w]{25,}/);
+            if(url.includes('drive.google.com') && driveMatch) {
+                driveId = driveMatch[0];
+            }
+            
+            currentGalleryFiles = [{
+                url: url,
+                name: name || 'Anexo',
+                type: type && type.includes('video') ? 'video' : 'image',
+                id: driveId
+            }];
+            openPreview(0);
+        }
+
+        function openDetalheFluxo(fluxoId) {
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+            if(!f) return;
+
+            document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
+            
+            let fluxoArr = [];
+            let histArr = [];
+            try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+            try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
+            
+            const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+            const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+
+            document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
+                const isPassado = idx < etapaAtualIdx;
+                const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
+                const user = appState.usuarios.find(u => (u.ID || u.id) === et.usuarioId);
+                const userName = user ? user.Nome : 'Desconhecido';
+                
+                let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
+                let txtColor = 'text-gray-400';
+                if(isPassado) { icon = '<i class="ph-fill ph-check-circle text-green-500 text-base"></i>'; txtColor = 'text-gray-500 line-through'; }
+                if(isAtual) { icon = '<i class="ph-fill ph-record text-iosBlue text-base animate-pulse"></i>'; txtColor = 'text-gray-900 dark:text-white font-bold'; }
+
+                return `
+                <div class="flex gap-3 relative">
+                    <div class="absolute -left-[1.35rem] bg-white dark:bg-[#1C1C1E] py-1">${icon}</div>
+                    <div>
+                        <p class="text-sm ${txtColor}">${idx+1}. ${et.etapa}</p>
+                        <p class="text-[10px] text-gray-500 flex items-center gap-1"><i class="ph-bold ph-user"></i> ${userName}</p>
+                    </div>
+                </div>`;
+            }).join('');
+
+            document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
+                const date = new Date(h.data).toLocaleString('pt-BR');
+                let anexosHtml = renderAnexos([h]);
+                return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${date}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexosHtml}</div>`;
+            }).join('') || 'Sem histórico';
+
+            openModal('modalDetalheFluxo');
+        }
+
+        function openEditMaterial(id) {
+            const m = appState.materiais.find(x => (x.ID || x.id) === id);
+            if(!m) return;
+            editingItemId = id;
+            document.getElementById('modalMaterialTitle').innerText = 'Editar Material';
+            document.getElementById('m_titulo').value = m.titulo || m.Titulo;
+            document.getElementById('m_desc').value = m.descricao || m.Descricao;
+            document.getElementById('m_link').value = m.linkDrive || m.linkdrive || m.LinkDrive;
+            document.getElementById('m_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalMaterial');
+        }
+
+        async function deleteMaterial(id) {
+            if(!confirm("Deseja excluir este material?")) return;
+            appState.materiais = appState.materiais.filter(m => (m.ID || m.id) !== id);
+            renderMateriais();
+            await apiRequest({ action: 'deleteMaterial', data: { id: id } });
+            forceSync();
+        }
+
+        async function submitMaterial(e) {
+            e.preventDefault(); setBtnLoading('m_btn', true);
+            const matData = { titulo: document.getElementById('m_titulo').value, descricao: document.getElementById('m_desc').value, linkDrive: document.getElementById('m_link').value };
+            
+            if (editingItemId) {
+                matData.id = editingItemId;
+                const idx = appState.materiais.findIndex(m => (m.id || m.ID) === editingItemId);
+                if(idx > -1) { appState.materiais[idx].titulo = matData.titulo; appState.materiais[idx].descricao = matData.descricao; appState.materiais[idx].linkDrive = matData.linkDrive; }
+            } else {
+                matData.id = 'temp_' + Date.now();
+                appState.materiais.push(matData);
+            }
+            renderMateriais();
+            closeModal('modalMaterial');
+
+            if (editingItemId) {
+                await apiRequest({ action: 'editMaterial', data: matData });
+            } else {
+                await apiRequest({ action: 'addMaterial', data: matData });
+            }
+            forceSync();
+            setBtnLoading('m_btn', false);
+        }
+
+        async function openGallery(materialId) {
+            const mat = appState.materiais.find(m => (m.id || m.ID) === materialId);
+            if(!mat) return;
+            document.getElementById('galleryTitle').innerText = mat.titulo || mat.Titulo;
+            document.getElementById('modalGallery').classList.add('active');
+            const grid = document.getElementById('galleryGrid');
+
+            if (galleryCache[materialId]) {
+                currentGalleryFiles = galleryCache[materialId];
+                if (currentGalleryFiles.length > 0) {
+                    renderGalleryGrid(currentGalleryFiles);
+                } else {
+                    grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><p>Pasta vazia.</p></div>`;
+                }
+                return; 
+            }
+
+            grid.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 text-gray-400"><i class="ph-bold ph-spinner animate-spin text-4xl mb-3 text-iosBlue"></i><p class="text-sm">Buscando arquivos...</p></div>`;
+
+            const linkFolder = mat.linkDrive || mat.linkdrive || mat.LinkDrive;
+            const res = await apiRequest({ action: 'getDriveFiles', link: linkFolder });
+            
+            if(res.success && res.files && res.files.length > 0) {
+                currentGalleryFiles = res.files;
+                galleryCache[materialId] = currentGalleryFiles; 
+                renderGalleryGrid(currentGalleryFiles);
+            } else if (res.success && res.files && res.files.length === 0) {
+                galleryCache[materialId] = []; 
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><p>Pasta vazia.</p></div>`;
+            } else {
+                grid.innerHTML = `<div class="col-span-full text-center py-20 text-gray-400"><i class="ph-bold ph-warning text-4xl mb-3 text-red-500"></i><p>${res.error}</p></div>`;
+            }
+        }
+
+        function renderGalleryGrid(files) {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = files.map((file, index) => {
+                const isVideo = file.type === 'video' || file.name.match(/\.(mp4|mov|avi|mkv)$/i);
+                const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                const bgColors = isVideo ? 'from-gray-700 to-gray-900' : 'from-iosBlue to-blue-800';
+                
+                let thumbUrl = file.url;
+                if (file.url.includes('drive.google.com') && file.id) {
+                    thumbUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w500`;
+                }
+
+                return `
+                <div class="w-full relative block">
+                    <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1 1'%3E%3C/svg%3E" class="w-full block opacity-0 pointer-events-none" alt="">
+                    <div onclick="openPreview(${index})" class="absolute inset-0 rounded-2xl bg-gradient-to-br ${bgColors} overflow-hidden shadow-sm hover:scale-[0.98] transition-transform cursor-pointer flex flex-col items-center justify-center">
+                        
+                        ${(file.id) ? `<img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover" onerror="this.style.display='none'">` : ''}
+                        
+                        <div class="absolute inset-0 bg-black/20 pointer-events-none"></div>
+                        
+                        ${isVideo || !file.id ? `<i class="ph-fill ${icon} text-4xl mb-2 text-white/50 relative z-10 pointer-events-none"></i>` : ''}
+                        
+                        ${isVideo ? `<div class="absolute top-2 right-2 bg-black/60 backdrop-blur-md rounded-md px-2 py-0.5 text-[10px] text-white font-bold flex items-center gap-1 z-10 pointer-events-none"><i class="ph-fill ph-play-circle"></i> VÍDEO</div>` : ''}
+                        
+                        <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-10 pointer-events-none">
+                            <p class="text-white text-[11px] font-semibold truncate">${file.name}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function closeGallery() { 
+            document.getElementById('modalGallery').classList.remove('active'); 
+            currentGalleryFiles = []; 
         }
 
         function openPreview(fileIndex) {
