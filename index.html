@@ -379,7 +379,7 @@
                         <div id="ce_progress_bar" class="bg-iosBlue h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
-
+                
                 <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -599,7 +599,7 @@
         let galleryCache = {}; 
         let currentAvisoId = null;
         let pollingInterval = null;
-        let ce_files_array = []; 
+        let raw_files_array = []; 
         let currentPreviewIndex = 0;
         let currentFiltroVisao = 'pra_voce';
 
@@ -672,6 +672,7 @@
 
         function aplicarRegrasUsuario() {
             if(!currentUser) return;
+            const currentUserId = currentUser.ID || currentUser.id;
             document.getElementById('user_profile_name').innerText = `Olá, ${currentUser.Nome.split(' ')[0]}`;
             document.getElementById('user_profile_role').innerText = currentUser.Funcao || 'Membro';
             if(currentUser.FotoPerfilURL) document.getElementById('user_profile_img').src = currentUser.FotoPerfilURL;
@@ -754,7 +755,7 @@
                 return { success: false };
             }
             if(currentUser && payload.action !== 'login') {
-                payload.requestUserId = currentUser.ID;
+                payload.requestUserId = currentUser.ID || currentUser.id;
             }
             try {
                 const response = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -765,11 +766,12 @@
         async function fetchData() {
             if(!currentUser) return;
             try {
-                const response = await fetch(`${WEB_APP_URL}?action=getAll&userId=${currentUser.ID}`);
+                const response = await fetch(`${WEB_APP_URL}?action=getAll&userId=${currentUser.ID || currentUser.id}`);
                 const data = await response.json();
                 if(data.tarefasFluxo) { 
                     appState = { ...appState, ...data }; 
                     if(!appState.etapas) appState.etapas = []; 
+                    if(!appState.usuarios) appState.usuarios = []; 
                     renderAll(); 
                 }
             } catch (error) {}
@@ -804,7 +806,7 @@
                 
                 if(tabName === 'concluidas' || tabName === 'config') { 
                     btn.style.display = 'none'; 
-                } else if ((tabName === 'tarefas' || tabName === 'equipe') && currentUser.TipoUsuario !== 'admin') {
+                } else if ((tabName === 'tarefas' || tabName === 'equipe') && currentUser && currentUser.TipoUsuario !== 'admin') {
                     btn.style.display = 'none'; 
                 } else { 
                     btn.style.display = 'flex'; 
@@ -825,8 +827,7 @@
         }
 
         function renderOnlineCounter() {
-            if(!appState.usuarios) return;
-            const onlineUsers = appState.usuarios.filter(u => u.IsOnline).length;
+            const onlineUsers = (appState.usuarios || []).filter(u => u.IsOnline).length;
             const counterEl = document.getElementById('online_counter');
             const textEl = document.getElementById('online_count_text');
             
@@ -841,8 +842,8 @@
         }
 
         function renderDashboard() {
-            const total = appState.tarefasFluxo.length;
-            const concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida').length;
+            const total = (appState.tarefasFluxo || []).length;
+            const concluidas = (appState.tarefasFluxo || []).filter(t => (t.Status || t.status) === 'concluida').length;
             const percent = total === 0 ? 0 : Math.round((concluidas / total) * 100);
 
             document.getElementById('dashPercent').innerText = `${percent}%`;
@@ -858,7 +859,7 @@
 
         function renderEquipe() {
             const list = document.getElementById('equipeList');
-            if(appState.usuarios.length === 0) {
+            if(!appState.usuarios || appState.usuarios.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 mt-10">Nenhum usuário.</p>`; return;
             }
             
@@ -880,7 +881,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -889,7 +890,7 @@
         }
 
         function openPerfilUsuario(userId) {
-            const user = appState.usuarios.find(u => (u.ID || u.id) === userId);
+            const user = (appState.usuarios || []).find(u => (u.ID || u.id) === userId);
             if(!user) return;
             
             document.getElementById('perf_foto').src = user.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(user.Nome);
@@ -897,7 +898,7 @@
             document.getElementById('perf_funcao').innerText = user.Funcao;
             
             const list = document.getElementById('perf_tarefas_list');
-            const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
+            const userTarefas = (appState.tarefasFluxo || []).filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
@@ -912,7 +913,8 @@
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
                     const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     const idVal = f.ID !== undefined ? f.ID : f.id;
-                    const isMinhaVez = (userId === currentUser.ID);
+                    const currentUserId = currentUser.ID || currentUser.id;
+                    const isMinhaVez = (userId === currentUserId);
 
                     let anexosHtml = renderAnexos(histArr);
 
@@ -936,16 +938,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -958,7 +960,6 @@
             openModal('modalPerfilUsuario');
         }
 
-        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -994,7 +995,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1010,7 +1011,6 @@
             return anexosHtml;
         }
 
-        // Nova função para abrir os álbuns no modal preview
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
@@ -1034,169 +1034,834 @@
             }
         }
 
-        function openEtapasConfig() {
-            renderListaEtapas();
-            openModal('modalEtapas');
+        function setFiltroVisao(visao) {
+            currentFiltroVisao = visao;
+            if(visao === 'pra_voce') {
+                document.getElementById('tabPraVoce').className = 'flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all';
+                document.getElementById('tabEquipe').className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all';
+            } else {
+                document.getElementById('tabEquipe').className = 'flex-1 py-2 text-sm font-bold rounded-lg shadow-sm bg-white dark:bg-[#1C1C1E] text-iosBlue transition-all';
+                document.getElementById('tabPraVoce').className = 'flex-1 py-2 text-sm font-bold rounded-lg text-gray-500 transition-all';
+            }
+            renderTarefas();
         }
 
-        function renderListaEtapas() {
-            const list = document.getElementById('listaEtapas');
-            if(appState.etapas.length === 0) {
-                list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`;
+        function renderTarefas() {
+            const list = document.getElementById('tarefasList');
+            let tarefas = appState.tarefasFluxo || [];
+            
+            let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
+            let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
+            let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
+            const currentUserId = currentUser.ID || currentUser.id;
+
+            let tarefasAtivas = tarefas.filter(f => {
+                if ((f.Status || f.status) === 'concluida') return false;
+                
+                const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
+                if (currentFiltroVisao === 'pra_voce' && usuarioAtualVal !== currentUserId) return false;
+
+                if (filtroAssunto) {
+                    let text = (String(f.Titulo || f.titulo || '') + ' ' + String(f.Descricao || f.descricao || '')).toLowerCase();
+                    if (!text.includes(filtroAssunto)) return false;
+                }
+                if (filtroDataEntrega) {
+                    let prazo = String(f.Prazo || f.prazo || "");
+                    if (!prazo.startsWith(filtroDataEntrega)) return false;
+                }
+                if (filtroDataInicio) {
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    let etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+                    let etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+                    let etapaAtualInfo = fluxoObj[etapaAtualIdx] || {};
+                    let iniciadaEm = String(etapaAtualInfo.iniciadaEm || "");
+                    if (!iniciadaEm.startsWith(filtroDataInicio)) return false;
+                }
+                return true;
+            });
+            
+            if(tarefasAtivas.length === 0) {
+                list.innerHTML = `<div class="text-center text-gray-400 py-10"><i class="ph-thin ph-list-bullets text-6xl mb-2"></i><p>Nenhuma demanda ativa.</p></div>`;
                 return;
             }
-            list.innerHTML = appState.etapas.map(e => `
-                <div class="flex justify-between items-center p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-800">
-                    <span class="font-medium text-sm">${e.nome || e.Nome}</span>
-                    <button onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 flex items-center justify-center text-red-500 bg-red-100 dark:bg-red-900/30 rounded-full hover:scale-95 transition-transform"><i class="ph-bold ph-trash"></i></button>
-                </div>
-            `).join('');
-        }
 
-        async function submitEtapa(e) {
-            e.preventDefault();
-            setBtnLoading('btn_etapa', true);
-            const nome = document.getElementById('nova_etapa_nome').value;
-            const novaEtapa = { id: 'temp_' + Date.now(), nome: nome };
-            appState.etapas.push(novaEtapa);
-            renderListaEtapas();
-            document.getElementById('nova_etapa_nome').value = '';
-            
-            await apiRequest({ action: 'addEtapa', data: novaEtapa });
-            forceSync();
-            setBtnLoading('btn_etapa', false);
-        }
+            tarefasAtivas.reverse();
 
-        async function deleteEtapa(id) {
-            if(!confirm("Deseja remover esta etapa?")) return;
-            appState.etapas = appState.etapas.filter(e => (e.id || e.ID) !== id);
-            renderListaEtapas();
-            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
-            forceSync();
-        }
-
-        function openCreateAviso() {
-            document.getElementById('av_titulo').value = '';
-            document.getElementById('av_desc').value = '';
-            document.getElementById('av_alvo_tipo').value = 'todos';
-            toggleAlvoUsuarios();
-            
-            const container = document.getElementById('av_usuarios_lista');
-            container.innerHTML = appState.usuarios.filter(u => (u.ID || u.id) !== currentUser.ID).map(u => `
-                <label class="flex items-center gap-3 p-3 bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-700 rounded-xl cursor-pointer">
-                    <input type="checkbox" value="${u.ID || u.id}" class="av_check_user w-5 h-5 text-iosBlue rounded focus:ring-iosBlue">
-                    <span class="text-sm font-semibold">${u.Nome}</span>
-                </label>
-            `).join('');
-            
-            openModal('modalCreateAviso');
-        }
-
-        function toggleAlvoUsuarios() {
-            const tipo = document.getElementById('av_alvo_tipo').value;
-            const lista = document.getElementById('av_usuarios_lista');
-            if(tipo === 'especificos') lista.classList.remove('hidden');
-            else lista.classList.add('hidden');
-        }
-
-        async function submitAviso(e) {
-            e.preventDefault();
-            setBtnLoading('av_btn', true);
-            
-            const tipo = document.getElementById('av_alvo_tipo').value;
-            let usuariosSelecionados = [];
-            if(tipo === 'especificos') {
-                document.querySelectorAll('.av_check_user:checked').forEach(el => usuariosSelecionados.push(el.value));
-                if(usuariosSelecionados.length === 0) {
-                    alert("Selecione pelo menos um usuário.");
-                    setBtnLoading('av_btn', false);
-                    return;
-                }
-            }
-            
-            const data = {
-                titulo: document.getElementById('av_titulo').value,
-                descricao: document.getElementById('av_desc').value,
-                alvoTipo: tipo,
-                alvoUsuarios: usuariosSelecionados
-            };
-
-            const res = await apiRequest({ action: 'addAviso', data: data });
-            if(res.success) {
-                closeModal('modalCreateAviso');
-                forceSync();
-            } else {
-                alert("Erro ao criar aviso.");
-            }
-            setBtnLoading('av_btn', false);
-        }
-
-        function verificarAvisosAlerta() {
-            if(!currentUser || !appState.avisos) return;
-            const modal = document.getElementById('modalShowAviso');
-            if(modal.classList.contains('active')) return; 
-            
-            const meusAvisos = appState.avisos.filter(a => {
-                let alvo = a.Alvo || a.alvo;
-                let recebedores = [];
-                
-                try { if(alvo !== 'todos') alvo = JSON.parse(alvo); } catch(e){}
-                try { recebedores = JSON.parse(a.Recebedores || a.recebedores || "[]"); } catch(e){}
-                
-                const souAlvo = alvo === 'todos' || (Array.isArray(alvo) && alvo.includes(currentUser.ID));
-                const jaRecebi = Array.isArray(recebedores) && recebedores.includes(currentUser.ID);
-                
-                return souAlvo && !jaRecebi;
+            const grouped = {};
+            tarefasAtivas.forEach(f => {
+                let rawDate = f.DataCriacao || f.Datacriacao || f.datacriacao || "0000-00-00"; 
+                if(!grouped[rawDate]) grouped[rawDate] = [];
+                grouped[rawDate].push(f);
             });
 
-            if(meusAvisos.length > 0) {
-                exibirAviso(meusAvisos[0]);
+            const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+            const todayStr = new Date().toISOString().split('T')[0];
+
+            let html = '';
+            sortedDates.forEach(date => {
+                let displayDate = date;
+                if (date === todayStr) {
+                    displayDate = "Hoje";
+                } else if (date !== "0000-00-00") {
+                    const parts = date.split('-');
+                    if(parts.length === 3) displayDate = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                } else {
+                    displayDate = "Sem Data";
+                }
+
+                html += `<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3 px-1"><i class="ph-bold ph-calendar-blank mr-1"></i> ${displayDate}</h3>`;
+                html += `<div class="space-y-4">` + grouped[date].map(f => {
+                    let fluxoObj = [];
+                    let histArr = [];
+                    try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(e){}
+                    try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
+                    
+                    const idVal = f.ID !== undefined ? f.ID : f.id;
+                    
+                    const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+                    const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+                    const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído', usuarioId: null };
+                    const foiIniciada = !!etapaAtualInfo.iniciadaEm;
+                    
+                    const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
+                    const userAtual = (appState.usuarios || []).find(u => (u.ID || u.id) === usuarioAtualVal);
+                    const nomeUserAtual = userAtual ? userAtual.Nome.split(' ')[0] : 'Sistema';
+                    
+                    const isMinhaVez = (usuarioAtualVal === currentUserId);
+
+                    let anexosHtml = renderAnexos(histArr);
+
+                    return `
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo(event, '${idVal}')">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                                ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
+                                ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
+                            </div>
+                            <div class="flex items-center gap-3">
+                                ${currentUser.TipoUsuario === 'admin' ? `
+                                <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        
+                        <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo || f.titulo}</h4>
+                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao || f.descricao}</p>
+                        
+                        ${anexosHtml}
+                        
+                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
+                            <div>
+                                <p class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual</p>
+                                <p class="font-bold text-sm text-iosBlue">${etapaAtualInfo.etapa}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-[10px] text-iosBlue font-bold uppercase">Com</p>
+                                <p class="font-bold text-sm text-iosBlue flex items-center justify-end gap-1"><i class="ph-bold ph-user text-xs"></i> ${nomeUserAtual}</p>
+                            </div>
+                        </div>
+
+                        <div class="w-full bg-gray-200 dark:bg-gray-700 h-1.5 rounded-full mb-4 overflow-hidden">
+                            <div class="bg-iosBlue h-full rounded-full transition-all" style="width: ${fluxoObj.length > 0 ? (etapaAtualIdx / fluxoObj.length)*100 : 100}%"></div>
+                        </div>
+
+                        ${isMinhaVez ? `
+                            <div class="w-full flex gap-2">
+                                ${etapaAtualIdx > 0 ? `
+                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
+                                </button>
+                                ` : ''}
+                                
+                                ${!foiIniciada ? `
+                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-play"></i> Iniciar Demanda
+                                </button>
+                                ` : `
+                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                    <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
+                                </button>
+                                `}
+                            </div>
+                        ` : ''}
+                    </div>`;
+                }).join('') + `</div>`;
+            });
+
+            list.innerHTML = html;
+        }
+
+        function renderConcluidas() { 
+            const list = document.getElementById('concluidasList');
+            const search = document.getElementById('searchConcluidas').value.toLowerCase();
+            let concluidas = (appState.tarefasFluxo || []).filter(t => (t.Status || t.status) === 'concluida');
+            if(search) concluidas = concluidas.filter(t => (t.Titulo || t.titulo).toLowerCase().includes(search));
+            
+            if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma demanda encontrada.</p>`; return; }
+            list.innerHTML = concluidas.map(t => {
+                const idVal = t.ID !== undefined ? t.ID : t.id;
+                
+                let histArr = [];
+                try { histArr = JSON.parse(t.Historico || t.historico || "[]"); } catch(e){}
+                let anexosHtml = renderAnexos(histArr);
+
+                return `
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
+                    <div class="flex-1 text-gray-500 pr-10">
+                        <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
+                        ${anexosHtml}
+                    </div>
+                    ${currentUser.TipoUsuario === 'admin' ? `
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                        <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                    </div>
+                    ` : ''}
+                </div>
+            `}).join('');
+        }
+
+        function renderMateriais() { 
+            const list = document.getElementById('materiaisList');
+            const search = document.getElementById('searchMateriais').value.toLowerCase();
+            let materiais = appState.materiais || [];
+            if(search) materiais = materiais.filter(m => (m.titulo || m.Titulo).toLowerCase().includes(search) || (m.descricao || m.Descricao).toLowerCase().includes(search));
+
+            if(materiais.length === 0) { list.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">Nenhum material</div>`; return; }
+            list.innerHTML = materiais.map(m => {
+                const idVal = m.id !== undefined ? m.id : m.ID;
+                return `
+                <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
+                    ${currentUser.TipoUsuario === 'admin' ? `
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
+                        <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                    </div>
+                    ` : ''}
+                    <div class="block pr-6">
+                        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 text-white flex items-center justify-center mb-4"><i class="ph-fill ph-images text-2xl"></i></div>
+                        <h4 class="font-bold text-lg">${m.titulo || m.Titulo}</h4>
+                        <p class="text-gray-500 text-sm mt-1 line-clamp-2">${m.descricao || m.Descricao}</p>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function setBtnLoading(btnPrefix, isLoading) {
+            const text = document.getElementById(`${btnPrefix}_text`);
+            const spin = document.getElementById(`${btnPrefix}_spin`);
+            if(isLoading) { text.classList.add('hidden'); spin.classList.remove('hidden'); } 
+            else { text.classList.remove('hidden'); spin.classList.add('hidden'); }
+        }
+
+        function openContextModal() {
+            const tab = appState.currentTab;
+            if((tab === 'inicio' || tab === 'tarefas') && currentUser.TipoUsuario === 'admin') {
+                openTarefaCreate();
+            }
+            else if(tab === 'materiais') {
+                editingItemId = null;
+                document.getElementById('modalMaterialTitle').innerText = 'Vincular Material';
+                document.getElementById('m_titulo').value = '';
+                document.getElementById('m_desc').value = '';
+                document.getElementById('m_link').value = '';
+                document.getElementById('m_btn_text').innerText = 'Salvar Vínculo';
+                openModal('modalMaterial');
+            }
+            else if(tab === 'equipe' && currentUser.TipoUsuario === 'admin') {
+                openNovoUsuario();
             }
         }
 
-        function exibirAviso(aviso) {
-            currentAvisoId = aviso.ID || aviso.id;
-            document.getElementById('show_aviso_titulo').innerText = aviso.Titulo || aviso.titulo;
-            document.getElementById('show_aviso_desc').innerText = aviso.Descricao || aviso.descricao;
+        function openModal(id) {
+            document.getElementById(id).style.visibility = 'visible';
+            document.getElementById(id).classList.add('active'); 
+        }
+        
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('active');
+            setTimeout(() => {
+                document.getElementById(id).style.visibility = 'hidden';
+            }, 400);
+            try { 
+                const f = document.querySelector(`#${id} form`);
+                if(f) f.reset(); 
+            } catch(e){}
+            editingItemId = null;
+        }
+
+        function openNovoUsuario() {
+            editingItemId = null;
+            document.getElementById('modalUsuarioTitle').innerText = 'Novo Membro';
+            document.getElementById('u_nome').value = '';
+            document.getElementById('u_funcao').value = '';
+            document.getElementById('u_whatsapp').value = '';
+            document.getElementById('u_email').value = '';
             
-            const modal = document.getElementById('modalShowAviso');
-            modal.classList.add('active');
+            document.getElementById('u_senha').value = '';
+            document.getElementById('u_senha').required = true;
+            document.getElementById('u_senha').placeholder = 'Senha';
+
+            document.getElementById('u_tipo').value = 'usuario';
+            document.getElementById('u_foto_file').value = '';
+            document.getElementById('u_foto_base64').value = '';
+            document.getElementById('u_foto_mime').value = '';
+            document.getElementById('u_foto_url').value = '';
+            document.getElementById('u_preview_foto').src = 'https://ui-avatars.com/api/?name=U&background=random';
+            document.getElementById('u_btn_text').innerText = 'Salvar Usuário';
+            openModal('modalUsuario');
+        }
+
+        function previewProfileImage(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('u_preview_foto').src = e.target.result;
+                const base64Data = e.target.result.split(',')[1];
+                const mimeType = e.target.result.split(';')[0].split(':')[1];
+                
+                document.getElementById('u_foto_base64').value = base64Data;
+                document.getElementById('u_foto_mime').value = mimeType;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function openEditUsuario(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const user = appState.usuarios.find(u => (u.ID || u.id) === id);
+            if(!user) return;
+            editingItemId = id;
+            document.getElementById('modalUsuarioTitle').innerText = 'Editar Membro';
+            document.getElementById('u_nome').value = user.Nome;
+            document.getElementById('u_funcao').value = user.Funcao;
+            document.getElementById('u_whatsapp').value = user.WhatsApp || '';
+            document.getElementById('u_email').value = user.Email;
             
-            const audio = document.getElementById('audioAlertaAviso');
-            if(audio) {
-                audio.muted = false; 
-                audio.volume = 1;
-                audio.currentTime = 0;
-                audio.play().catch(e => console.log("Aguardando interação do usuário para tocar o áudio."));
+            document.getElementById('u_senha').value = '';
+            document.getElementById('u_senha').required = false;
+            document.getElementById('u_senha').placeholder = 'Senha (deixe em branco para manter)';
+
+            document.getElementById('u_tipo').value = user.TipoUsuario;
+            
+            document.getElementById('u_foto_file').value = '';
+            document.getElementById('u_foto_base64').value = '';
+            document.getElementById('u_foto_mime').value = '';
+            document.getElementById('u_foto_url').value = user.FotoPerfilURL || '';
+            document.getElementById('u_preview_foto').src = user.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(user.Nome);
+            
+            document.getElementById('u_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalUsuario');
+        }
+
+        async function submitUsuario(e) {
+            e.preventDefault(); setBtnLoading('u_btn', true);
+            const data = {
+                nome: document.getElementById('u_nome').value,
+                funcao: document.getElementById('u_funcao').value,
+                whatsapp: document.getElementById('u_whatsapp').value,
+                email: document.getElementById('u_email').value,
+                senha: document.getElementById('u_senha').value,
+                tipo: document.getElementById('u_tipo').value,
+                fotoUrl: document.getElementById('u_foto_url').value,
+                fotoBase64: document.getElementById('u_foto_base64').value,
+                fotoMimeType: document.getElementById('u_foto_mime').value
+            };
+            
+            const action = editingItemId ? 'editUsuario' : 'addUsuario';
+            if(editingItemId) data.id = editingItemId;
+
+            const fakeUrl = data.fotoBase64 ? document.getElementById('u_preview_foto').src : data.fotoUrl;
+            if (editingItemId) {
+                const idx = appState.usuarios.findIndex(u => (u.ID || u.id) === editingItemId);
+                if(idx > -1) {
+                    appState.usuarios[idx].Nome = data.nome;
+                    appState.usuarios[idx].Funcao = data.funcao;
+                    appState.usuarios[idx].WhatsApp = data.whatsapp;
+                    appState.usuarios[idx].TipoUsuario = data.tipo;
+                    appState.usuarios[idx].FotoPerfilURL = fakeUrl;
+                    if(data.senha && data.senha.trim() !== '') {
+                        appState.usuarios[idx].Senha = data.senha;
+                    }
+                }
+            } else {
+                appState.usuarios.push({
+                    ID: 'temp_' + Date.now(), Nome: data.nome, Funcao: data.funcao, WhatsApp: data.whatsapp, Email: data.email, TipoUsuario: data.tipo, FotoPerfilURL: fakeUrl, Status: 'ativo'
+                });
+            }
+            renderEquipe();
+            closeModal('modalUsuario');
+
+            const res = await apiRequest({ action: action, data: data });
+            if(!res.success) { console.error("Erro ao salvar usuário: " + res.error); }
+            forceSync(); 
+            setBtnLoading('u_btn', false);
+        }
+
+        let countEtapasForm = 0;
+        function openTarefaCreate() {
+            editingItemId = null;
+            document.getElementById('modalTarefaTitle').innerText = 'Nova Tarefa';
+            document.getElementById('t_titulo').value = '';
+            document.getElementById('t_prazo').value = '';
+            document.getElementById('t_desc').value = '';
+            document.getElementById('t_btn_text').innerText = 'Salvar Tarefa';
+            
+            document.getElementById('t_etapas_container').innerHTML = '';
+            countEtapasForm = 0;
+            addEtapaToForm(); 
+            openModal('modalTarefa');
+        }
+
+        function openEditTarefaFluxo(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === id);
+            if(!f) return;
+            
+            editingItemId = id;
+            document.getElementById('modalTarefaTitle').innerText = 'Editar Tarefa';
+            document.getElementById('t_titulo').value = f.Titulo || f.titulo;
+            
+            let rawPrazo = f.Prazo || f.prazo || '';
+            if (rawPrazo && rawPrazo.includes('T')) rawPrazo = rawPrazo.split('T')[0];
+            document.getElementById('t_prazo').value = rawPrazo;
+            
+            document.getElementById('t_desc').value = f.Descricao || f.descricao;
+            
+            let fluxoObj = [];
+            try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+            
+            const container = document.getElementById('t_etapas_container');
+            container.innerHTML = '';
+            countEtapasForm = 0;
+            
+            if(fluxoObj.length === 0) {
+                addEtapaToForm();
+            } else {
+                fluxoObj.forEach(et => {
+                    countEtapasForm++;
+                    const div = document.createElement('div');
+                    div.className = "flex gap-2 items-center etapa-row";
+                    
+                    let userOptions = appState.usuarios.map(u => {
+                        const uid = u.ID || u.id;
+                        return `<option value="${uid}" ${uid === et.usuarioId ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
+                    }).join('');
+
+                    let etapaOptions = appState.etapas.map(etp => {
+                        const val = etp.nome || etp.Nome;
+                        return `<option value="${val}" ${val === et.etapa ? 'selected' : ''}>${val}</option>`;
+                    }).join('');
+                    
+                    if (!appState.etapas.find(etp => (etp.nome || etp.Nome) === et.etapa)) {
+                        etapaOptions = `<option value="${et.etapa}" selected>${et.etapa} (Antiga)</option>` + etapaOptions;
+                    }
+                    
+                    div.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
+                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
+                            <option value="">Selecione a Etapa...</option>
+                            ${etapaOptions}
+                        </select>
+                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
+                            <option value="">Selecione Usuário...</option>
+                            ${userOptions}
+                        </select>
+                    `;
+                    container.appendChild(div);
+                });
+            }
+            
+            document.getElementById('t_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalTarefa');
+        }
+
+        async function deleteTarefaFluxo(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
+            appState.tarefasFluxo = appState.tarefasFluxo.filter(f => (f.ID || f.id) !== id);
+            renderTarefas(); renderConcluidas();
+            await apiRequest({ action: 'deleteTarefaFluxo', data: { id: id } });
+            forceSync();
+        }
+
+        function addEtapaToForm() {
+            countEtapasForm++;
+            const container = document.getElementById('t_etapas_container');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center etapa-row";
+            
+            let userOptions = appState.usuarios.map(u => `<option value="${u.ID || u.id}">${u.Nome} (${u.Funcao})</option>`).join('');
+            
+            let etapaOptions = appState.etapas.map(e => `<option value="${e.nome || e.Nome}">${e.nome || e.Nome}</option>`).join('');
+            if(appState.etapas.length === 0) etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
+
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
+                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
+                    <option value="">Selecione a Etapa...</option>
+                    ${etapaOptions}
+                </select>
+                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
+                    <option value="">Selecione Usuário...</option>
+                    ${userOptions}
+                </select>
+            `;
+            container.appendChild(div);
+        }
+
+        async function submitTarefa(e) {
+            e.preventDefault(); setBtnLoading('t_btn', true);
+            
+            const rows = document.querySelectorAll('.etapa-row');
+            let fluxoArr = [];
+            rows.forEach(r => {
+                fluxoArr.push({
+                    etapa: r.querySelector('.t-etapa-nome').value,
+                    usuarioId: r.querySelector('.t-etapa-user').value
+                });
+            });
+
+            if(fluxoArr.length === 0) { alert("Adicione pelo menos uma etapa."); setBtnLoading('t_btn', false); return; }
+
+            const data = {
+                titulo: document.getElementById('t_titulo').value,
+                descricao: document.getElementById('t_desc').value,
+                prazo: document.getElementById('t_prazo').value,
+                fluxo: fluxoArr
+            };
+
+            const actionName = editingItemId ? 'editTarefaFluxo' : 'addTarefaFluxo';
+            if (editingItemId) data.id = editingItemId;
+
+            if (editingItemId) {
+                const idx = appState.tarefasFluxo.findIndex(f => (f.ID || f.id) === editingItemId);
+                if(idx > -1) {
+                    appState.tarefasFluxo[idx].Titulo = data.titulo;
+                    appState.tarefasFluxo[idx].Descricao = data.descricao;
+                    appState.tarefasFluxo[idx].Fluxo = JSON.stringify(data.fluxo);
+                    appState.tarefasFluxo[idx].Prazo = data.prazo;
+                    appState.tarefasFluxo[idx].prazo = data.prazo;
+                }
+            } else {
+                appState.tarefasFluxo.push({
+                    ID: 'temp_' + Date.now(), Titulo: data.titulo, Descricao: data.descricao, Fluxo: JSON.stringify(data.fluxo), EtapaAtual: 0, Etapaatual: 0, UsuarioAtual: data.fluxo[0].usuarioId, Usuarioatual: data.fluxo[0].usuarioId, Status: 'pendente', Historico: "[]", Prazo: data.prazo, prazo: data.prazo
+                });
+            }
+            renderAll();
+            closeModal('modalTarefa');
+
+            const res = await apiRequest({ action: actionName, data: data });
+            if(!res.success) { console.error("Erro: " + res.error); }
+            forceSync();
+            setBtnLoading('t_btn', false);
+        }
+
+        function openConcluirEtapa(e, fluxoId) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+            let etapaNome = "";
+            if (f) {
+                let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                etapaNome = (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "").toLowerCase();
+            }
+
+            document.getElementById('ce_tarefa_id').value = fluxoId;
+            document.getElementById('ce_arquivo').value = '';
+            raw_files_array = [];
+            document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
+            document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
+            document.getElementById('ce_progress_container').classList.add('hidden');
+            
+            const uploadArea = document.getElementById('ce_upload_area');
+            const descArea = document.getElementById('ce_desc_area');
+            
+            if(etapaNome.includes('cria') || etapaNome.includes('edi')) {
+                if(uploadArea) uploadArea.style.display = 'flex';
+                if(descArea) descArea.innerText = 'Anexe os materiais (foto/vídeo) gerados nesta etapa.';
+                document.getElementById('ce_btn_text').innerText = 'Confirmar e Avançar';
+            } else {
+                if(uploadArea) uploadArea.style.display = 'none';
+                if(descArea) descArea.innerText = 'Deseja confirmar e avançar a demanda?';
+                document.getElementById('ce_btn_text').innerText = 'Aprovar / Avançar';
+            }
+
+            openModal('modalConcluirEtapa');
+        }
+
+        function previewConcluirArquivo(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            
+            raw_files_array = Array.from(files);
+            document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
+            document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
+        }
+
+        async function submitAvancarEtapa(e) {
+            e.preventDefault(); 
+            setBtnLoading('ce_btn', true);
+            
+            const fluxoId = document.getElementById('ce_tarefa_id').value;
+            
+            if (raw_files_array.length > 0) {
+                document.getElementById('ce_progress_container').classList.remove('hidden');
+                document.getElementById('ce_progress_bar').style.width = '10%';
+                document.getElementById('ce_progress_text').innerText = 'Preparando imagens...';
+            }
+
+            let processedFiles = [];
+            
+            // Compressor Inteligente (Reduz de 4MB para ~200KB mantendo qualidade)
+            const compressImage = (file) => {
+                return new Promise((resolve) => {
+                    if (!file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (evt) => resolve({
+                            base64: evt.target.result.split(',')[1],
+                            mimeType: file.type,
+                            fileName: file.name
+                        });
+                        reader.readAsDataURL(file);
+                        return;
+                    }
+                    const reader = new FileReader();
+                    reader.onload = function(evt) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const max_size = 1000; 
+
+                            if (width > height && width > max_size) {
+                                height *= max_size / width;
+                                width = max_size;
+                            } else if (height > max_size) {
+                                width *= max_size / height;
+                                height = max_size;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            resolve({
+                                base64: canvas.toDataURL('image/jpeg', 0.6).split(',')[1],
+                                mimeType: 'image/jpeg',
+                                fileName: file.name
+                            });
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                });
+            };
+
+            // Processa arquivo por arquivo (atualizando a barra)
+            for (let i = 0; i < raw_files_array.length; i++) {
+                if (raw_files_array.length > 1) {
+                    document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                }
+                const compressed = await compressImage(raw_files_array[i]);
+                processedFiles.push(compressed);
+                
+                let prog = 10 + Math.round(((i + 1) / raw_files_array.length) * 30);
+                document.getElementById('ce_progress_bar').style.width = prog + '%';
+            }
+
+            if (processedFiles.length > 0) {
+                document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
+            }
+
+            const payloadData = { id: fluxoId };
+            if (processedFiles.length > 0) {
+                payloadData.files = processedFiles;
+            }
+
+            let progUpload = 40;
+            let progressInterval;
+            if (processedFiles.length > 0) {
+                progressInterval = setInterval(() => {
+                    progUpload += Math.random() * 5;
+                    if (progUpload >= 95) progUpload = 95; 
+                    document.getElementById('ce_progress_bar').style.width = parseInt(progUpload) + '%';
+                    document.getElementById('ce_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
+                }, 400);
+            }
+
+            try {
+                // Envio seguro padrão via fetch com os arquivos minificados
+                const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
+                
+                if(progressInterval) clearInterval(progressInterval);
+
+                if(res.success) {
+                    if (processedFiles.length > 0) {
+                        document.getElementById('ce_progress_bar').style.width = '100%';
+                        document.getElementById('ce_progress_text').innerText = '100% (Concluído!)';
+                    }
+
+                    const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                    if(fIdx > -1) {
+                        let f = appState.tarefasFluxo[fIdx];
+                        let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                        let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                        
+                        let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
+                        let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
+                        
+                        if(processedFiles.length > 0) {
+                            logConclusao.files = processedFiles.map(arq => {
+                               return {
+                                   url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
+                                   name: arq.fileName,
+                                   type: arq.mimeType
+                               }
+                            });
+                        }
+                        histArr.push(logConclusao);
+                        f.Historico = JSON.stringify(histArr);
+                        f.historico = f.Historico;
+
+                        etapaAtualIdx++;
+                        f.EtapaAtual = etapaAtualIdx;
+                        f.Etapaatual = etapaAtualIdx;
+                        
+                        if(etapaAtualIdx >= fluxoObj.length) {
+                            f.Status = 'concluida';
+                            f.status = 'concluida';
+                        } else {
+                            f.Status = 'em andamento';
+                            f.status = 'em andamento';
+                            f.UsuarioAtual = fluxoObj[etapaAtualIdx].usuarioId;
+                            f.Usuarioatual = fluxoObj[etapaAtualIdx].usuarioId;
+                        }
+                        renderAll();
+                    }
+                } else {
+                    alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
+                }
+            } catch (err) {
+                if(progressInterval) clearInterval(progressInterval);
+                console.error(err);
+                alert("Erro de conexão. A internet falhou ou o pacote excedeu o limite do Google.");
+            } finally {
+                setTimeout(() => {
+                    document.getElementById('ce_progress_container').classList.add('hidden');
+                    closeModal('modalConcluirEtapa');
+                    forceSync(); 
+                    setBtnLoading('ce_btn', false);
+                    raw_files_array = []; 
+                }, 1000);
             }
         }
 
-        async function confirmarRecebimentoAviso() {
-            if(!currentAvisoId) return;
-            setBtnLoading('conf_av_btn', true);
+        function openRetornarEtapa(e, fluxoId) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+            if(!f) return;
+
+            document.getElementById('re_tarefa_id').value = fluxoId;
+            document.getElementById('re_observacao').value = '';
             
-            const audio = document.getElementById('audioAlertaAviso');
-            if(audio) {
-                audio.pause();
-                audio.currentTime = 0;
+            let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+            const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+            const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+
+            const select = document.getElementById('re_etapa_idx');
+            select.innerHTML = '<option value="">Selecione a etapa de destino...</option>';
+            
+            for(let i = 0; i < etapaAtualIdx; i++) {
+                select.innerHTML += `<option value="${i}">${i+1}. ${fluxoObj[i].etapa}</option>`;
             }
             
-            const aIdx = appState.avisos.findIndex(a => (a.ID || a.id) === currentAvisoId);
-            if(aIdx > -1) {
-                let rec = [];
-                try { rec = JSON.parse(appState.avisos[aIdx].Recebedores || appState.avisos[aIdx].recebedores || "[]"); } catch(e){}
-                rec.push(currentUser.ID);
-                appState.avisos[aIdx].Recebedores = JSON.stringify(rec);
-                appState.avisos[aIdx].recebedores = JSON.stringify(rec);
+            openModal('modalRetornarEtapa');
+        }
+
+        async function submitRetornarEtapa(e) {
+            e.preventDefault();
+            setBtnLoading('re_btn', true);
+            
+            const fluxoId = document.getElementById('re_tarefa_id').value;
+            const stepIndex = parseInt(document.getElementById('re_etapa_idx').value);
+            const observacao = document.getElementById('re_observacao').value;
+
+            const payloadData = { id: fluxoId, stepIndex: stepIndex, observacao: observacao };
+
+            const res = await apiRequest({ action: 'retornarEtapaFluxo', data: payloadData });
+            
+            if(res.success) {
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                    if(fluxoObj[stepIndex]) { delete fluxoObj[stepIndex].iniciadaEm; }
+                    f.Fluxo = JSON.stringify(fluxoObj); f.fluxo = f.Fluxo;
+                    
+                    let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
+                    histArr.push({ 
+                        msg: `Retornado para [${fluxoObj[stepIndex].etapa}] por ${currentUser.Nome.split(' ')[0]}. Obs: ${observacao}`, 
+                        data: new Date().toISOString() 
+                    });
+                    f.Historico = JSON.stringify(histArr);
+                    f.historico = f.Historico;
+
+                    f.EtapaAtual = stepIndex;
+                    f.Etapaatual = stepIndex;
+                    f.UsuarioAtual = fluxoObj[stepIndex].usuarioId;
+                    f.Usuarioatual = fluxoObj[stepIndex].usuarioId;
+                    f.Status = 'pendente';
+                    f.status = 'pendente';
+                    
+                    renderAll();
+                }
+            } else {
+                alert(res.error || "Falha ao retornar a tarefa.");
             }
+
+            closeModal('modalRetornarEtapa');
+            forceSync(); 
+            setBtnLoading('re_btn', false);
+        }
+
+        async function iniciarDemanda(e, fluxoId) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const btn = document.getElementById('btn_iniciar_' + fluxoId);
+            if(btn) {
+                btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
+                btn.disabled = true;
+            }
+
+            const res = await apiRequest({ action: 'iniciarDemandaFluxo', data: { id: fluxoId } });
             
-            document.getElementById('modalShowAviso').classList.remove('active');
-            await apiRequest({ action: 'confirmarAviso', data: { avisoId: currentAvisoId } });
-            
-            setBtnLoading('conf_av_btn', false);
-            currentAvisoId = null;
-            
-            setTimeout(verificarAvisosAlerta, 800);
+            if(res.success) {
+                const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
+                if(fIdx > -1) {
+                    let f = appState.tarefasFluxo[fIdx];
+                    let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                    let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
+                    
+                    if(fluxoObj[etapaAtualIdx]) {
+                        fluxoObj[etapaAtualIdx].iniciadaEm = new Date().toISOString();
+                    }
+                    
+                    f.Fluxo = JSON.stringify(fluxoObj);
+                    f.fluxo = f.Fluxo;
+                    f.Status = 'em andamento';
+                    f.status = 'em andamento';
+                    
+                    renderAll();
+                }
+            } else {
+                alert(res.error || "Falha ao iniciar a demanda.");
+            }
+            forceSync();
         }
 
         function openAvisosHistorico() {
@@ -1296,7 +1961,7 @@
             document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
                 const isPassado = idx < etapaAtualIdx;
                 const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
-                const user = appState.usuarios.find(u => (u.ID || u.id) === et.usuarioId);
+                const user = (appState.usuarios || []).find(u => (u.ID || u.id) === et.usuarioId);
                 const userName = user ? user.Nome : 'Desconhecido';
                 
                 let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
@@ -1323,7 +1988,8 @@
             openModal('modalDetalheFluxo');
         }
 
-        function openEditMaterial(id) {
+        function openEditMaterial(e, id) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const m = appState.materiais.find(x => (x.ID || x.id) === id);
             if(!m) return;
             editingItemId = id;
@@ -1335,7 +2001,8 @@
             openModal('modalMaterial');
         }
 
-        async function deleteMaterial(id) {
+        async function deleteMaterial(e, id) {
+            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
             if(!confirm("Deseja excluir este material?")) return;
             appState.materiais = appState.materiais.filter(m => (m.ID || m.id) !== id);
             renderMateriais();
