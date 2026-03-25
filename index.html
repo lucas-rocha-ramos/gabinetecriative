@@ -92,13 +92,13 @@
         .nav-item.active { color: #007AFF; }
         .dark .nav-item.active { color: #0A84FF; }
 
-        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease; }
-        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal.active { transform: translateY(0); }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -362,7 +362,7 @@
                 <input type="hidden" id="ce_tarefa_id">
                 
                 <div id="ce_upload_container">
-                    <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa.</p>
+                    <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
                     <input type="file" id="ce_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewConcluirArquivo(event)">
                     <div id="ce_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
                         <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
@@ -379,12 +379,8 @@
                         <div id="ce_progress_bar" class="bg-iosBlue h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
-                
-                <div id="ce_apenas_avancar_container" style="display:none;">
-                    <p class="text-sm text-gray-500 mb-4 text-center">Deseja aprovar e enviar esta demanda para a próxima etapa?</p>
-                </div>
 
-                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
@@ -419,7 +415,7 @@
     <div id="modalAvisosHistorico" class="slide-modal fixed inset-0 z-[70] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisosHistorico')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisosHistorico').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Histórico de Avisos</h2>
                 <div class="w-16"></div>
             </div>
@@ -431,7 +427,7 @@
     <div id="modalAvisoDetalhes" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisoDetalhes')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisoDetalhes').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Detalhes</h2>
                 <div class="w-16"></div>
             </div>
@@ -475,7 +471,7 @@
     <div id="modalPerfilUsuario" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalPerfilUsuario')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalPerfilUsuario').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Perfil</h2>
                 <div class="w-16"></div>
             </div>
@@ -543,7 +539,7 @@
     <div id="modalDetalheFluxo" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalDetalheFluxo')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalDetalheFluxo').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2" id="det_f_titulo">Detalhes da Tarefa</h2>
                 <div class="w-16"></div>
             </div>
@@ -959,7 +955,7 @@
                 }).join('');
             }
             
-            openModal('modalPerfilUsuario');
+            document.getElementById('modalPerfilUsuario').classList.add('active');
         }
 
         // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
@@ -1089,6 +1085,7 @@
                 return;
             }
 
+            // Inverte a ordem das demandas para mostrar a mais recente primeiro
             tarefasAtivas.reverse();
 
             const grouped = {};
@@ -1336,7 +1333,7 @@
         }
 
         function openEditUsuario(e, id) {
-            if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const user = appState.usuarios.find(u => (u.ID || u.id) === id);
             if(!user) return;
             editingItemId = id;
@@ -1607,15 +1604,51 @@
             document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
 
             Array.from(files).forEach(file => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    ce_files_array.push({
-                        base64: e.target.result.split(',')[1],
-                        mimeType: file.type,
-                        fileName: file.name
-                    });
-                };
-                reader.readAsDataURL(file);
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            const canvas = document.createElement('canvas');
+                            let width = img.width;
+                            let height = img.height;
+                            const max_size = 1200; // COMPRESSÃO: Reduz para no max 1200px
+
+                            if (width > height && width > max_size) {
+                                height *= max_size / width;
+                                width = max_size;
+                            } else if (height > max_size) {
+                                width *= max_size / height;
+                                height = max_size;
+                            }
+
+                            canvas.width = width;
+                            canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
+                            
+                            // Transforma a imagem para JPEG reduzindo a qualidade em 20%
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            ce_files_array.push({
+                                base64: dataUrl.split(',')[1],
+                                mimeType: 'image/jpeg',
+                                fileName: file.name
+                            });
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        ce_files_array.push({
+                            base64: e.target.result.split(',')[1],
+                            mimeType: file.type,
+                            fileName: file.name
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
             });
         }
 
@@ -1625,6 +1658,10 @@
             
             const fluxoId = document.getElementById('ce_tarefa_id').value;
             const payloadData = { id: fluxoId };
+            
+            if (ce_files_array.length > 0) {
+                payloadData.files = ce_files_array;
+            }
 
             if (ce_files_array.length > 0) {
                 document.getElementById('ce_progress_container').classList.remove('hidden');
@@ -1632,26 +1669,28 @@
                 document.getElementById('ce_progress_text').innerText = '0%';
             }
 
+            let progressoReal = 0;
+            let progressInterval;
+            if (ce_files_array.length > 0) {
+                progressInterval = setInterval(() => {
+                    progressoReal += Math.random() * 15;
+                    if (progressoReal >= 90) progressoReal = 90; 
+                    document.getElementById('ce_progress_bar').style.width = parseInt(progressoReal) + '%';
+                    document.getElementById('ce_progress_text').innerText = parseInt(progressoReal) + '% (Enviando...)';
+                }, 800);
+            }
+
             try {
-                if (ce_files_array.length > 0) {
-                    for (let i = 0; i < ce_files_array.length; i++) {
-                        document.getElementById('ce_progress_text').innerText = `Enviando arquivo ${i + 1} de ${ce_files_array.length}...`;
-                        const resArq = await apiRequest({ 
-                            action: 'avancarEtapaFluxo', 
-                            data: { id: fluxoId, files: [ce_files_array[i]], ehLote: true } 
-                        });
-                        if(!resArq.success) throw new Error("Falha no upload do arquivo " + (i+1));
-                        
-                        let prog = Math.round(((i + 1) / ce_files_array.length) * 100);
-                        document.getElementById('ce_progress_bar').style.width = prog + '%';
-                    }
-                }
+                const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
                 
-                document.getElementById('ce_progress_text').innerText = 'Processando conclusão...';
-                
-                const res = await apiRequest({ action: 'avancarEtapaFluxo', data: { id: fluxoId, finalizaLote: true } });
+                if(progressInterval) clearInterval(progressInterval);
                 
                 if(res.success) {
+                    if (ce_files_array.length > 0) {
+                        document.getElementById('ce_progress_bar').style.width = '100%';
+                        document.getElementById('ce_progress_text').innerText = '100% (Concluído!)';
+                    }
+
                     const fIdx = appState.tarefasFluxo.findIndex(f => (f.ID !== undefined ? f.ID : f.id) === fluxoId);
                     if(fIdx > -1) {
                         let f = appState.tarefasFluxo[fIdx];
@@ -1690,11 +1729,11 @@
                         renderAll();
                     }
                 } else {
-                    alert(res.error || "Falha ao concluir etapa no banco de dados.");
+                    alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
                 }
             } catch (err) {
-                console.error(err);
-                alert("Erro de conexão ao tentar enviar o(s) arquivo(s). Eles são muito pesados para enviar juntos.");
+                if(progressInterval) clearInterval(progressInterval);
+                alert("Erro ao enviar. O arquivo é muito pesado ou a internet oscilou.");
             } finally {
                 setTimeout(() => {
                     if (document.getElementById('ce_progress_container')) {
