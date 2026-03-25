@@ -379,7 +379,7 @@
                     </div>
                 </div>
 
-                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
@@ -598,7 +598,7 @@
         let galleryCache = {}; 
         let currentAvisoId = null;
         let pollingInterval = null;
-        let ce_files_array = []; 
+        let raw_files_array = []; 
         let currentPreviewIndex = 0;
         let currentFiltroVisao = 'pra_voce';
 
@@ -954,8 +954,7 @@
                 }).join('');
             }
             
-            document.getElementById('modalPerfilUsuario').classList.add('active');
-            document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
+            openModal('modalPerfilUsuario');
         }
 
         // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
@@ -1333,7 +1332,7 @@
         }
 
         function openEditUsuario(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
             const user = appState.usuarios.find(u => (u.ID || u.id) === id);
             if(!user) return;
             editingItemId = id;
@@ -1574,7 +1573,7 @@
 
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
-            ce_files_array = [];
+            raw_files_array = [];
             document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
             document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
             document.getElementById('ce_progress_container').classList.add('hidden');
@@ -1598,15 +1597,42 @@
         function previewConcluirArquivo(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
+            
+            // Apenas guarda os arquivos brutos (serão processados no momento do envio)
+            raw_files_array = Array.from(files);
+            
+            document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
+            document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
+        }
 
-            ce_files_array = [];
-            document.getElementById('ce_nome_arquivo').innerText = "Processando imagens...";
-            document.getElementById('ce_icone').className = 'ph-bold ph-spinner animate-spin text-4xl text-iosBlue mb-2';
+        // --- SOLUÇÃO DO UPLOAD: COMPRESSÃO E APIREQUEST SEGURO ---
+        async function submitAvancarEtapa(e) {
+            e.preventDefault(); 
+            setBtnLoading('ce_btn', true);
+            
+            const fluxoId = document.getElementById('ce_tarefa_id').value;
+            
+            if (raw_files_array.length > 0) {
+                document.getElementById('ce_progress_container').classList.remove('hidden');
+                document.getElementById('ce_progress_bar').style.width = '5%';
+                document.getElementById('ce_progress_text').innerText = 'Iniciando processamento...';
+            }
 
-            let processed = 0;
-
-            Array.from(files).forEach(file => {
-                if (file.type.startsWith('image/')) {
+            let processedFiles = [];
+            
+            // Motor de compressão invisível
+            const compressImage = (file) => {
+                return new Promise((resolve) => {
+                    if (!file.type.startsWith('image/')) {
+                        const reader = new FileReader();
+                        reader.onload = (e) => resolve({
+                            base64: e.target.result.split(',')[1],
+                            mimeType: file.type,
+                            fileName: file.name
+                        });
+                        reader.readAsDataURL(file);
+                        return;
+                    }
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         const img = new Image();
@@ -1614,7 +1640,7 @@
                             const canvas = document.createElement('canvas');
                             let width = img.width;
                             let height = img.height;
-                            const max_size = 1000;
+                            const max_size = 800; // Reduz bastante para não estourar o limite CORS do Google
 
                             if (width > height && width > max_size) {
                                 height *= max_size / width;
@@ -1629,81 +1655,45 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
-                            ce_files_array.push({
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.6); // Compressão
+                            resolve({
                                 base64: dataUrl.split(',')[1],
                                 mimeType: 'image/jpeg',
                                 fileName: file.name
                             });
-                            checkDone();
                         };
                         img.src = e.target.result;
                     };
                     reader.readAsDataURL(file);
-                } else {
-                    const reader = new FileReader();
-                    reader.onload = function(e) {
-                        ce_files_array.push({
-                            base64: e.target.result.split(',')[1],
-                            mimeType: file.type,
-                            fileName: file.name
-                        });
-                        checkDone();
-                    };
-                    reader.readAsDataURL(file);
-                }
-            });
+                });
+            };
 
-            function checkDone() {
-                processed++;
-                if(processed === files.length) {
-                    document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
-                    document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
-                }
+            // Processa arquivo por arquivo (atualizando a barra)
+            for (let i = 0; i < raw_files_array.length; i++) {
+                document.getElementById('ce_progress_text').innerText = `Processando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                let prog = 5 + Math.round(((i) / raw_files_array.length) * 45); // A barra vai até 50%
+                document.getElementById('ce_progress_bar').style.width = prog + '%';
+                
+                const compressed = await compressImage(raw_files_array[i]);
+                processedFiles.push(compressed);
             }
-        }
 
-        async function submitAvancarEtapa(e) {
-            e.preventDefault(); 
-            setBtnLoading('ce_btn', true);
-            
-            const fluxoId = document.getElementById('ce_tarefa_id').value;
+            if (processedFiles.length > 0) {
+                document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
+                document.getElementById('ce_progress_bar').style.width = '75%';
+            }
+
             const payloadData = { id: fluxoId };
-            
-            if (ce_files_array.length > 0) {
-                payloadData.files = ce_files_array;
-                document.getElementById('ce_progress_container').classList.remove('hidden');
-                document.getElementById('ce_progress_bar').style.width = '0%';
+            if (processedFiles.length > 0) {
+                payloadData.files = processedFiles;
             }
 
-            let progressInterval;
-            if (ce_files_array.length > 0) {
-                let currentFileIndex = 0;
-                let fileProgress = 0;
-
-                progressInterval = setInterval(() => {
-                    fileProgress += Math.random() * 25;
-                    if (fileProgress >= 100) {
-                        fileProgress = 0;
-                        currentFileIndex++;
-                    }
-                    if (currentFileIndex >= ce_files_array.length) {
-                        currentFileIndex = ce_files_array.length - 1;
-                        fileProgress = 95; 
-                    }
-                    let totalProgress = ((currentFileIndex * 100) + fileProgress) / ce_files_array.length;
-                    
-                    document.getElementById('ce_progress_bar').style.width = totalProgress + '%';
-                    document.getElementById('ce_progress_text').innerText = `Enviando arquivo ${currentFileIndex + 1} de ${ce_files_array.length}...`;
-                }, 400);
-            }
-
+            // Envia tudo comprimido usando apiRequest (o fetch blindado que passa no CORS)
             try {
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
-                if(progressInterval) clearInterval(progressInterval);
-
+                
                 if(res.success) {
-                    if (ce_files_array.length > 0) {
+                    if (processedFiles.length > 0) {
                         document.getElementById('ce_progress_bar').style.width = '100%';
                         document.getElementById('ce_progress_text').innerText = '100% (Concluído!)';
                     }
@@ -1717,8 +1707,8 @@
                         let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                         let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
                         
-                        if(ce_files_array.length > 0) {
-                            logConclusao.files = ce_files_array.map(arq => {
+                        if(processedFiles.length > 0) {
+                            logConclusao.files = processedFiles.map(arq => {
                                return {
                                    url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
                                    name: arq.fileName,
@@ -1748,18 +1738,17 @@
                 } else {
                     alert(res.error || "Falha no envio do arquivo. Verifique a autorização do Google Drive no backend.");
                 }
-            } catch(err) {
-                if(progressInterval) clearInterval(progressInterval);
-                alert("Erro de conexão. Ocorreu um problema ao comunicar com o servidor.");
+            } catch (err) {
+                console.error(err);
+                alert("Erro de conexão. O pacote ainda está muito pesado ou sua internet caiu.");
             } finally {
                 setTimeout(() => {
-                    if (document.getElementById('ce_progress_container')) {
-                        document.getElementById('ce_progress_container').classList.add('hidden');
-                    }
+                    document.getElementById('ce_progress_container').classList.add('hidden');
                     closeModal('modalConcluirEtapa');
                     forceSync(); 
                     setBtnLoading('ce_btn', false);
-                }, 800);
+                    raw_files_array = []; // reseta pra próxima vez
+                }, 1000);
             }
         }
 
