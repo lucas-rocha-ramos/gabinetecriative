@@ -92,13 +92,13 @@
         .nav-item.active { color: #007AFF; }
         .dark .nav-item.active { color: #0A84FF; }
 
-        .modal-overlay { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.3s ease, visibility 0.3s ease; }
-        .modal-overlay.active { opacity: 1; visibility: visible; pointer-events: auto; }
+        .modal-overlay { opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+        .modal-overlay.active { opacity: 1; pointer-events: auto; }
         .modal-content { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.active .modal-content { transform: translateY(0); }
 
-        .slide-modal { transform: translateY(100%); visibility: hidden; pointer-events: none; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.4s ease; }
-        .slide-modal.active { transform: translateY(0); visibility: visible; pointer-events: auto; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal { transform: translateY(100%); transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .slide-modal.active { transform: translateY(0); }
 
         .ios-input {
             width: 100%; background: rgba(118, 118, 128, 0.12); border-radius: 12px;
@@ -362,7 +362,7 @@
                 <input type="hidden" id="ce_tarefa_id">
                 
                 <div id="ce_upload_container">
-                    <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa.</p>
+                    <p id="ce_desc_area" class="text-sm text-gray-500 mb-4">Anexe os materiais (foto/vídeo) gerados nesta etapa (Opcional).</p>
                     <input type="file" id="ce_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewConcluirArquivo(event)">
                     <div id="ce_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('ce_arquivo').click()">
                         <i id="ce_icone" class="ph-bold ph-upload-simple text-4xl text-iosBlue mb-2"></i>
@@ -379,7 +379,7 @@
                         <div id="ce_progress_bar" class="bg-iosBlue h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
-                
+
                 <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -415,7 +415,7 @@
     <div id="modalAvisosHistorico" class="slide-modal fixed inset-0 z-[70] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisosHistorico')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisosHistorico').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Histórico de Avisos</h2>
                 <div class="w-16"></div>
             </div>
@@ -427,7 +427,7 @@
     <div id="modalAvisoDetalhes" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalAvisoDetalhes')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalAvisoDetalhes').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Detalhes</h2>
                 <div class="w-16"></div>
             </div>
@@ -471,7 +471,7 @@
     <div id="modalPerfilUsuario" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalPerfilUsuario')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalPerfilUsuario').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2">Perfil</h2>
                 <div class="w-16"></div>
             </div>
@@ -539,7 +539,7 @@
     <div id="modalDetalheFluxo" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
         <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
             <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalDetalheFluxo')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
+                <button onclick="document.getElementById('modalDetalheFluxo').classList.remove('active')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
                 <h2 class="font-bold text-lg truncate flex-1 text-center px-2" id="det_f_titulo">Detalhes da Tarefa</h2>
                 <div class="w-16"></div>
             </div>
@@ -599,7 +599,7 @@
         let galleryCache = {}; 
         let currentAvisoId = null;
         let pollingInterval = null;
-        let raw_files_array = []; 
+        let ce_files_array = []; 
         let currentPreviewIndex = 0;
         let currentFiltroVisao = 'pra_voce';
 
@@ -672,7 +672,6 @@
 
         function aplicarRegrasUsuario() {
             if(!currentUser) return;
-            const currentUserId = currentUser.ID || currentUser.id;
             document.getElementById('user_profile_name').innerText = `Olá, ${currentUser.Nome.split(' ')[0]}`;
             document.getElementById('user_profile_role').innerText = currentUser.Funcao || 'Membro';
             if(currentUser.FotoPerfilURL) document.getElementById('user_profile_img').src = currentUser.FotoPerfilURL;
@@ -755,7 +754,7 @@
                 return { success: false };
             }
             if(currentUser && payload.action !== 'login') {
-                payload.requestUserId = currentUser.ID || currentUser.id;
+                payload.requestUserId = currentUser.ID;
             }
             try {
                 const response = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
@@ -766,12 +765,11 @@
         async function fetchData() {
             if(!currentUser) return;
             try {
-                const response = await fetch(`${WEB_APP_URL}?action=getAll&userId=${currentUser.ID || currentUser.id}`);
+                const response = await fetch(`${WEB_APP_URL}?action=getAll&userId=${currentUser.ID}`);
                 const data = await response.json();
                 if(data.tarefasFluxo) { 
                     appState = { ...appState, ...data }; 
                     if(!appState.etapas) appState.etapas = []; 
-                    if(!appState.usuarios) appState.usuarios = []; 
                     renderAll(); 
                 }
             } catch (error) {}
@@ -806,7 +804,7 @@
                 
                 if(tabName === 'concluidas' || tabName === 'config') { 
                     btn.style.display = 'none'; 
-                } else if ((tabName === 'tarefas' || tabName === 'equipe') && currentUser && currentUser.TipoUsuario !== 'admin') {
+                } else if ((tabName === 'tarefas' || tabName === 'equipe') && currentUser.TipoUsuario !== 'admin') {
                     btn.style.display = 'none'; 
                 } else { 
                     btn.style.display = 'flex'; 
@@ -827,7 +825,8 @@
         }
 
         function renderOnlineCounter() {
-            const onlineUsers = (appState.usuarios || []).filter(u => u.IsOnline).length;
+            if(!appState.usuarios) return;
+            const onlineUsers = appState.usuarios.filter(u => u.IsOnline).length;
             const counterEl = document.getElementById('online_counter');
             const textEl = document.getElementById('online_count_text');
             
@@ -842,8 +841,8 @@
         }
 
         function renderDashboard() {
-            const total = (appState.tarefasFluxo || []).length;
-            const concluidas = (appState.tarefasFluxo || []).filter(t => (t.Status || t.status) === 'concluida').length;
+            const total = appState.tarefasFluxo.length;
+            const concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida').length;
             const percent = total === 0 ? 0 : Math.round((concluidas / total) * 100);
 
             document.getElementById('dashPercent').innerText = `${percent}%`;
@@ -859,7 +858,7 @@
 
         function renderEquipe() {
             const list = document.getElementById('equipeList');
-            if(!appState.usuarios || appState.usuarios.length === 0) {
+            if(appState.usuarios.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 mt-10">Nenhum usuário.</p>`; return;
             }
             
@@ -881,7 +880,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="if(window.event) window.event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -890,7 +889,7 @@
         }
 
         function openPerfilUsuario(userId) {
-            const user = (appState.usuarios || []).find(u => (u.ID || u.id) === userId);
+            const user = appState.usuarios.find(u => (u.ID || u.id) === userId);
             if(!user) return;
             
             document.getElementById('perf_foto').src = user.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(user.Nome);
@@ -898,7 +897,7 @@
             document.getElementById('perf_funcao').innerText = user.Funcao;
             
             const list = document.getElementById('perf_tarefas_list');
-            const userTarefas = (appState.tarefasFluxo || []).filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
+            const userTarefas = appState.tarefasFluxo.filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
             
             if(userTarefas.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
@@ -913,8 +912,7 @@
                     const etapaAtualInfo = fluxoObj[etapaAtualIdx] || { etapa: 'Concluído' };
                     const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     const idVal = f.ID !== undefined ? f.ID : f.id;
-                    const currentUserId = currentUser.ID || currentUser.id;
-                    const isMinhaVez = (userId === currentUserId);
+                    const isMinhaVez = (userId === currentUser.ID);
 
                     let anexosHtml = renderAnexos(histArr);
 
@@ -938,16 +936,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -957,9 +955,10 @@
                 }).join('');
             }
             
-            openModal('modalPerfilUsuario');
+            document.getElementById('modalPerfilUsuario').classList.add('active');
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -995,7 +994,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(window.event) window.event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1011,6 +1010,7 @@
             return anexosHtml;
         }
 
+        // Nova função para abrir os álbuns no modal preview
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
@@ -1048,18 +1048,18 @@
 
         function renderTarefas() {
             const list = document.getElementById('tarefasList');
-            let tarefas = appState.tarefasFluxo || [];
+            let tarefas = appState.tarefasFluxo;
             
+            // FILTROS DE DEMANDAS
             let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
             let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
             let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
-            const currentUserId = currentUser.ID || currentUser.id;
 
             let tarefasAtivas = tarefas.filter(f => {
                 if ((f.Status || f.status) === 'concluida') return false;
                 
                 const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
-                if (currentFiltroVisao === 'pra_voce' && usuarioAtualVal !== currentUserId) return false;
+                if (currentFiltroVisao === 'pra_voce' && usuarioAtualVal !== currentUser.ID) return false;
 
                 if (filtroAssunto) {
                     let text = (String(f.Titulo || f.titulo || '') + ' ' + String(f.Descricao || f.descricao || '')).toLowerCase();
@@ -1085,6 +1085,7 @@
                 return;
             }
 
+            // Inverte a ordem das demandas para mostrar a mais recente primeiro
             tarefasAtivas.reverse();
 
             const grouped = {};
@@ -1124,10 +1125,10 @@
                     const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     
                     const usuarioAtualVal = f.UsuarioAtual !== undefined ? f.UsuarioAtual : f.Usuarioatual;
-                    const userAtual = (appState.usuarios || []).find(u => (u.ID || u.id) === usuarioAtualVal);
+                    const userAtual = appState.usuarios.find(u => (u.ID || u.id) === usuarioAtualVal);
                     const nomeUserAtual = userAtual ? userAtual.Nome.split(' ')[0] : 'Sistema';
                     
-                    const isMinhaVez = (usuarioAtualVal === currentUserId);
+                    const isMinhaVez = (usuarioAtualVal === currentUser.ID);
 
                     let anexosHtml = renderAnexos(histArr);
 
@@ -1141,8 +1142,8 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="if(window.event) window.event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1170,17 +1171,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(window.event) window.event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(window.event) window.event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1196,7 +1197,7 @@
         function renderConcluidas() { 
             const list = document.getElementById('concluidasList');
             const search = document.getElementById('searchConcluidas').value.toLowerCase();
-            let concluidas = (appState.tarefasFluxo || []).filter(t => (t.Status || t.status) === 'concluida');
+            let concluidas = appState.tarefasFluxo.filter(t => (t.Status || t.status) === 'concluida');
             if(search) concluidas = concluidas.filter(t => (t.Titulo || t.titulo).toLowerCase().includes(search));
             
             if(concluidas.length === 0) { list.innerHTML = `<p class="text-center text-gray-400 py-10">Nenhuma demanda encontrada.</p>`; return; }
@@ -1212,11 +1213,12 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
+                        <button onclick="if(window.event) window.event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="if(window.event) window.event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1226,7 +1228,7 @@
         function renderMateriais() { 
             const list = document.getElementById('materiaisList');
             const search = document.getElementById('searchMateriais').value.toLowerCase();
-            let materiais = appState.materiais || [];
+            let materiais = appState.materiais;
             if(search) materiais = materiais.filter(m => (m.titulo || m.Titulo).toLowerCase().includes(search) || (m.descricao || m.Descricao).toLowerCase().includes(search));
 
             if(materiais.length === 0) { list.innerHTML = `<div class="col-span-full text-center text-gray-400 py-10">Nenhum material</div>`; return; }
@@ -1235,9 +1237,9 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
-                        <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined') event.stopPropagation();">
+                        <button onclick="openEditMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button onclick="deleteMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
@@ -1572,7 +1574,7 @@
 
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
-            raw_files_array = [];
+            ce_files_array = [];
             document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
             document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
             document.getElementById('ce_progress_container').classList.add('hidden');
@@ -1596,47 +1598,21 @@
         function previewConcluirArquivo(event) {
             const files = event.target.files;
             if (!files || files.length === 0) return;
-            
-            raw_files_array = Array.from(files);
+
+            ce_files_array = [];
             document.getElementById('ce_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
             document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
-        }
 
-        async function submitAvancarEtapa(e) {
-            e.preventDefault(); 
-            setBtnLoading('ce_btn', true);
-            
-            const fluxoId = document.getElementById('ce_tarefa_id').value;
-            
-            if (raw_files_array.length > 0) {
-                document.getElementById('ce_progress_container').classList.remove('hidden');
-                document.getElementById('ce_progress_bar').style.width = '10%';
-                document.getElementById('ce_progress_text').innerText = 'Preparando imagens...';
-            }
-
-            let processedFiles = [];
-            
-            // Compressor Inteligente (Reduz de 4MB para ~200KB mantendo qualidade)
-            const compressImage = (file) => {
-                return new Promise((resolve) => {
-                    if (!file.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (evt) => resolve({
-                            base64: evt.target.result.split(',')[1],
-                            mimeType: file.type,
-                            fileName: file.name
-                        });
-                        reader.readAsDataURL(file);
-                        return;
-                    }
+            Array.from(files).forEach(file => {
+                if (file.type.startsWith('image/')) {
                     const reader = new FileReader();
-                    reader.onload = function(evt) {
+                    reader.onload = function(e) {
                         const img = new Image();
                         img.onload = function() {
                             const canvas = document.createElement('canvas');
                             let width = img.width;
                             let height = img.height;
-                            const max_size = 1000; 
+                            const max_size = 1200; // COMPRESSÃO: Reduz para no max 1200px
 
                             if (width > height && width > max_size) {
                                 height *= max_size / width;
@@ -1651,58 +1627,66 @@
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, 0, 0, width, height);
                             
-                            resolve({
-                                base64: canvas.toDataURL('image/jpeg', 0.6).split(',')[1],
+                            // Transforma a imagem para JPEG reduzindo a qualidade em 20%
+                            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                            ce_files_array.push({
+                                base64: dataUrl.split(',')[1],
                                 mimeType: 'image/jpeg',
                                 fileName: file.name
                             });
                         };
-                        img.src = evt.target.result;
+                        img.src = e.target.result;
                     };
                     reader.readAsDataURL(file);
-                });
-            };
-
-            // Processa arquivo por arquivo (atualizando a barra)
-            for (let i = 0; i < raw_files_array.length; i++) {
-                if (raw_files_array.length > 1) {
-                    document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                } else {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        ce_files_array.push({
+                            base64: e.target.result.split(',')[1],
+                            mimeType: file.type,
+                            fileName: file.name
+                        });
+                    };
+                    reader.readAsDataURL(file);
                 }
-                const compressed = await compressImage(raw_files_array[i]);
-                processedFiles.push(compressed);
-                
-                let prog = 10 + Math.round(((i + 1) / raw_files_array.length) * 30);
-                document.getElementById('ce_progress_bar').style.width = prog + '%';
-            }
+            });
+        }
 
-            if (processedFiles.length > 0) {
-                document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
-            }
-
+        async function submitAvancarEtapa(e) {
+            e.preventDefault(); 
+            setBtnLoading('ce_btn', true);
+            
+            const fluxoId = document.getElementById('ce_tarefa_id').value;
             const payloadData = { id: fluxoId };
-            if (processedFiles.length > 0) {
-                payloadData.files = processedFiles;
+            
+            if (ce_files_array.length > 0) {
+                payloadData.files = ce_files_array;
             }
 
-            let progUpload = 40;
+            if (ce_files_array.length > 0) {
+                document.getElementById('ce_progress_container').classList.remove('hidden');
+                document.getElementById('ce_progress_bar').style.width = '0%';
+                document.getElementById('ce_progress_text').innerText = '0%';
+            }
+
+            let progressoReal = 0;
             let progressInterval;
-            if (processedFiles.length > 0) {
+            if (ce_files_array.length > 0) {
                 progressInterval = setInterval(() => {
-                    progUpload += Math.random() * 5;
-                    if (progUpload >= 95) progUpload = 95; 
-                    document.getElementById('ce_progress_bar').style.width = parseInt(progUpload) + '%';
-                    document.getElementById('ce_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
-                }, 400);
+                    progressoReal += Math.random() * 15;
+                    if (progressoReal >= 90) progressoReal = 90; 
+                    document.getElementById('ce_progress_bar').style.width = parseInt(progressoReal) + '%';
+                    document.getElementById('ce_progress_text').innerText = parseInt(progressoReal) + '% (Enviando...)';
+                }, 800);
             }
 
             try {
-                // Envio seguro padrão via fetch com os arquivos minificados
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
                 
                 if(progressInterval) clearInterval(progressInterval);
-
+                
                 if(res.success) {
-                    if (processedFiles.length > 0) {
+                    if (ce_files_array.length > 0) {
                         document.getElementById('ce_progress_bar').style.width = '100%';
                         document.getElementById('ce_progress_text').innerText = '100% (Concluído!)';
                     }
@@ -1716,8 +1700,8 @@
                         let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
                         let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
                         
-                        if(processedFiles.length > 0) {
-                            logConclusao.files = processedFiles.map(arq => {
+                        if(ce_files_array.length > 0) {
+                            logConclusao.files = ce_files_array.map(arq => {
                                return {
                                    url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
                                    name: arq.fileName,
@@ -1749,15 +1733,15 @@
                 }
             } catch (err) {
                 if(progressInterval) clearInterval(progressInterval);
-                console.error(err);
-                alert("Erro de conexão. A internet falhou ou o pacote excedeu o limite do Google.");
+                alert("Erro ao enviar. O arquivo é muito pesado ou a internet oscilou.");
             } finally {
                 setTimeout(() => {
-                    document.getElementById('ce_progress_container').classList.add('hidden');
+                    if (document.getElementById('ce_progress_container')) {
+                        document.getElementById('ce_progress_container').classList.add('hidden');
+                    }
                     closeModal('modalConcluirEtapa');
                     forceSync(); 
                     setBtnLoading('ce_btn', false);
-                    raw_files_array = []; 
                 }, 1000);
             }
         }
@@ -1961,7 +1945,7 @@
             document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
                 const isPassado = idx < etapaAtualIdx;
                 const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
-                const user = (appState.usuarios || []).find(u => (u.ID || u.id) === et.usuarioId);
+                const user = appState.usuarios.find(u => (u.ID || u.id) === et.usuarioId);
                 const userName = user ? user.Nome : 'Desconhecido';
                 
                 let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
@@ -1988,8 +1972,7 @@
             openModal('modalDetalheFluxo');
         }
 
-        function openEditMaterial(e, id) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openEditMaterial(id) {
             const m = appState.materiais.find(x => (x.ID || x.id) === id);
             if(!m) return;
             editingItemId = id;
@@ -2001,8 +1984,7 @@
             openModal('modalMaterial');
         }
 
-        async function deleteMaterial(e, id) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function deleteMaterial(id) {
             if(!confirm("Deseja excluir este material?")) return;
             appState.materiais = appState.materiais.filter(m => (m.ID || m.id) !== id);
             renderMateriais();
