@@ -380,6 +380,10 @@
                     </div>
                 </div>
                 
+                <div id="ce_apenas_avancar_container" style="display:none;">
+                    <p class="text-sm text-gray-500 mb-4 text-center">Deseja aprovar e enviar esta demanda para a próxima etapa?</p>
+                </div>
+
                 <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -533,6 +537,42 @@
                     <i id="conf_av_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="modalTarefa" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold" id="modalTarefaTitle">Nova Tarefa</h2>
+                <button onclick="closeModal('modalTarefa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formTarefa" onsubmit="submitTarefa(event)" class="space-y-4">
+                <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-500 font-bold uppercase ml-1">Prazo de Entrega</label>
+                        <input type="date" id="t_prazo" class="ios-input mt-1">
+                    </div>
+                </div>
+                <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
+                
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4">
+                    <h3 class="font-bold mb-3 text-sm uppercase tracking-wide">Etapas do Fluxo</h3>
+                    <div id="t_etapas_container" class="space-y-3 mb-3">
+                        </div>
+                    <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
+                    <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                    <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
+                </div>
+
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="t_btn_text">Salvar Tarefa</span><i id="t_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -960,6 +1000,7 @@
             openModal('modalPerfilUsuario');
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1011,6 +1052,7 @@
             return anexosHtml;
         }
 
+        // Nova função para abrir os álbuns no modal preview
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
@@ -1050,6 +1092,7 @@
             const list = document.getElementById('tarefasList');
             let tarefas = appState.tarefasFluxo || [];
             
+            // FILTROS DE DEMANDAS
             let filtroAssunto = document.getElementById('filtroAssuntoTarefa') ? document.getElementById('filtroAssuntoTarefa').value.toLowerCase() : '';
             let filtroDataInicio = document.getElementById('filtroDataInicioTarefa') ? document.getElementById('filtroDataInicioTarefa').value : '';
             let filtroDataEntrega = document.getElementById('filtroDataEntregaTarefa') ? document.getElementById('filtroDataEntregaTarefa').value : '';
@@ -1089,18 +1132,29 @@
 
             const grouped = {};
             tarefasAtivas.forEach(f => {
+                let isUrg = (f.Urgente === true || f.urgente === true || f.Urgente === 'true' || f.urgente === 'true');
                 let rawDate = f.DataCriacao || f.Datacriacao || f.datacriacao || "0000-00-00"; 
+                if (isUrg) { rawDate = "URGENTE"; }
                 if(!grouped[rawDate]) grouped[rawDate] = [];
                 grouped[rawDate].push(f);
             });
 
-            const sortedDates = Object.keys(grouped).sort((a, b) => b.localeCompare(a));
+            const sortedDates = Object.keys(grouped).sort((a, b) => {
+                if(a === "URGENTE") return -1;
+                if(b === "URGENTE") return 1;
+                return b.localeCompare(a); // Sorts dates descending
+            });
+            
             const todayStr = new Date().toISOString().split('T')[0];
 
             let html = '';
             sortedDates.forEach(date => {
                 let displayDate = date;
-                if (date === todayStr) {
+                let isUrgGroup = false;
+                if (date === "URGENTE") {
+                    displayDate = "🚨 DEMANDAS URGENTES";
+                    isUrgGroup = true;
+                } else if (date === todayStr) {
                     displayDate = "Hoje";
                 } else if (date !== "0000-00-00") {
                     const parts = date.split('-');
@@ -1109,7 +1163,9 @@
                     displayDate = "Sem Data";
                 }
 
-                html += `<h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mt-6 mb-3 px-1"><i class="ph-bold ph-calendar-blank mr-1"></i> ${displayDate}</h3>`;
+                let headerClass = isUrgGroup ? "text-red-500 animate-pulse" : "text-gray-400";
+                html += `<h3 class="text-xs font-bold ${headerClass} uppercase tracking-widest mt-6 mb-3 px-1"><i class="ph-bold ph-calendar-blank mr-1"></i> ${displayDate}</h3>`;
+                
                 html += `<div class="space-y-4">` + grouped[date].map(f => {
                     let fluxoObj = [];
                     let histArr = [];
@@ -1128,14 +1184,19 @@
                     const nomeUserAtual = userAtual ? userAtual.Nome.split(' ')[0] : 'Sistema';
                     
                     const isMinhaVez = (usuarioAtualVal === currentUserId);
+                    let isUrg = (f.Urgente === true || f.urgente === true || f.Urgente === 'true' || f.urgente === 'true');
+
+                    let borderClass = isUrg ? 'ring-2 ring-red-500 ring-offset-2 dark:ring-offset-black shadow-[0_0_15px_rgba(239,68,68,0.4)]' : (isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : '');
+                    let pulseClass = isUrg ? 'animate-pulse' : '';
 
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${isMinhaVez ? 'ring-2 ring-iosBlue ring-offset-2 dark:ring-offset-black' : ''}" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${borderClass}" onclick="openDetalheFluxo(event, '${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
+                                ${isUrg ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-red-100 text-red-700 ${pulseClass}"><i class="ph-bold ph-warning"></i> Urgente</span>` : ''}
                                 ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
                                 ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
                             </div>
@@ -1332,7 +1393,7 @@
 
         function openEditUsuario(e, id) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
-            const user = appState.usuarios.find(u => (u.ID || u.id) === id);
+            const user = (appState.usuarios || []).find(u => (u.ID || u.id) === id);
             if(!user) return;
             editingItemId = id;
             document.getElementById('modalUsuarioTitle').innerText = 'Editar Membro';
@@ -1408,6 +1469,7 @@
             document.getElementById('t_titulo').value = '';
             document.getElementById('t_prazo').value = '';
             document.getElementById('t_desc').value = '';
+            if(document.getElementById('t_urgente')) document.getElementById('t_urgente').checked = false;
             document.getElementById('t_btn_text').innerText = 'Salvar Tarefa';
             
             document.getElementById('t_etapas_container').innerHTML = '';
@@ -1430,6 +1492,10 @@
             document.getElementById('t_prazo').value = rawPrazo;
             
             document.getElementById('t_desc').value = f.Descricao || f.descricao;
+
+            if(document.getElementById('t_urgente')) {
+                document.getElementById('t_urgente').checked = (f.Urgente === true || f.urgente === true || f.Urgente === 'true' || f.urgente === 'true');
+            }
             
             let fluxoObj = [];
             try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
@@ -1446,17 +1512,17 @@
                     const div = document.createElement('div');
                     div.className = "flex gap-2 items-center etapa-row";
                     
-                    let userOptions = appState.usuarios.map(u => {
+                    let userOptions = (appState.usuarios || []).map(u => {
                         const uid = u.ID || u.id;
                         return `<option value="${uid}" ${uid === et.usuarioId ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
                     }).join('');
 
-                    let etapaOptions = appState.etapas.map(etp => {
+                    let etapaOptions = (appState.etapas || []).map(etp => {
                         const val = etp.nome || etp.Nome;
                         return `<option value="${val}" ${val === et.etapa ? 'selected' : ''}>${val}</option>`;
                     }).join('');
                     
-                    if (!appState.etapas.find(etp => (etp.nome || etp.Nome) === et.etapa)) {
+                    if (!(appState.etapas || []).find(etp => (etp.nome || etp.Nome) === et.etapa)) {
                         etapaOptions = `<option value="${et.etapa}" selected>${et.etapa} (Antiga)</option>` + etapaOptions;
                     }
                     
@@ -1494,10 +1560,10 @@
             const div = document.createElement('div');
             div.className = "flex gap-2 items-center etapa-row";
             
-            let userOptions = appState.usuarios.map(u => `<option value="${u.ID || u.id}">${u.Nome} (${u.Funcao})</option>`).join('');
+            let userOptions = (appState.usuarios || []).map(u => `<option value="${u.ID || u.id}">${u.Nome} (${u.Funcao})</option>`).join('');
             
-            let etapaOptions = appState.etapas.map(e => `<option value="${e.nome || e.Nome}">${e.nome || e.Nome}</option>`).join('');
-            if(appState.etapas.length === 0) etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
+            let etapaOptions = (appState.etapas || []).map(e => `<option value="${e.nome || e.Nome}">${e.nome || e.Nome}</option>`).join('');
+            if((appState.etapas || []).length === 0) etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
 
             div.innerHTML = `
                 <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
@@ -1527,11 +1593,14 @@
 
             if(fluxoArr.length === 0) { alert("Adicione pelo menos uma etapa."); setBtnLoading('t_btn', false); return; }
 
+            const isUrgente = document.getElementById('t_urgente') ? document.getElementById('t_urgente').checked : false;
+
             const data = {
                 titulo: document.getElementById('t_titulo').value,
                 descricao: document.getElementById('t_desc').value,
                 prazo: document.getElementById('t_prazo').value,
-                fluxo: fluxoArr
+                fluxo: fluxoArr,
+                urgente: isUrgente
             };
 
             const actionName = editingItemId ? 'editTarefaFluxo' : 'addTarefaFluxo';
@@ -1545,10 +1614,12 @@
                     appState.tarefasFluxo[idx].Fluxo = JSON.stringify(data.fluxo);
                     appState.tarefasFluxo[idx].Prazo = data.prazo;
                     appState.tarefasFluxo[idx].prazo = data.prazo;
+                    appState.tarefasFluxo[idx].Urgente = isUrgente;
+                    appState.tarefasFluxo[idx].urgente = isUrgente;
                 }
             } else {
                 appState.tarefasFluxo.push({
-                    ID: 'temp_' + Date.now(), Titulo: data.titulo, Descricao: data.descricao, Fluxo: JSON.stringify(data.fluxo), EtapaAtual: 0, Etapaatual: 0, UsuarioAtual: data.fluxo[0].usuarioId, Usuarioatual: data.fluxo[0].usuarioId, Status: 'pendente', Historico: "[]", Prazo: data.prazo, prazo: data.prazo
+                    ID: 'temp_' + Date.now(), Titulo: data.titulo, Descricao: data.descricao, Fluxo: JSON.stringify(data.fluxo), EtapaAtual: 0, Etapaatual: 0, UsuarioAtual: data.fluxo[0].usuarioId, Usuarioatual: data.fluxo[0].usuarioId, Status: 'pendente', Historico: "[]", Prazo: data.prazo, prazo: data.prazo, Urgente: isUrgente, urgente: isUrgente
                 });
             }
             renderAll();
@@ -1610,13 +1681,12 @@
             
             if (raw_files_array.length > 0) {
                 document.getElementById('ce_progress_container').classList.remove('hidden');
-                document.getElementById('ce_progress_bar').style.width = '10%';
+                document.getElementById('ce_progress_bar').style.width = '5%';
                 document.getElementById('ce_progress_text').innerText = 'Preparando imagens...';
             }
 
             let processedFiles = [];
             
-            // Compressor Inteligente (Reduz de 4MB para ~200KB mantendo qualidade)
             const compressImage = (file) => {
                 return new Promise((resolve) => {
                     if (!file.type.startsWith('image/')) {
@@ -1663,7 +1733,6 @@
                 });
             };
 
-            // Processa arquivo por arquivo (atualizando a barra)
             for (let i = 0; i < raw_files_array.length; i++) {
                 if (raw_files_array.length > 1) {
                     document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
@@ -1671,7 +1740,7 @@
                 const compressed = await compressImage(raw_files_array[i]);
                 processedFiles.push(compressed);
                 
-                let prog = 10 + Math.round(((i + 1) / raw_files_array.length) * 30);
+                let prog = 5 + Math.round(((i + 1) / raw_files_array.length) * 45);
                 document.getElementById('ce_progress_bar').style.width = prog + '%';
             }
 
@@ -1684,7 +1753,7 @@
                 payloadData.files = processedFiles;
             }
 
-            let progUpload = 40;
+            let progUpload = 50;
             let progressInterval;
             if (processedFiles.length > 0) {
                 progressInterval = setInterval(() => {
@@ -1696,7 +1765,6 @@
             }
 
             try {
-                // Envio seguro padrão via fetch com os arquivos minificados
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
                 
                 if(progressInterval) clearInterval(progressInterval);
@@ -1901,9 +1969,9 @@
             let usuariosAlvo = [];
             const criador = a.CriadoPor || a.criadopor;
             if(alvo === 'todos') {
-                usuariosAlvo = appState.usuarios.filter(u => (u.ID || u.id) !== criador);
+                usuariosAlvo = (appState.usuarios || []).filter(u => (u.ID || u.id) !== criador);
             } else if (Array.isArray(alvo)) {
-                usuariosAlvo = appState.usuarios.filter(u => alvo.includes(u.ID || u.id));
+                usuariosAlvo = (appState.usuarios || []).filter(u => alvo.includes(u.ID || u.id));
             }
 
             let confirmaram = [];
@@ -1945,7 +2013,7 @@
 
         function openDetalheFluxo(e, fluxoId) {
             if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
-            const f = appState.tarefasFluxo.find(x => (x.ID !== undefined ? x.ID : x.id) === fluxoId);
+            const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             if(!f) return;
 
             document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
@@ -1961,7 +2029,7 @@
             document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
                 const isPassado = idx < etapaAtualIdx;
                 const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
-                const user = (appState.usuarios || []).find(u => (u.ID || u.id) === et.usuarioId);
+                const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(et.usuarioId));
                 const userName = user ? user.Nome : 'Desconhecido';
                 
                 let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
