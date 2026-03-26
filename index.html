@@ -565,7 +565,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(event) event.stopPropagation();">
+                    <input type="checkbox" id="t_urgente" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
@@ -932,7 +932,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -987,18 +987,18 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <div class="w-full flex gap-2 relative z-10">
+                            <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1048,7 +1048,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1214,16 +1214,15 @@
                             </div>
                             <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
                         
                         <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-sm line-clamp-2">${f.Descricao || f.descricao}</p>
-                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-2 mb-4 flex items-center gap-1 text-iosBlue hover:underline relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
+                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao || f.descricao}</p>
+                        
                         ${anexosHtml}
                         
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
@@ -1244,17 +1243,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1286,12 +1285,12 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1311,8 +1310,8 @@
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
-                        <button onclick="if(event) event.stopPropagation(); openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button onclick="if(event) event.stopPropagation(); deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
