@@ -951,7 +951,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -999,8 +999,6 @@
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
-                        <button type="button" onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1010,16 +1008,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1069,7 +1067,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1086,7 +1084,7 @@
         }
 
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if (e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1235,8 +1233,8 @@
                             </div>
                             <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button type="button" onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button type="button" onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button type="button" onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1264,17 +1262,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1306,12 +1304,12 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button type="button" onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button type="button" onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button type="button" onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1330,9 +1328,9 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
-                        <button type="button" onclick="if(event) event.stopPropagation(); openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button type="button" onclick="if(event) event.stopPropagation(); deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute top-3 right-3 flex gap-2 z-10">
+                        <button type="button" onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button type="button" onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
@@ -1426,7 +1424,7 @@
         }
 
         function openEditUsuario(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if (e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(id));
             if(!user) return;
             editingItemId = id;
@@ -1600,7 +1598,7 @@
         }
 
         function openEditTarefaFluxo(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(id));
             if(!f) return;
             
@@ -1638,7 +1636,7 @@
         }
 
         async function deleteTarefaFluxo(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
             appState.tarefasFluxo = appState.tarefasFluxo.filter(f => String(f.ID || f.id) !== String(id));
             renderTarefas(); renderConcluidas();
@@ -1726,7 +1724,7 @@
         }
 
         function openConcluirEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             let etapaNome = "";
             if (f) {
@@ -1928,7 +1926,7 @@
 
         function openDetalheFluxo(e, fluxoId) {
             try {
-                if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
                 const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
                 if(!f) return;
 
@@ -1986,7 +1984,7 @@
         }
 
         function openRetornarEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             if(!f) return;
 
@@ -2059,7 +2057,7 @@
         }
 
         async function iniciarDemanda(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const btn = document.getElementById('btn_iniciar_' + fluxoId);
             if(btn) {
                 btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
@@ -2293,7 +2291,7 @@
 
         // Funções de Etapas e Materiais restauradas
         function openEditMaterial(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
             if(!m) return;
             editingItemId = id;
@@ -2306,7 +2304,7 @@
         }
 
         async function deleteMaterial(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             if(!confirm("Tem a certeza que deseja excluir este material?")) return;
             appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
             renderMateriais();
@@ -2421,6 +2419,7 @@
             closeModal('modalGallery');
             setTimeout(() => { document.getElementById('galleryGrid').innerHTML = ''; }, 400);
         }
+        // --- FIM DAS FUNÇÕES RESTAURADAS ---
 
         function openPreview(fileIndex) {
             currentPreviewIndex = fileIndex;
