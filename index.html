@@ -564,8 +564,8 @@
                     <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
                 </div>
 
-                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
+                    <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
@@ -932,7 +932,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -979,7 +979,9 @@
                             </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
+                        <p class="text-gray-500 text-xs line-clamp-1">${f.Descricao || f.descricao}</p>
+                        <button onclick="event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -987,18 +989,18 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <div class="w-full flex gap-2">
+                            <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1008,7 +1010,8 @@
                 }).join('');
             }
             
-            openModal('modalPerfilUsuario');
+            document.getElementById('modalPerfilUsuario').classList.add('active');
+            document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
         }
 
         function renderAnexos(histArr) {
@@ -1046,7 +1049,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1137,7 +1140,6 @@
                 return;
             }
 
-            // Inverte a ordem das demandas para mostrar a mais recente primeiro
             tarefasAtivas.reverse();
 
             const grouped = {};
@@ -1212,15 +1214,16 @@
                             </div>
                             <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
                         
                         <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao || f.descricao}</p>
-                        
+                        <p class="text-gray-500 text-sm line-clamp-2">${f.Descricao || f.descricao}</p>
+                        <button onclick="event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-2 mb-4 flex items-center gap-1 text-iosBlue hover:underline relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+
                         ${anexosHtml}
                         
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
@@ -1241,17 +1244,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1283,12 +1286,12 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button onclick="event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button onclick="event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1307,7 +1310,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="event.stopPropagation();">
                         <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
@@ -1478,7 +1481,6 @@
             }
         }
 
-        // --- INÍCIO DA FUNÇÃO DE REORDENAR E EXCLUIR ETAPAS ---
         let countEtapasForm = 0;
         
         function reindexEtapas() {
@@ -1899,6 +1901,65 @@
                 closeModal('modalConcluirEtapa');
             } finally {
                 setBtnLoading('ce_btn', false);
+            }
+        }
+
+        function openDetalheFluxo(e, fluxoId) {
+            try {
+                if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
+                if(!f) return;
+
+                document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
+                
+                let fluxoArr = [];
+                let histArr = [];
+                try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
+                
+                const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+                const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+
+                document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
+                    const isPassado = idx < etapaAtualIdx;
+                    const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
+                    const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(et.usuarioId));
+                    const userName = user ? user.Nome : 'Desconhecido';
+                    
+                    let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
+                    let txtColor = 'text-gray-400';
+                    if(isPassado) { icon = '<i class="ph-fill ph-check-circle text-green-500 text-base"></i>'; txtColor = 'text-gray-500 line-through'; }
+                    if(isAtual) { icon = '<i class="ph-fill ph-record text-iosBlue text-base animate-pulse"></i>'; txtColor = 'text-gray-900 dark:text-white font-bold'; }
+
+                    return `
+                    <div class="flex gap-3 relative">
+                        <div class="absolute -left-[1.35rem] bg-white dark:bg-[#1C1C1E] py-1">${icon}</div>
+                        <div>
+                            <p class="text-sm ${txtColor}">${idx+1}. ${et.etapa}</p>
+                            <p class="text-[10px] text-gray-500 flex items-center gap-1"><i class="ph-bold ph-user"></i> ${userName}</p>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
+                    let dateStr = '';
+                    try {
+                        if(h.data) {
+                            const d = new Date(h.data);
+                            if(!isNaN(d.getTime())) {
+                                dateStr = d.toLocaleString('pt-BR');
+                            }
+                        }
+                    } catch(e){}
+                    
+                    let anexosHtml = renderAnexos([h]);
+                    return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${dateStr}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexosHtml}</div>`;
+                }).join('') || '<p class="text-xs text-gray-500">Sem histórico</p>';
+
+                openModal('modalDetalheFluxo');
+            } catch (error) {
+                console.error(error);
+                alert("Houve um erro ao abrir o histórico.");
             }
         }
 
