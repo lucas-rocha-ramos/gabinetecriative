@@ -135,7 +135,7 @@
             <h1 class="text-3xl font-extrabold text-center mb-2">Bem-vindo</h1>
             <p class="text-center text-gray-500 mb-8">Faça login para acessar suas demandas</p>
             
-            <form id="formLogin" onsubmit="event.preventDefault(); realizarLogin();" class="space-y-4">
+            <form id="formLogin" onsubmit="event.preventDefault(); realizarLogin(event);" class="space-y-4">
                 <input type="email" id="login_email" placeholder="E-mail" class="ios-input" required>
                 <input type="password" id="login_senha" placeholder="Senha" class="ios-input" required>
                 
@@ -357,7 +357,7 @@
                 <h2 id="modalMaterialTitle" class="text-xl font-bold">Vincular Material</h2>
                 <button onclick="closeModal('modalMaterial')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formMaterial" onsubmit="event.preventDefault(); submitMaterial();" class="space-y-4">
+            <form id="formMaterial" onsubmit="submitMaterial(event)" class="space-y-4">
                 <input type="text" id="m_titulo" placeholder="Título da Pasta/Arquivo" class="ios-input" required>
                 <textarea id="m_desc" placeholder="Descrição..." class="ios-input h-20 resize-none" required></textarea>
                 <input type="url" id="m_link" placeholder="Link do Google Drive" class="ios-input" required>
@@ -373,7 +373,7 @@
                 <h2 id="modalUsuarioTitle" class="text-xl font-bold">Novo Membro</h2>
                 <button onclick="closeModal('modalUsuario')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formUsuario" onsubmit="event.preventDefault(); submitUsuario();" class="space-y-4">
+            <form id="formUsuario" onsubmit="submitUsuario(event)" class="space-y-4">
                 <div class="flex justify-center mb-2">
                     <div class="relative group cursor-pointer" onclick="document.getElementById('u_foto_file').click()">
                         <img id="u_preview_foto" src="https://ui-avatars.com/api/?name=U&background=random" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800 transition-opacity group-hover:opacity-70">
@@ -413,7 +413,7 @@
                 <h2 class="text-xl font-bold">Concluir Etapa</h2>
                 <button onclick="closeModal('modalConcluirEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formConcluirEtapa" onsubmit="event.preventDefault(); submitAvancarEtapa();" class="space-y-4">
+            <form id="formConcluirEtapa" onsubmit="submitAvancarEtapa(event)" class="space-y-4">
                 <input type="hidden" id="ce_tarefa_id">
                 
                 <div id="ce_upload_container">
@@ -454,7 +454,7 @@
                 <h2 class="text-xl font-bold text-red-600 flex items-center gap-2"><i class="ph-bold ph-arrow-u-up-left"></i> Retornar Tarefa</h2>
                 <button onclick="closeModal('modalRetornarEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formRetornarEtapa" onsubmit="event.preventDefault(); submitRetornarEtapa();" class="space-y-4">
+            <form id="formRetornarEtapa" onsubmit="submitRetornarEtapa(event)" class="space-y-4">
                 <input type="hidden" id="re_tarefa_id">
                 
                 <p class="text-sm text-gray-500 mb-2">Para qual etapa deseja retornar?</p>
@@ -514,7 +514,7 @@
                 <button onclick="closeModal('modalEtapas')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
             
-            <form id="formEtapa" onsubmit="event.preventDefault(); submitEtapa();" class="flex gap-2 mb-6">
+            <form id="formEtapa" onsubmit="submitEtapa(event)" class="flex gap-2 mb-6">
                 <input type="text" id="nova_etapa_nome" placeholder="Nova etapa (Ex: Edição)" class="ios-input py-3 text-sm flex-1" required>
                 <button type="submit" class="bg-iosBlue text-white px-4 rounded-xl font-bold active:scale-95 transition-transform">
                     <i id="btn_etapa_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -556,7 +556,7 @@
                 <h2 class="text-xl font-bold text-red-600 flex items-center gap-2"><i class="ph-bold ph-bell-ringing"></i> Novo Aviso</h2>
                 <button onclick="closeModal('modalCreateAviso')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formAviso" onsubmit="event.preventDefault(); submitAviso();" class="space-y-4">
+            <form id="formAviso" onsubmit="submitAviso(event)" class="space-y-4">
                 <input type="text" id="av_titulo" placeholder="Título do Aviso (Ex: Urgente)" class="ios-input border border-red-100 dark:border-red-900/30" required>
                 <textarea id="av_desc" placeholder="Mensagem do aviso..." class="ios-input h-24 resize-none border border-red-100 dark:border-red-900/30" required></textarea>
                 
@@ -592,6 +592,42 @@
                     <i id="conf_av_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
             </div>
+        </div>
+    </div>
+
+    <div id="modalTarefa" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold" id="modalTarefaTitle">Nova Tarefa</h2>
+                <button onclick="closeModal('modalTarefa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formTarefa" onsubmit="submitTarefa(event)" class="space-y-4">
+                <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
+                <div class="flex gap-2">
+                    <div class="flex-1">
+                        <label class="text-xs text-gray-500 font-bold uppercase ml-1">Prazo de Entrega</label>
+                        <input type="date" id="t_prazo" class="ios-input mt-1">
+                    </div>
+                </div>
+                <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
+                
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4">
+                    <h3 class="font-bold mb-3 text-sm uppercase tracking-wide">Etapas do Fluxo</h3>
+                    <div id="t_etapas_container" class="space-y-3 mb-3">
+                        </div>
+                    <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
+                </div>
+
+                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
+                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
+                    <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
+                </div>
+
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="t_btn_text">Salvar Tarefa</span><i id="t_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
         </div>
     </div>
 
@@ -744,7 +780,8 @@
             }
         }
 
-        async function realizarLogin() {
+        async function realizarLogin(e) {
+            if(e) e.preventDefault();
             setBtnLoading('login_btn', true);
             document.getElementById('login_error').classList.add('hidden');
 
@@ -950,7 +987,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="event.stopPropagation(); openEditUsuario('${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -988,7 +1025,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -997,9 +1034,7 @@
                             </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-xs line-clamp-1">${f.Descricao || f.descricao}</p>
-                        <button type="button" onclick="event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
+                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1009,16 +1044,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1032,6 +1067,7 @@
             document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1067,11 +1103,11 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full bg-black/5 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex justify-center items-center" style="max-height: 250px;" onclick="event.stopPropagation(); openPreviewTaskAlbum('${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full bg-black/5 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex justify-center items-center min-h-[120px]" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
-                    <img src="${thumbUrl}" class="w-full h-auto max-h-[250px] object-contain relative z-10" onerror="this.style.display='none'">
+                    <img src="${thumbUrl}" class="w-full h-auto max-h-[350px] object-contain relative z-10" onerror="this.style.display='none'">
                     ${isVideo && !hasMultiple ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
                     ${badgeExtra}
                     <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
@@ -1083,7 +1119,8 @@
             return anexosHtml;
         }
 
-        function openPreviewTaskAlbum(encodedFilesJson, startIndex) {
+        function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1222,7 +1259,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${borderClass}" onclick="openDetalheFluxo('${idVal}')">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${borderClass}" onclick="openDetalheFluxo(event, '${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1232,8 +1269,8 @@
                             </div>
                             <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button type="button" onclick="event.stopPropagation(); openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button type="button" onclick="event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button type="button" onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1261,17 +1298,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="event.stopPropagation(); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="event.stopPropagation(); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="event.stopPropagation(); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1299,16 +1336,15 @@
                 let anexosHtml = renderAnexos(histArr);
 
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button type="button" onclick="event.stopPropagation(); openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button type="button" onclick="event.stopPropagation(); deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1328,8 +1364,8 @@
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute top-3 right-3 flex gap-2 z-10">
-                        <button type="button" onclick="event.stopPropagation(); openEditMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button type="button" onclick="event.stopPropagation(); deleteMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                        <button type="button" onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button type="button" onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
@@ -1422,7 +1458,8 @@
             reader.readAsDataURL(file);
         }
 
-        function openEditUsuario(id) {
+        function openEditUsuario(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(id));
             if(!user) return;
             editingItemId = id;
@@ -1448,7 +1485,8 @@
             openModal('modalUsuario');
         }
 
-        async function submitUsuario() {
+        async function submitUsuario(e) {
+            if(e) e.preventDefault(); 
             setBtnLoading('u_btn', true);
             
             try {
@@ -1594,7 +1632,8 @@
             openModal('modalTarefa');
         }
 
-        function openEditTarefaFluxo(id) {
+        function openEditTarefaFluxo(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(id));
             if(!f) return;
             
@@ -1631,7 +1670,8 @@
             openModal('modalTarefa');
         }
 
-        async function deleteTarefaFluxo(id) {
+        async function deleteTarefaFluxo(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
             appState.tarefasFluxo = appState.tarefasFluxo.filter(f => String(f.ID || f.id) !== String(id));
             renderTarefas(); renderConcluidas();
@@ -1639,7 +1679,8 @@
             forceSync();
         }
 
-        async function submitTarefa() {
+        async function submitTarefa(e) {
+            if(e) e.preventDefault(); 
             setBtnLoading('t_btn', true);
             
             try {
@@ -1717,7 +1758,8 @@
             }
         }
 
-        function openConcluirEtapa(fluxoId) {
+        function openConcluirEtapa(e, fluxoId) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             let etapaNome = "";
             if (f) {
@@ -1758,7 +1800,8 @@
             document.getElementById('ce_icone').className = 'ph-bold ph-files text-4xl text-iosBlue mb-2';
         }
 
-        async function submitAvancarEtapa() {
+        async function submitAvancarEtapa(e) {
+            if(e) e.preventDefault(); 
             setBtnLoading('ce_btn', true);
             
             try {
@@ -1916,8 +1959,9 @@
             }
         }
 
-        function openDetalheFluxo(fluxoId) {
+        function openDetalheFluxo(e, fluxoId) {
             try {
+                if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
                 const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
                 if(!f) return;
 
@@ -1974,7 +2018,8 @@
             }
         }
 
-        function openRetornarEtapa(fluxoId) {
+        function openRetornarEtapa(e, fluxoId) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             if(!f) return;
 
@@ -1995,7 +2040,8 @@
             openModal('modalRetornarEtapa');
         }
 
-        async function submitRetornarEtapa() {
+        async function submitRetornarEtapa(e) {
+            if(e) e.preventDefault();
             setBtnLoading('re_btn', true);
             
             try {
@@ -2045,7 +2091,8 @@
             }
         }
 
-        async function iniciarDemanda(fluxoId) {
+        async function iniciarDemanda(e, fluxoId) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const btn = document.getElementById('btn_iniciar_' + fluxoId);
             if(btn) {
                 btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
@@ -2174,7 +2221,8 @@
             openModal('modalAvisoDetalhes');
         }
 
-        async function submitAviso() {
+        async function submitAviso(e) {
+            if(e) e.preventDefault();
             setBtnLoading('av_btn', true);
             
             try {
@@ -2284,8 +2332,8 @@
             }
         }
 
-        // Funções de Etapas e Materiais
-        function openEditMaterial(id) {
+        function openEditMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
             if(!m) return;
             editingItemId = id;
@@ -2297,7 +2345,8 @@
             openModal('modalMaterial');
         }
 
-        async function deleteMaterial(id) {
+        async function deleteMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             if(!confirm("Tem a certeza que deseja excluir este material?")) return;
             appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
             renderMateriais();
@@ -2305,7 +2354,8 @@
             forceSync();
         }
 
-        async function submitMaterial() {
+        async function submitMaterial(e) {
+            if(e) e.preventDefault();
             setBtnLoading('m_btn', true);
             try {
                 const data = {
@@ -2344,7 +2394,8 @@
             `).join('');
         }
 
-        async function submitEtapa() {
+        async function submitEtapa(e) {
+            if(e) e.preventDefault();
             setBtnLoading('btn_etapa', true);
             try {
                 const nome = document.getElementById('nova_etapa_nome').value;
