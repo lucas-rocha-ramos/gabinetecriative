@@ -595,96 +595,6 @@
         </div>
     </div>
 
-    <div id="modalTarefa" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
-        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
-            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold" id="modalTarefaTitle">Nova Tarefa</h2>
-                <button onclick="closeModal('modalTarefa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
-            </div>
-            <form id="formTarefa" onsubmit="event.preventDefault(); submitTarefa(event);" class="space-y-4">
-                <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
-                <div class="flex gap-2">
-                    <div class="flex-1">
-                        <label class="text-xs text-gray-500 font-bold uppercase ml-1">Prazo de Entrega</label>
-                        <input type="date" id="t_prazo" class="ios-input mt-1">
-                    </div>
-                </div>
-                <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
-                
-                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4">
-                    <h3 class="font-bold mb-3 text-sm uppercase tracking-wide">Etapas do Fluxo</h3>
-                    <div id="t_etapas_container" class="space-y-3 mb-3">
-                        </div>
-                    <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
-                </div>
-
-                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
-                    <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
-                </div>
-
-                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
-                    <span id="t_btn_text">Salvar Tarefa</span><i id="t_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div id="modalDetalheFluxo" class="slide-modal fixed inset-0 z-[80] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
-        <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
-            <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeModal('modalDetalheFluxo')" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
-                <h2 class="font-bold text-lg truncate flex-1 text-center px-2" id="det_f_titulo">Detalhes da Tarefa</h2>
-                <div class="w-16"></div>
-            </div>
-        </div>
-        <div class="flex-1 overflow-y-auto p-6 pb-safe-bottom">
-            <div class="space-y-6">
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">Linha do Tempo</h3>
-                    <div class="relative border-l-2 border-gray-200 dark:border-gray-800 ml-3 space-y-4" id="det_f_timeline">
-                        </div>
-                </div>
-
-                <div>
-                    <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">Histórico (Logs)</h3>
-                    <div class="bg-gray-50 dark:bg-gray-900/50 rounded-xl p-4 space-y-2 text-xs font-mono text-gray-600 dark:text-gray-400" id="det_f_logs">
-                        </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalGallery" class="slide-modal fixed inset-0 z-[60] bg-[#f2f2f7] dark:bg-[#000000] flex flex-col">
-        <div class="pt-safe-top glass-panel relative z-10 border-b border-gray-300 dark:border-gray-800">
-            <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closeGallery()" class="text-iosBlue flex items-center gap-1 font-medium"><i class="ph-bold ph-caret-left text-xl"></i> Voltar</button>
-                <h2 id="galleryTitle" class="font-bold text-lg truncate flex-1 text-center px-2">Arquivos</h2>
-                <div class="w-16"></div>
-            </div>
-        </div>
-        <div id="galleryGrid" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 sm:grid-cols-3 gap-3 pb-safe-bottom content-start"></div>
-    </div>
-
-    <div id="modalPreview" class="slide-modal fixed inset-0 z-[90] bg-black flex flex-col">
-        <div class="pt-safe-top w-full z-10 shrink-0">
-            <div class="flex items-center justify-between px-4 py-3">
-                <button onclick="closePreview()" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white"><i class="ph-bold ph-x text-xl"></i></button>
-                <a id="btnDownloadPreview" href="#" target="_blank" download class="px-5 py-2 bg-iosBlue text-white font-semibold rounded-full flex items-center gap-2"><i class="ph-bold ph-download-simple"></i> Baixar</a>
-            </div>
-        </div>
-        
-        <button id="btnPrevPreview" onclick="prevPreview()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center z-50 hidden"><i class="ph-bold ph-caret-left text-xl"></i></button>
-        <button id="btnNextPreview" onclick="nextPreview()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 text-white flex items-center justify-center z-50 hidden"><i class="ph-bold ph-caret-right text-xl"></i></button>
-
-        <div id="previewMediaContainer" class="flex-1 flex items-center justify-center w-full min-h-0 relative"></div>
-        <div class="w-full p-6 pb-safe-bottom shrink-0">
-            <h3 id="previewFilename" class="text-white font-semibold text-lg truncate">Nome</h3>
-            <p id="previewType" class="text-gray-400 text-sm">Tipo</p>
-        </div>
-    </div>
-
     <script>
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbz4OerHYrzFpGHKdkDsy-_Dd5DZLYXF-34hYv1fBZ8A4ty0D6a8Bd963bTRk9FEJuLa/exec"; 
 
@@ -1034,9 +944,7 @@
                             </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-xs line-clamp-1">${f.Descricao || f.descricao}</p>
-                        <button type="button" onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
+                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1278,8 +1186,9 @@
                         </div>
                         
                         <h4 class="font-bold text-lg leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-sm mb-4 line-clamp-2">${f.Descricao || f.descricao}</p>
-                        
+                        <p class="text-gray-500 text-sm line-clamp-2">${f.Descricao || f.descricao}</p>
+                        <button type="button" onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-2 mb-4 flex items-center gap-1 text-iosBlue hover:underline relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+
                         ${anexosHtml}
                         
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
@@ -1366,7 +1275,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
                         <button type="button" onclick="if(event) event.stopPropagation(); openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button type="button" onclick="if(event) event.stopPropagation(); deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
@@ -2135,6 +2044,24 @@
             }
         }
 
+        function toggleAlvoUsuarios() {
+            const tipo = document.getElementById('av_alvo_tipo').value;
+            const lista = document.getElementById('av_usuarios_lista');
+            if(tipo === 'especificos') {
+                const users = (appState.usuarios || []).filter(u => u.Status === 'ativo');
+                lista.innerHTML = users.map(u => `
+                    <label class="flex items-center gap-3 p-2 bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-lg cursor-pointer active:scale-95 transition-transform">
+                        <input type="checkbox" value="${u.ID || u.id}" class="av_check_user w-5 h-5 accent-iosBlue rounded cursor-pointer">
+                        <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-sm font-semibold">${u.Nome}</span>
+                    </label>
+                `).join('');
+                lista.classList.remove('hidden');
+            } else {
+                lista.classList.add('hidden');
+            }
+        }
+
         function openAvisosHistorico() {
             const container = document.getElementById('lista_avisos_historico');
             if(!appState.avisos || appState.avisos.length === 0) {
@@ -2307,6 +2234,136 @@
             } finally {
                 setBtnLoading('conf_av_btn', false);
             }
+        }
+
+        // Funções de Etapas e Materiais restauradas
+        function openEditMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
+            if(!m) return;
+            editingItemId = id;
+            document.getElementById('modalMaterialTitle').innerText = 'Editar Vínculo';
+            document.getElementById('m_titulo').value = m.titulo || m.Titulo || '';
+            document.getElementById('m_desc').value = m.descricao || m.Descricao || '';
+            document.getElementById('m_link').value = m.linkDrive || m.LinkDrive || '';
+            document.getElementById('m_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalMaterial');
+        }
+
+        async function deleteMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if(!confirm("Tem a certeza que deseja excluir este material?")) return;
+            appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
+            renderMateriais();
+            await apiRequest({ action: 'deleteMaterial', data: { id: id } });
+            forceSync();
+        }
+
+        async function submitMaterial(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('m_btn', true);
+            try {
+                const data = {
+                    titulo: document.getElementById('m_titulo').value,
+                    descricao: document.getElementById('m_desc').value,
+                    linkDrive: document.getElementById('m_link').value
+                };
+                const action = editingItemId ? 'editMaterial' : 'addMaterial';
+                if(editingItemId) data.id = editingItemId;
+
+                closeModal('modalMaterial');
+                await apiRequest({ action: action, data: data });
+                await forceSync();
+            } catch(err) {
+                console.error(err);
+            } finally {
+                setBtnLoading('m_btn', false);
+            }
+        }
+
+        function openEtapasConfig() {
+            document.getElementById('nova_etapa_nome').value = '';
+            renderListaEtapas();
+            openModal('modalEtapas');
+        }
+
+        function renderListaEtapas() {
+            const list = document.getElementById('listaEtapas');
+            let etapas = appState.etapas || [];
+            if(etapas.length === 0) { list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`; return; }
+            list.innerHTML = etapas.map(e => `
+                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <span class="font-semibold text-sm">${e.nome || e.Nome}</span>
+                    <button type="button" onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center active:scale-95"><i class="ph-bold ph-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function submitEtapa(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('btn_etapa', true);
+            try {
+                const nome = document.getElementById('nova_etapa_nome').value;
+                const res = await apiRequest({ action: 'addEtapa', data: { nome: nome } });
+                if(res.success) {
+                    document.getElementById('nova_etapa_nome').value = '';
+                    await forceSync();
+                    renderListaEtapas();
+                }
+            } catch(err) { console.error(err); } 
+            finally { setBtnLoading('btn_etapa', false); }
+        }
+
+        async function deleteEtapa(id) {
+            if(!confirm("Excluir esta etapa padrão?")) return;
+            appState.etapas = appState.etapas.filter(e => String(e.id || e.ID) !== String(id));
+            renderListaEtapas();
+            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
+            forceSync();
+        }
+        
+        async function openGallery(materialId) {
+            const m = appState.materiais.find(x => String(x.id || x.ID) === String(materialId));
+            if(!m) return;
+            document.getElementById('galleryTitle').innerText = m.titulo || m.Titulo;
+            document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full flex justify-center py-10"><i class="ph-bold ph-spinner animate-spin text-3xl text-iosBlue"></i></div>';
+            openModal('modalGallery');
+            
+            try {
+                const res = await apiRequest({ action: 'getDriveFiles', link: m.linkDrive || m.LinkDrive });
+                if(res.success && res.files) {
+                    currentGalleryFiles = res.files;
+                    if(currentGalleryFiles.length === 0) {
+                        document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">Pasta vazia</div>';
+                        return;
+                    }
+                    document.getElementById('galleryGrid').innerHTML = currentGalleryFiles.map((file, idx) => {
+                        const isVideo = file.type === 'video' || (file.name && file.name.match(/\.(mp4|mov|avi|mkv)$/i));
+                        const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                        let thumbUrl = file.url;
+                        if(file.url.includes('drive.google.com') && file.id) {
+                            thumbUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w300`;
+                        }
+                        return `
+                        <div class="relative aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform" onclick="openPreview(${idx})">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                <i class="ph-fill ${icon} text-3xl mb-1"></i>
+                            </div>
+                            <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
+                            ${isVideo ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-4xl text-white drop-shadow-lg"></i></div>' : ''}
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">' + (res.error || 'Erro ao carregar') + '</div>';
+                }
+            } catch(err) {
+                document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">Erro de conexão</div>';
+            }
+        }
+
+        function closeGallery() {
+            closeModal('modalGallery');
+            setTimeout(() => { document.getElementById('galleryGrid').innerHTML = ''; }, 400);
         }
 
         function openPreview(fileIndex) {
