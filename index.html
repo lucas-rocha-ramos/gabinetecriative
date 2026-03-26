@@ -351,6 +351,61 @@
         </button>
     </nav>
 
+    <div id="modalMaterial" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalMaterialTitle" class="text-xl font-bold">Vincular Material</h2>
+                <button onclick="closeModal('modalMaterial')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formMaterial" onsubmit="submitMaterial(event)" class="space-y-4">
+                <input type="text" id="m_titulo" placeholder="Título da Pasta/Arquivo" class="ios-input" required>
+                <textarea id="m_desc" placeholder="Descrição..." class="ios-input h-20 resize-none" required></textarea>
+                <input type="url" id="m_link" placeholder="Link do Google Drive" class="ios-input" required>
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 flex justify-center items-center gap-2"><span id="m_btn_text">Salvar Vínculo</span><i id="m_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalUsuario" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalUsuarioTitle" class="text-xl font-bold">Novo Membro</h2>
+                <button onclick="closeModal('modalUsuario')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formUsuario" onsubmit="submitUsuario(event)" class="space-y-4">
+                <div class="flex justify-center mb-2">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('u_foto_file').click()">
+                        <img id="u_preview_foto" src="https://ui-avatars.com/api/?name=U&background=random" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800 transition-opacity group-hover:opacity-70">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                            <i class="ph-bold ph-camera text-white text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="u_foto_file" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+                <input type="hidden" id="u_foto_base64">
+                <input type="hidden" id="u_foto_mime">
+                <input type="hidden" id="u_foto_url">
+                
+                <input type="text" id="u_nome" placeholder="Nome Completo" class="ios-input" required>
+                <input type="text" id="u_funcao" placeholder="Função (Ex: Editor, Câmera)" class="ios-input" required>
+                <input type="tel" id="u_whatsapp" placeholder="Nº WhatsApp (Ex: 5565999999999)" class="ios-input" required>
+                <input type="email" id="u_email" placeholder="E-mail de Login" class="ios-input" required>
+                <input type="password" id="u_senha" placeholder="Senha" class="ios-input">
+                
+                <select id="u_tipo" class="ios-input appearance-none">
+                    <option value="usuario">Usuário Comum</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="u_btn_text">Salvar Usuário</span>
+                    <i id="u_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalConcluirEtapa" class="modal-overlay fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
@@ -565,7 +620,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" onclick="if(event) event.stopPropagation();" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(event) event.stopPropagation();">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
@@ -980,8 +1035,6 @@
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
                         <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
-                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1014,7 +1067,6 @@
             document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
         }
 
-        // Função isolada para renderizar os cartões de arquivos independentes
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1219,7 +1271,6 @@
                                 <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
                                 <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
-                                <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-clock-counter-clockwise"></i> Histórico</button>
                             </div>
                         </div>
                         
@@ -2078,6 +2129,13 @@
                 alert("Erro de conexão ao iniciar. Verifique sua internet.");
                 renderAll();
             }
+        }
+
+        function toggleAlvoUsuarios() {
+            const tipo = document.getElementById('av_alvo_tipo').value;
+            const lista = document.getElementById('av_usuarios_lista');
+            if(tipo === 'especificos') lista.classList.remove('hidden');
+            else lista.classList.add('hidden');
         }
 
         function openAvisosHistorico() {
