@@ -798,9 +798,15 @@
                 payload.requestUserId = currentUser.ID || currentUser.id;
             }
             try {
-                const response = await fetch(WEB_APP_URL, { method: 'POST', body: JSON.stringify(payload) });
+                const response = await fetch(WEB_APP_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify(payload),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                });
                 return await response.json();
-            } catch (error) { return { success: false, error }; }
+            } catch (error) { 
+                return { success: false, error: "Erro de conexão (CORS/Fetch). Verifique a internet e certifique-se de que publicou o Web App com acesso para 'Qualquer Pessoa'." }; 
+            }
         }
 
         async function fetchData() {
@@ -1000,6 +1006,7 @@
             openModal('modalPerfilUsuario');
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1051,6 +1058,7 @@
             return anexosHtml;
         }
 
+        // Nova função para abrir os álbuns no modal preview
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
@@ -1141,7 +1149,7 @@
             const sortedDates = Object.keys(grouped).sort((a, b) => {
                 if(a === "URGENTE") return -1;
                 if(b === "URGENTE") return 1;
-                return b.localeCompare(a); 
+                return b.localeCompare(a); // Sorts dates descending
             });
             
             const todayStr = new Date().toISOString().split('T')[0];
@@ -1212,7 +1220,7 @@
                         
                         ${anexosHtml}
                         
-                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
+                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
                             <div>
                                 <p class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual</p>
                                 <p class="font-bold text-sm text-iosBlue">${etapaAtualInfo.etapa}</p>
@@ -1272,6 +1280,7 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
+                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
@@ -1392,7 +1401,7 @@
 
         function openEditUsuario(e, id) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
-            const user = (appState.usuarios || []).find(u => (u.ID || u.id) === id);
+            const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(id));
             if(!user) return;
             editingItemId = id;
             document.getElementById('modalUsuarioTitle').innerText = 'Editar Membro';
@@ -1419,7 +1428,6 @@
 
         async function submitUsuario(e) {
             e.preventDefault(); setBtnLoading('u_btn', true);
-            
             try {
                 const data = {
                     nome: document.getElementById('u_nome').value,
@@ -1805,7 +1813,7 @@
                         document.getElementById('ce_progress_text').innerText = '100% (Concluído!)';
                     }
 
-                    const fIdx = appState.tarefasFluxo.findIndex(f => String(f.ID || f.id) === String(fluxoId));
+                    const fIdx = appState.tarefasFluxo.findIndex(f => String(f.ID !== undefined ? f.ID : f.id) === String(fluxoId));
                     if(fIdx > -1) {
                         let f = appState.tarefasFluxo[fIdx];
                         let fluxoObj = []; try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
@@ -1966,10 +1974,13 @@
                     }
                 } else {
                     alert(res.error || "Falha ao iniciar a demanda.");
+                    renderAll();
                 }
                 await forceSync();
             } catch (err) {
                 console.error(err);
+                alert("Erro de conexão ao iniciar. Verifique sua internet.");
+                renderAll();
             }
         }
 
