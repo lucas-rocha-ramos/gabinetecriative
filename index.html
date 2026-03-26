@@ -564,7 +564,7 @@
                     <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
                 </div>
 
-                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
+                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
                     <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
@@ -805,7 +805,8 @@
                 });
                 return await response.json();
             } catch (error) { 
-                return { success: false, error: "Erro de conexão (CORS/Fetch). Verifique a internet e certifique-se de que publicou o Web App com acesso para 'Qualquer Pessoa'." }; 
+                console.error(error);
+                return { success: false, error: "Erro de conexão." }; 
             }
         }
 
@@ -814,13 +815,17 @@
             try {
                 const response = await fetch(`${WEB_APP_URL}?action=getAll&userId=${currentUser.ID || currentUser.id}`);
                 const data = await response.json();
-                if(data.tarefasFluxo) { 
-                    appState = { ...appState, ...data }; 
-                    if(!appState.etapas) appState.etapas = []; 
-                    if(!appState.usuarios) appState.usuarios = []; 
+                if(data && !data.error) { 
+                    appState.tarefasFluxo = data.tarefasFluxo || [];
+                    appState.materiais = data.materiais || [];
+                    appState.usuarios = data.usuarios || [];
+                    appState.avisos = data.avisos || [];
+                    appState.etapas = data.etapas || [];
                     renderAll(); 
                 }
-            } catch (error) {}
+            } catch (error) {
+                console.error("Erro no fetchData:", error);
+            }
         }
 
         async function forceSync() {
@@ -936,7 +941,7 @@
         }
 
         function openPerfilUsuario(userId) {
-            const user = (appState.usuarios || []).find(u => (u.ID || u.id) === userId);
+            const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(userId));
             if(!user) return;
             
             document.getElementById('perf_foto').src = user.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(user.Nome);
@@ -944,7 +949,7 @@
             document.getElementById('perf_funcao').innerText = user.Funcao;
             
             const list = document.getElementById('perf_tarefas_list');
-            const userTarefas = (appState.tarefasFluxo || []).filter(f => (f.Status || f.status) !== 'concluida' && (f.UsuarioAtual === userId || f.Usuarioatual === userId));
+            const userTarefas = (appState.tarefasFluxo || []).filter(f => (f.Status || f.status) !== 'concluida' && (String(f.UsuarioAtual) === String(userId) || String(f.Usuarioatual) === String(userId)));
             
             if(userTarefas.length === 0) {
                 list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma demanda ativa no momento.</p>`;
@@ -960,7 +965,7 @@
                     const foiIniciada = !!etapaAtualInfo.iniciadaEm;
                     const idVal = f.ID !== undefined ? f.ID : f.id;
                     const currentUserId = currentUser.ID || currentUser.id;
-                    const isMinhaVez = (userId === currentUserId);
+                    const isMinhaVez = (String(userId) === String(currentUserId));
 
                     let anexosHtml = renderAnexos(histArr);
 
@@ -1006,7 +1011,7 @@
             openModal('modalPerfilUsuario');
         }
 
-        // Função isolada para renderizar os cartões de arquivos independentes se for fileUrl (antigo) ou array files
+        // Função isolada para renderizar os cartões de arquivos independentes
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1058,7 +1063,6 @@
             return anexosHtml;
         }
 
-        // Nova função para abrir os álbuns no modal preview
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
             if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             try {
@@ -1220,7 +1224,7 @@
                         
                         ${anexosHtml}
                         
-                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
+                        <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-3 flex items-center justify-between mb-4 animate-pulse shadow-sm">
                             <div>
                                 <p class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual</p>
                                 <p class="font-bold text-sm text-iosBlue">${etapaAtualInfo.etapa}</p>
@@ -1304,7 +1308,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined') event.stopPropagation();">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
                         <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
@@ -1773,39 +1777,35 @@
 
                 for (let i = 0; i < raw_files_array.length; i++) {
                     if (raw_files_array.length > 1) {
-                        document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                        document.getElementById('ce_progress_text').innerText = `Enviando arquivo ${i + 1} de ${raw_files_array.length}...`;
                     }
                     const compressed = await compressImage(raw_files_array[i]);
                     processedFiles.push(compressed);
                     
-                    let prog = 5 + Math.round(((i + 1) / raw_files_array.length) * 45);
+                    // Envio um a um usando Lotes
+                    const resArq = await apiRequest({ 
+                        action: 'avancarEtapaFluxo', 
+                        data: { id: fluxoId, files: [compressed], ehLote: true } 
+                    });
+                    
+                    if(!resArq.success) throw new Error("Falha no upload do arquivo " + (i+1));
+                    
+                    let prog = Math.round(((i + 1) / raw_files_array.length) * 90);
                     document.getElementById('ce_progress_bar').style.width = prog + '%';
                 }
 
-                if (processedFiles.length > 0) {
-                    document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
+                if (raw_files_array.length > 0) {
+                    document.getElementById('ce_progress_text').innerText = `Finalizando...`;
                 }
 
+                // Finaliza o lote ou apenas avança se não houver arquivos
                 const payloadData = { id: fluxoId };
                 if (processedFiles.length > 0) {
-                    payloadData.files = processedFiles;
+                    payloadData.finalizaLote = true;
                 }
 
-                let progUpload = 50;
-                let progressInterval;
-                if (processedFiles.length > 0) {
-                    progressInterval = setInterval(() => {
-                        progUpload += Math.random() * 5;
-                        if (progUpload >= 95) progUpload = 95; 
-                        document.getElementById('ce_progress_bar').style.width = parseInt(progUpload) + '%';
-                        document.getElementById('ce_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
-                    }, 400);
-                }
-
-                // Envio seguro usando o apiRequest padrão
+                // Envio da conclusão da etapa
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
-                
-                if(progressInterval) clearInterval(progressInterval);
 
                 if(res.success) {
                     if (processedFiles.length > 0) {
