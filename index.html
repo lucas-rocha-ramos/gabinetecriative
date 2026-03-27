@@ -439,6 +439,8 @@
                     <p class="text-sm text-gray-500 mb-4 text-center">Deseja aprovar e enviar esta demanda para a próxima etapa?</p>
                 </div>
 
+                <textarea id="ce_observacao" placeholder="Observações para a próxima etapa (Opcional)..." class="ios-input h-20 resize-none mt-2"></textarea>
+
                 <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -1770,6 +1772,7 @@
 
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
+            document.getElementById('ce_observacao').value = ''; 
             raw_files_array = [];
             document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
             document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
@@ -1876,7 +1879,8 @@
                     document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
                 }
 
-                const payloadData = { id: fluxoId };
+                const observacao = document.getElementById('ce_observacao').value;
+                const payloadData = { id: fluxoId, observacao: observacao }; 
                 if (processedFiles.length > 0) {
                     payloadData.files = processedFiles;
                 }
@@ -1909,7 +1913,8 @@
                         let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
                         
                         let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
-                        let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
+                        let obsText = document.getElementById('ce_observacao').value ? " Obs: " + document.getElementById('ce_observacao').value : ""; 
+                        let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída." + obsText, data: new Date().toISOString() }; 
                         
                         if(processedFiles.length > 0) {
                             logConclusao.files = processedFiles.map(arq => {
