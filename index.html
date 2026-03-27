@@ -643,6 +643,12 @@
         </div>
         <div class="flex-1 overflow-y-auto p-6 pb-safe-bottom">
             <div class="space-y-6">
+                
+                <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm">
+                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Descrição</h3>
+                    <p id="det_f_descricao" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
+                </div>
+
                 <div>
                     <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">Linha do Tempo</h3>
                     <div class="relative border-l-2 border-gray-200 dark:border-gray-800 ml-3 space-y-4" id="det_f_timeline">
@@ -1971,6 +1977,9 @@
                 if(!f) return;
 
                 document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
+                
+                // EXIBE A DESCRIÇÃO COMPLETA:
+                document.getElementById('det_f_descricao').innerText = f.Descricao || f.descricao || "Nenhuma descrição fornecida.";
                 
                 let fluxoArr = [];
                 let histArr = [];
