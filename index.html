@@ -645,7 +645,12 @@
             <div class="space-y-6">
                 
                 <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm">
-                    <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2">Descrição</h3>
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Descrição</h3>
+                        <button type="button" onclick="copiarDescricao(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-all p-1 flex items-center justify-center" title="Copiar Descrição">
+                            <i class="ph-bold ph-copy text-lg"></i>
+                        </button>
+                    </div>
                     <p id="det_f_descricao" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
                 </div>
 
@@ -2030,6 +2035,21 @@
                 console.error(error);
                 alert("Houve um erro ao abrir o histórico.");
             }
+        }
+        
+        function copiarDescricao(btn) {
+            const desc = document.getElementById('det_f_descricao').innerText;
+            if (!desc) return;
+            
+            navigator.clipboard.writeText(desc).then(() => {
+                const icon = btn.querySelector('i');
+                icon.className = 'ph-bold ph-check text-iosGreen text-lg scale-110 transition-all';
+                setTimeout(() => {
+                    icon.className = 'ph-bold ph-copy text-lg transition-all';
+                }, 1500);
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+            });
         }
 
         function openRetornarEtapa(e, fluxoId) {
