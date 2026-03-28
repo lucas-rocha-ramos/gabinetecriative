@@ -357,7 +357,7 @@
                 <h2 id="modalMaterialTitle" class="text-xl font-bold">Vincular Material</h2>
                 <button onclick="closeModal('modalMaterial')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formMaterial" onsubmit="submitMaterial(event)" class="space-y-4">
+            <form id="formMaterial" onsubmit="event.preventDefault(); submitMaterial(event);" class="space-y-4">
                 <input type="text" id="m_titulo" placeholder="Título da Pasta/Arquivo" class="ios-input" required>
                 <textarea id="m_desc" placeholder="Descrição..." class="ios-input h-20 resize-none" required></textarea>
                 <input type="url" id="m_link" placeholder="Link do Google Drive" class="ios-input" required>
@@ -373,7 +373,7 @@
                 <h2 id="modalUsuarioTitle" class="text-xl font-bold">Novo Membro</h2>
                 <button onclick="closeModal('modalUsuario')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formUsuario" onsubmit="submitUsuario(event)" class="space-y-4">
+            <form id="formUsuario" onsubmit="event.preventDefault(); submitUsuario(event);" class="space-y-4">
                 <div class="flex justify-center mb-2">
                     <div class="relative group cursor-pointer" onclick="document.getElementById('u_foto_file').click()">
                         <img id="u_preview_foto" src="https://ui-avatars.com/api/?name=U&background=random" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800 transition-opacity group-hover:opacity-70">
@@ -413,7 +413,7 @@
                 <h2 class="text-xl font-bold">Concluir Etapa</h2>
                 <button onclick="closeModal('modalConcluirEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formConcluirEtapa" onsubmit="submitAvancarEtapa(event)" class="space-y-4">
+            <form id="formConcluirEtapa" onsubmit="event.preventDefault(); submitAvancarEtapa(event);" class="space-y-4">
                 <input type="hidden" id="ce_tarefa_id">
                 
                 <div id="ce_upload_container">
@@ -439,8 +439,6 @@
                     <p class="text-sm text-gray-500 mb-4 text-center">Deseja aprovar e enviar esta demanda para a próxima etapa?</p>
                 </div>
 
-                <textarea id="ce_observacao" placeholder="Observações para a próxima etapa (Opcional)..." class="ios-input h-20 resize-none mt-2"></textarea>
-
                 <button type="submit" id="ce_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="ce_btn_text">Confirmar e Avançar</span>
                     <i id="ce_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -456,7 +454,7 @@
                 <h2 class="text-xl font-bold text-red-600 flex items-center gap-2"><i class="ph-bold ph-arrow-u-up-left"></i> Retornar Tarefa</h2>
                 <button onclick="closeModal('modalRetornarEtapa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formRetornarEtapa" onsubmit="submitRetornarEtapa(event)" class="space-y-4">
+            <form id="formRetornarEtapa" onsubmit="event.preventDefault(); submitRetornarEtapa(event);" class="space-y-4">
                 <input type="hidden" id="re_tarefa_id">
                 
                 <p class="text-sm text-gray-500 mb-2">Para qual etapa deseja retornar?</p>
@@ -516,7 +514,7 @@
                 <button onclick="closeModal('modalEtapas')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
             
-            <form id="formEtapa" onsubmit="submitEtapa(event)" class="flex gap-2 mb-6">
+            <form id="formEtapa" onsubmit="event.preventDefault(); submitEtapa(event);" class="flex gap-2 mb-6">
                 <input type="text" id="nova_etapa_nome" placeholder="Nova etapa (Ex: Edição)" class="ios-input py-3 text-sm flex-1" required>
                 <button type="submit" class="bg-iosBlue text-white px-4 rounded-xl font-bold active:scale-95 transition-transform">
                     <i id="btn_etapa_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
@@ -558,7 +556,7 @@
                 <h2 class="text-xl font-bold text-red-600 flex items-center gap-2"><i class="ph-bold ph-bell-ringing"></i> Novo Aviso</h2>
                 <button onclick="closeModal('modalCreateAviso')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formAviso" onsubmit="submitAviso(event)" class="space-y-4">
+            <form id="formAviso" onsubmit="event.preventDefault(); submitAviso(event);" class="space-y-4">
                 <input type="text" id="av_titulo" placeholder="Título do Aviso (Ex: Urgente)" class="ios-input border border-red-100 dark:border-red-900/30" required>
                 <textarea id="av_desc" placeholder="Mensagem do aviso..." class="ios-input h-24 resize-none border border-red-100 dark:border-red-900/30" required></textarea>
                 
@@ -604,7 +602,7 @@
                 <h2 class="text-xl font-bold" id="modalTarefaTitle">Nova Tarefa</h2>
                 <button onclick="closeModal('modalTarefa')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
             </div>
-            <form id="formTarefa" onsubmit="submitTarefa(event)" class="space-y-4">
+            <form id="formTarefa" onsubmit="event.preventDefault(); submitTarefa(event);" class="space-y-4">
                 <input type="text" id="t_titulo" placeholder="Título da Tarefa (Ex: Entrevista Fulano)" class="ios-input" required>
                 <div class="flex gap-2">
                     <div class="flex-1">
@@ -612,15 +610,14 @@
                         <input type="date" id="t_prazo" class="ios-input mt-1">
                     </div>
                 </div>
-                
                 <textarea id="t_desc" placeholder="Descrição da Tarefa..." class="ios-input h-20 resize-none" required></textarea>
                 
-                <div id="t_upload_container" class="mt-2">
-                    <p class="text-xs text-gray-500 font-bold uppercase ml-1 mb-2">Anexos Iniciais (Opcional)</p>
-                    <input type="file" id="t_arquivo" accept="*/*" multiple class="hidden" onchange="previewTarefaArquivo(event)">
+                <div id="t_upload_container">
+                    <p class="text-sm text-gray-500 mb-2">Arquivos da Demanda (Opcional)</p>
+                    <input type="file" id="t_arquivo" accept="image/*,video/*" multiple class="hidden" onchange="previewTarefaArquivo(event)">
                     <div id="t_upload_area" class="border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-xl p-4 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors" onclick="document.getElementById('t_arquivo').click()">
-                        <i id="t_icone" class="ph-bold ph-upload-simple text-3xl text-iosBlue mb-2"></i>
-                        <p id="t_nome_arquivo" class="text-xs font-semibold text-center truncate w-full px-2 text-gray-600 dark:text-gray-300">Clique para anexar arquivos</p>
+                        <i id="t_icone" class="ph-bold ph-upload-simple text-3xl text-iosBlue mb-1"></i>
+                        <p id="t_nome_arquivo" class="text-xs font-semibold text-center truncate w-full px-2 text-gray-600 dark:text-gray-300">Anexar arquivos base</p>
                     </div>
                 </div>
 
@@ -633,8 +630,8 @@
                         <div id="t_progress_bar" class="bg-iosBlue h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                     </div>
                 </div>
-                
-                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4 mt-2">
+
+                <div class="bg-gray-100 dark:bg-gray-800 rounded-2xl p-4 mt-3">
                     <h3 class="font-bold mb-3 text-sm uppercase tracking-wide">Etapas do Fluxo</h3>
                     <div id="t_etapas_container" class="space-y-3 mb-3">
                         </div>
@@ -642,11 +639,11 @@
                 </div>
 
                 <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
+                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="bloquearCliquePassante(event)">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
-                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                <button type="submit" id="t_btn" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
                     <span id="t_btn_text">Salvar Tarefa</span><i id="t_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
                 </button>
             </form>
@@ -663,17 +660,6 @@
         </div>
         <div class="flex-1 overflow-y-auto p-6 pb-safe-bottom">
             <div class="space-y-6">
-                
-                <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-xl p-4 shadow-sm">
-                    <div class="flex justify-between items-center mb-2">
-                        <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest">Descrição</h3>
-                        <button type="button" onclick="copiarDescricao(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-all p-1 flex items-center justify-center" title="Copiar Descrição">
-                            <i class="ph-bold ph-copy text-lg"></i>
-                        </button>
-                    </div>
-                    <p id="det_f_descricao" class="text-sm text-gray-600 dark:text-gray-300 whitespace-pre-wrap"></p>
-                </div>
-
                 <div>
                     <h3 class="text-sm font-semibold text-gray-500 uppercase tracking-widest mb-2">Linha do Tempo</h3>
                     <div class="relative border-l-2 border-gray-200 dark:border-gray-800 ml-3 space-y-4" id="det_f_timeline">
@@ -704,13 +690,7 @@
         <div class="pt-safe-top w-full z-10 shrink-0">
             <div class="flex items-center justify-between px-4 py-3">
                 <button onclick="closePreview()" class="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white"><i class="ph-bold ph-x text-xl"></i></button>
-                
-                <input type="file" id="replaceFileInput" class="hidden" onchange="handleReplaceFile(event)">
-                
-                <div class="flex gap-2">
-                    <button id="btnReplacePreview" onclick="document.getElementById('replaceFileInput').click()" class="px-5 py-2 bg-orange-500 text-white font-semibold rounded-full flex items-center gap-2 shadow-lg"><i class="ph-bold ph-arrows-clockwise"></i> Trocar</button>
-                    <a id="btnDownloadPreview" href="#" target="_blank" download class="px-5 py-2 bg-iosBlue text-white font-semibold rounded-full flex items-center gap-2"><i class="ph-bold ph-download-simple"></i> Baixar</a>
-                </div>
+                <a id="btnDownloadPreview" href="#" target="_blank" download class="px-5 py-2 bg-iosBlue text-white font-semibold rounded-full flex items-center gap-2"><i class="ph-bold ph-download-simple"></i> Baixar</a>
             </div>
         </div>
         
@@ -733,8 +713,8 @@
         let galleryCache = {}; 
         let currentAvisoId = null;
         let pollingInterval = null;
+        let raw_tarefa_files_array = [];
         let raw_files_array = []; 
-        let t_raw_files_array = [];
         let currentPreviewIndex = 0;
         let currentFiltroVisao = 'pra_voce';
 
@@ -776,6 +756,14 @@
                 }
             }
         };
+
+        function bloquearCliquePassante(e) {
+            if (!e) e = window.event;
+            if (e.stopPropagation) e.stopPropagation();
+            if (e.preventDefault) e.preventDefault();
+            e.cancelBubble = true;
+            e.returnValue = false;
+        }
 
         function formatarDataPTBR(dataStr) {
             if(!dataStr) return '';
@@ -1027,7 +1015,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="bloquearCliquePassante(event); openEditUsuario('${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -1065,7 +1053,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-2xl p-4 shadow-sm cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1084,16 +1072,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="bloquearCliquePassante(event); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="bloquearCliquePassante(event); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="bloquearCliquePassante(event); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1143,7 +1131,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full bg-black/5 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex justify-center items-center min-h-[120px]" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full bg-black/5 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex justify-center items-center min-h-[120px]" onclick="bloquearCliquePassante(event); openPreviewTaskAlbum('${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1159,8 +1147,7 @@
             return anexosHtml;
         }
 
-        function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openPreviewTaskAlbum(encodedFilesJson, startIndex) {
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1299,7 +1286,7 @@
                     let anexosHtml = renderAnexos(histArr);
 
                     return `
-                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${borderClass}" onclick="openDetalheFluxo(event, '${idVal}')">
+                    <div class="glass-panel ios-card p-5 relative cursor-pointer ${borderClass}" onclick="openDetalheFluxo('${idVal}')">
                         <div class="flex justify-between items-start mb-2">
                             <div class="flex items-center gap-2 flex-wrap">
                                 <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700">${f.Status || f.status}</span>
@@ -1309,8 +1296,8 @@
                             </div>
                             <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button type="button" onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button type="button" onclick="bloquearCliquePassante(event); openEditTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button type="button" onclick="bloquearCliquePassante(event); deleteTarefaFluxo('${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1338,17 +1325,17 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="bloquearCliquePassante(event); openRetornarEtapa('${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="bloquearCliquePassante(event); iniciarDemanda('${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="bloquearCliquePassante(event); openConcluirEtapa('${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1376,15 +1363,16 @@
                 let anexosHtml = renderAnexos(histArr);
 
                 return `
-                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo(event, '${idVal}')">
+                <div class="glass-panel ios-card p-5 flex gap-4 items-start opacity-70 relative cursor-pointer" onclick="openDetalheFluxo('${idVal}')">
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
+                        <button type="button" onclick="bloquearCliquePassante(event); openDetalheFluxo('${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
                     <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                        <button type="button" onclick="bloquearCliquePassante(event); deleteTarefaFluxo('${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1403,9 +1391,9 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10">
-                        <button type="button" onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button type="button" onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="bloquearCliquePassante(event);">
+                        <button type="button" onclick="openEditMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button type="button" onclick="deleteMaterial('${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
@@ -1498,8 +1486,7 @@
             reader.readAsDataURL(file);
         }
 
-        function openEditUsuario(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openEditUsuario(id) {
             const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(id));
             if(!user) return;
             editingItemId = id;
@@ -1657,14 +1644,6 @@
             reindexEtapas();
         }
 
-        function previewTarefaArquivo(event) {
-            const files = event.target.files;
-            if (!files || files.length === 0) return;
-            t_raw_files_array = Array.from(files);
-            document.getElementById('t_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
-            document.getElementById('t_icone').className = 'ph-bold ph-files text-3xl text-iosBlue mb-2';
-        }
-
         function openTarefaCreate() {
             editingItemId = null;
             document.getElementById('modalTarefaTitle').innerText = 'Nova Tarefa';
@@ -1675,11 +1654,10 @@
             document.getElementById('t_btn_text').innerText = 'Salvar Tarefa';
             
             document.getElementById('t_arquivo').value = '';
-            t_raw_files_array = [];
-            document.getElementById('t_nome_arquivo').innerText = 'Clique para anexar arquivos';
-            document.getElementById('t_icone').className = 'ph-bold ph-upload-simple text-3xl text-iosBlue mb-2';
+            raw_tarefa_files_array = [];
+            document.getElementById('t_nome_arquivo').innerText = 'Anexar arquivos base';
+            document.getElementById('t_icone').className = 'ph-bold ph-upload-simple text-3xl text-iosBlue mb-1';
             document.getElementById('t_progress_container').classList.add('hidden');
-            document.getElementById('t_upload_container').style.display = 'block';
 
             document.getElementById('t_etapas_container').innerHTML = '';
             countEtapasForm = 0;
@@ -1687,13 +1665,18 @@
             openModal('modalTarefa');
         }
 
-        function openEditTarefaFluxo(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function previewTarefaArquivo(event) {
+            const files = event.target.files;
+            if (!files || files.length === 0) return;
+            raw_tarefa_files_array = Array.from(files);
+            document.getElementById('t_nome_arquivo').innerText = files.length + " arquivo(s) selecionado(s)";
+            document.getElementById('t_icone').className = 'ph-bold ph-files text-3xl text-iosBlue mb-1';
+        }
+
+        function openEditTarefaFluxo(id) {
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(id));
             if(!f) return;
             
-            document.getElementById('t_upload_container').style.display = 'none'; // Oculta no modo edição
-
             editingItemId = id;
             document.getElementById('modalTarefaTitle').innerText = 'Editar Tarefa';
             document.getElementById('t_titulo').value = f.Titulo || f.titulo;
@@ -1707,6 +1690,12 @@
             if(document.getElementById('t_urgente')) {
                 document.getElementById('t_urgente').checked = (f.Urgente === true || f.urgente === true || f.Urgente === 'true' || f.urgente === 'true');
             }
+
+            document.getElementById('t_arquivo').value = '';
+            raw_tarefa_files_array = [];
+            document.getElementById('t_nome_arquivo').innerText = 'Anexar novos arquivos (opcional)';
+            document.getElementById('t_icone').className = 'ph-bold ph-upload-simple text-3xl text-iosBlue mb-1';
+            document.getElementById('t_progress_container').classList.add('hidden');
             
             let fluxoObj = [];
             try { fluxoObj = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
@@ -1727,8 +1716,7 @@
             openModal('modalTarefa');
         }
 
-        async function deleteTarefaFluxo(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function deleteTarefaFluxo(id) {
             if(!confirm("Tem a certeza que deseja excluir esta tarefa?")) return;
             appState.tarefasFluxo = appState.tarefasFluxo.filter(f => String(f.ID || f.id) !== String(id));
             renderTarefas(); renderConcluidas();
@@ -1757,11 +1745,11 @@
                 }
 
                 let processedFiles = [];
-                if (!editingItemId && t_raw_files_array.length > 0) {
+                if (raw_tarefa_files_array.length > 0) {
                     document.getElementById('t_progress_container').classList.remove('hidden');
                     document.getElementById('t_progress_bar').style.width = '5%';
-                    document.getElementById('t_progress_text').innerText = 'Preparando arquivos...';
-                    
+                    document.getElementById('t_progress_text').innerText = 'Preparando imagens...';
+
                     const compressImage = (file) => {
                         return new Promise((resolve) => {
                             if (!file.type.startsWith('image/')) {
@@ -1808,19 +1796,23 @@
                         });
                     };
 
-                    for (let i = 0; i < t_raw_files_array.length; i++) {
-                        if (t_raw_files_array.length > 1) {
-                            document.getElementById('t_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${t_raw_files_array.length}...`;
-                        }
-                        const compressed = await compressImage(t_raw_files_array[i]);
+                    for (let i = 0; i < raw_tarefa_files_array.length; i++) {
+                        document.getElementById('t_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_tarefa_files_array.length}...`;
+                        const compressed = await compressImage(raw_tarefa_files_array[i]);
                         processedFiles.push(compressed);
                         
-                        let prog = 5 + Math.round(((i + 1) / t_raw_files_array.length) * 45);
+                        let prog = 5 + Math.round(((i + 1) / raw_tarefa_files_array.length) * 45);
                         document.getElementById('t_progress_bar').style.width = prog + '%';
                     }
-                    if (processedFiles.length > 0) {
-                        document.getElementById('t_progress_text').innerText = `Enviando para a nuvem...`;
-                    }
+
+                    document.getElementById('t_progress_text').innerText = `Enviando para a nuvem...`;
+                    let progUpload = 50;
+                    var progressInterval = setInterval(() => {
+                        progUpload += Math.random() * 5;
+                        if (progUpload >= 95) progUpload = 95; 
+                        document.getElementById('t_progress_bar').style.width = parseInt(progUpload) + '%';
+                        document.getElementById('t_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
+                    }, 400);
                 }
 
                 const isUrgente = document.getElementById('t_urgente') ? document.getElementById('t_urgente').checked : false;
@@ -1830,22 +1822,23 @@
                     descricao: document.getElementById('t_desc').value,
                     prazo: document.getElementById('t_prazo').value,
                     fluxo: fluxoArr,
-                    urgente: isUrgente
+                    urgente: isUrgente,
+                    files: processedFiles
                 };
-                if (processedFiles.length > 0) data.files = processedFiles;
 
                 const actionName = editingItemId ? 'editTarefaFluxo' : 'addTarefaFluxo';
                 if (editingItemId) data.id = editingItemId;
 
-                let progUpload = 50;
-                let progressInterval;
-                if (processedFiles.length > 0) {
-                    progressInterval = setInterval(() => {
-                        progUpload += Math.random() * 5;
-                        if (progUpload >= 95) progUpload = 95; 
-                        document.getElementById('t_progress_bar').style.width = parseInt(progUpload) + '%';
-                        document.getElementById('t_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
-                    }, 400);
+                const tempDate = new Date().toISOString(); 
+                let localLog = { msg: "Demanda " + (editingItemId ? "editada" : "criada") + ". Atribuída para " + data.fluxo[0].etapa, data: tempDate };
+                if(processedFiles.length > 0) {
+                    localLog.files = processedFiles.map(arq => {
+                       return {
+                           url: 'data:' + arq.mimeType + ';base64,' + arq.base64,
+                           name: arq.fileName,
+                           type: arq.mimeType
+                       }
+                    });
                 }
 
                 if (editingItemId) {
@@ -1858,19 +1851,15 @@
                         appState.tarefasFluxo[idx].prazo = data.prazo;
                         appState.tarefasFluxo[idx].Urgente = isUrgente;
                         appState.tarefasFluxo[idx].urgente = isUrgente;
+                        
+                        if(processedFiles.length > 0) {
+                            let histArr = []; try { histArr = JSON.parse(appState.tarefasFluxo[idx].Historico || "[]"); } catch(e){}
+                            histArr.push(localLog);
+                            appState.tarefasFluxo[idx].Historico = JSON.stringify(histArr);
+                            appState.tarefasFluxo[idx].historico = appState.tarefasFluxo[idx].Historico;
+                        }
                     }
                 } else {
-                    const tempDate = new Date().toISOString(); 
-                    
-                    let histArr = [];
-                    let logInicialLocal = { msg: "Demanda criada. Atribuída para " + data.fluxo[0].etapa, data: tempDate };
-                    if(processedFiles.length > 0) {
-                        logInicialLocal.files = processedFiles.map(arq => {
-                           return { url: 'data:' + arq.mimeType + ';base64,' + arq.base64, name: arq.fileName, type: arq.mimeType }
-                        });
-                    }
-                    histArr.push(logInicialLocal);
-
                     appState.tarefasFluxo.push({
                         ID: 'temp_' + Date.now(), 
                         Titulo: data.titulo, 
@@ -1881,7 +1870,7 @@
                         UsuarioAtual: data.fluxo[0].usuarioId, 
                         Usuarioatual: data.fluxo[0].usuarioId, 
                         Status: 'pendente', 
-                        Historico: JSON.stringify(histArr), 
+                        Historico: JSON.stringify([localLog]), 
                         Prazo: data.prazo, 
                         prazo: data.prazo, 
                         Urgente: isUrgente, 
@@ -1891,32 +1880,21 @@
                     });
                 }
                 
-                if(progressInterval) clearInterval(progressInterval);
-                if (processedFiles.length > 0) {
-                    document.getElementById('t_progress_bar').style.width = '100%';
-                    document.getElementById('t_progress_text').innerText = '100% (Concluído!)';
-                }
-
                 renderAll();
-                setTimeout(() => {
-                    document.getElementById('t_progress_container').classList.add('hidden');
-                    closeModal('modalTarefa');
-                    t_raw_files_array = [];
-                }, 1000);
+                closeModal('modalTarefa');
 
                 const res = await apiRequest({ action: actionName, data: data });
+                if(typeof progressInterval !== 'undefined') clearInterval(progressInterval);
                 if(!res.success) { console.error("Erro: " + res.error); }
                 await forceSync();
             } catch (err) {
                 console.error(err);
-                alert("Erro de conexão.");
             } finally {
                 setBtnLoading('t_btn', false);
             }
         }
 
-        function openConcluirEtapa(e, fluxoId) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openConcluirEtapa(fluxoId) {
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             let etapaNome = "";
             if (f) {
@@ -1927,7 +1905,6 @@
 
             document.getElementById('ce_tarefa_id').value = fluxoId;
             document.getElementById('ce_arquivo').value = '';
-            document.getElementById('ce_observacao').value = ''; 
             raw_files_array = [];
             document.getElementById('ce_nome_arquivo').innerText = 'Clique para selecionar os arquivos';
             document.getElementById('ce_icone').className = 'ph-bold ph-upload-simple text-4xl text-iosBlue mb-2';
@@ -2034,8 +2011,7 @@
                     document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
                 }
 
-                const observacao = document.getElementById('ce_observacao').value;
-                const payloadData = { id: fluxoId, observacao: observacao }; 
+                const payloadData = { id: fluxoId };
                 if (processedFiles.length > 0) {
                     payloadData.files = processedFiles;
                 }
@@ -2068,8 +2044,7 @@
                         let etapaAtualIdx = parseInt(f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual) || 0;
                         
                         let histArr = []; try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(e){}
-                        let obsText = document.getElementById('ce_observacao').value ? " Obs: " + document.getElementById('ce_observacao').value : ""; 
-                        let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída." + obsText, data: new Date().toISOString() }; 
+                        let logConclusao = { msg: "Etapa [" + (fluxoObj[etapaAtualIdx] ? fluxoObj[etapaAtualIdx].etapa : "") + "] concluída.", data: new Date().toISOString() };
                         
                         if(processedFiles.length > 0) {
                             logConclusao.files = processedFiles.map(arq => {
@@ -2119,16 +2094,12 @@
             }
         }
 
-        function openDetalheFluxo(e, fluxoId) {
+        function openDetalheFluxo(fluxoId) {
             try {
-                if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
                 const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
                 if(!f) return;
 
                 document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
-                
-                // EXIBE A DESCRIÇÃO COMPLETA:
-                document.getElementById('det_f_descricao').innerText = f.Descricao || f.descricao || "Nenhuma descrição fornecida.";
                 
                 let fluxoArr = [];
                 let histArr = [];
@@ -2180,24 +2151,8 @@
                 alert("Houve um erro ao abrir o histórico.");
             }
         }
-        
-        function copiarDescricao(btn) {
-            const desc = document.getElementById('det_f_descricao').innerText;
-            if (!desc) return;
-            
-            navigator.clipboard.writeText(desc).then(() => {
-                const icon = btn.querySelector('i');
-                icon.className = 'ph-bold ph-check text-iosGreen text-lg scale-110 transition-all';
-                setTimeout(() => {
-                    icon.className = 'ph-bold ph-copy text-lg transition-all';
-                }, 1500);
-            }).catch(err => {
-                console.error('Erro ao copiar: ', err);
-            });
-        }
 
-        function openRetornarEtapa(e, fluxoId) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        function openRetornarEtapa(fluxoId) {
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             if(!f) return;
 
@@ -2269,8 +2224,7 @@
             }
         }
 
-        async function iniciarDemanda(e, fluxoId) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function iniciarDemanda(fluxoId) {
             const btn = document.getElementById('btn_iniciar_' + fluxoId);
             if(btn) {
                 btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
@@ -2510,8 +2464,8 @@
             }
         }
 
-        function openEditMaterial(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        // Funções de Etapas e Materiais restauradas
+        function openEditMaterial(id) {
             const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
             if(!m) return;
             editingItemId = id;
@@ -2523,8 +2477,7 @@
             openModal('modalMaterial');
         }
 
-        async function deleteMaterial(e, id) {
-            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+        async function deleteMaterial(id) {
             if(!confirm("Tem a certeza que deseja excluir este material?")) return;
             appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
             renderMateriais();
@@ -2677,12 +2630,6 @@
             document.getElementById('previewType').innerText = isVideo ? 'Vídeo' : 'Imagem';
             document.getElementById('btnDownloadPreview').href = file.downloadUrl || (file.url.includes('drive.google.com') ? `https://drive.google.com/uc?export=download&id=${file.id}` : file.url); 
             document.getElementById('btnDownloadPreview').download = file.name;
-            
-            if (file.id) {
-                document.getElementById('btnReplacePreview').style.display = 'flex';
-            } else {
-                document.getElementById('btnReplacePreview').style.display = 'none';
-            }
 
             setTimeout(() => {
                 if (file.url.includes('drive.google.com') && file.id) { 
@@ -2720,94 +2667,6 @@
                 document.getElementById('modalPreview').style.visibility = 'hidden'; 
                 document.getElementById('previewMediaContainer').innerHTML = ''; 
             }, 300);
-        }
-
-        async function handleReplaceFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const currentFile = currentGalleryFiles[currentPreviewIndex];
-            if (!currentFile || !currentFile.id) {
-                alert("Este arquivo não pode ser substituído (ID não encontrado).");
-                return;
-            }
-
-            const btn = document.getElementById('btnReplacePreview');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="ph-bold ph-spinner animate-spin"></i> Trocando...`;
-            btn.disabled = true;
-
-            const compressImage = (f) => {
-                return new Promise((resolve) => {
-                    if (!f.type.startsWith('image/')) {
-                        const reader = new FileReader();
-                        reader.onload = (evt) => resolve({
-                            base64: evt.target.result.split(',')[1],
-                            mimeType: f.type,
-                            fileName: f.name
-                        });
-                        reader.readAsDataURL(f);
-                        return;
-                    }
-                    const reader = new FileReader();
-                    reader.onload = function(evt) {
-                        const img = new Image();
-                        img.onload = function() {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            const max_size = 1200; 
-
-                            if (width > height && width > max_size) {
-                                height *= max_size / width;
-                                width = max_size;
-                            } else if (height > max_size) {
-                                width *= max_size / height;
-                                height = max_size;
-                            }
-
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            
-                            resolve({
-                                base64: canvas.toDataURL('image/jpeg', 0.8).split(',')[1],
-                                mimeType: 'image/jpeg',
-                                fileName: f.name
-                            });
-                        };
-                        img.src = evt.target.result;
-                    };
-                    reader.readAsDataURL(f);
-                });
-            };
-
-            try {
-                const compressed = await compressImage(file);
-                const payloadData = {
-                    oldFileId: currentFile.id,
-                    base64: compressed.base64,
-                    mimeType: compressed.mimeType,
-                    fileName: compressed.fileName
-                };
-
-                const res = await apiRequest({ action: 'replaceFile', data: payloadData });
-                
-                if (res.success) {
-                    closePreview();
-                    await forceSync();
-                } else {
-                    alert("Erro ao substituir: " + res.error);
-                }
-            } catch (err) {
-                console.error(err);
-                alert("Erro na substituição. Arquivo pode ser muito grande.");
-            } finally {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-                document.getElementById('replaceFileInput').value = '';
-            }
         }
 
         let audioUnlocked = false;
