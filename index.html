@@ -565,7 +565,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                    <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
@@ -932,7 +932,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -989,16 +989,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1011,6 +1011,7 @@
             openModal('modalPerfilUsuario');
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1046,7 +1047,7 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
                     <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
@@ -1210,10 +1211,10 @@
                                 ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
                                 ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
                             </div>
-                            <div class="flex items-center gap-3 relative z-10">
+                            <div class="flex items-center gap-3">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1239,19 +1240,19 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <div class="w-full flex gap-2 relative z-10">
+                            <div class="w-full flex gap-2">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1283,12 +1284,12 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
+                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
-                        <button onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
+                        <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1307,7 +1308,7 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
+                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
                         <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
                         <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
@@ -1431,6 +1432,7 @@
 
         async function submitUsuario(e) {
             e.preventDefault(); setBtnLoading('u_btn', true);
+            
             try {
                 const data = {
                     nome: document.getElementById('u_nome').value,
@@ -1478,88 +1480,7 @@
             }
         }
 
-        // --- INÍCIO DA FUNÇÃO DE REORDENAR E EXCLUIR ETAPAS ---
         let countEtapasForm = 0;
-        
-        function reindexEtapas() {
-            const rows = document.querySelectorAll('#t_etapas_container .etapa-row');
-            countEtapasForm = 0;
-            rows.forEach(row => {
-                countEtapasForm++;
-                const numEl = row.querySelector('.etapa-numero');
-                if(numEl) numEl.innerText = countEtapasForm;
-            });
-        }
-
-        function deleteEtapaRow(btn) {
-            btn.closest('.etapa-row').remove();
-            reindexEtapas();
-        }
-
-        function moveEtapaUp(btn) {
-            const row = btn.closest('.etapa-row');
-            const prev = row.previousElementSibling;
-            if(prev) {
-                row.parentNode.insertBefore(row, prev);
-                reindexEtapas();
-            }
-        }
-
-        function moveEtapaDown(btn) {
-            const row = btn.closest('.etapa-row');
-            const next = row.nextElementSibling;
-            if(next) {
-                row.parentNode.insertBefore(next, row);
-                reindexEtapas();
-            }
-        }
-
-        function addEtapaToForm(etapaSelecionada = '', usuarioSelecionado = '') {
-            countEtapasForm++;
-            const container = document.getElementById('t_etapas_container');
-            const div = document.createElement('div');
-            div.className = "flex gap-2 items-center etapa-row bg-gray-50 dark:bg-gray-900/30 p-3 rounded-xl relative border border-gray-200 dark:border-gray-800";
-            
-            let userOptions = (appState.usuarios || []).map(u => {
-                const uid = u.ID || u.id;
-                return `<option value="${uid}" ${String(uid) === String(usuarioSelecionado) ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
-            }).join('');
-            
-            let etapaOptions = (appState.etapas || []).map(e => {
-                const val = e.nome || e.Nome;
-                return `<option value="${val}" ${String(val) === String(etapaSelecionada) ? 'selected' : ''}>${val}</option>`;
-            }).join('');
-
-            if (etapaSelecionada && !(appState.etapas || []).find(etp => (etp.nome || etp.Nome) === etapaSelecionada)) {
-                etapaOptions = `<option value="${etapaSelecionada}" selected>${etapaSelecionada} (Antiga)</option>` + etapaOptions;
-            }
-            
-            if ((appState.etapas || []).length === 0 && !etapaSelecionada) {
-                etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
-            }
-
-            div.innerHTML = `
-                <div class="flex flex-col items-center gap-1">
-                    <button type="button" onclick="moveEtapaUp(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-transform"><i class="ph-bold ph-caret-up"></i></button>
-                    <div class="w-6 h-6 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-[10px] shrink-0 etapa-numero">${countEtapasForm}</div>
-                    <button type="button" onclick="moveEtapaDown(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-transform"><i class="ph-bold ph-caret-down"></i></button>
-                </div>
-                <div class="flex flex-col gap-2 flex-1 min-w-0 ml-1">
-                    <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome m-0" required>
-                        <option value="">Selecione a Etapa...</option>
-                        ${etapaOptions}
-                    </select>
-                    <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user m-0" required>
-                        <option value="">Selecione Usuário...</option>
-                        ${userOptions}
-                    </select>
-                </div>
-                <button type="button" onclick="deleteEtapaRow(this)" class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center ml-1 active:scale-95 transition-transform shrink-0"><i class="ph-bold ph-trash"></i></button>
-            `;
-            container.appendChild(div);
-            reindexEtapas();
-        }
-
         function openTarefaCreate() {
             editingItemId = null;
             document.getElementById('modalTarefaTitle').innerText = 'Nova Tarefa';
@@ -1605,7 +1526,36 @@
                 addEtapaToForm();
             } else {
                 fluxoObj.forEach(et => {
-                    addEtapaToForm(et.etapa, et.usuarioId);
+                    countEtapasForm++;
+                    const div = document.createElement('div');
+                    div.className = "flex gap-2 items-center etapa-row";
+                    
+                    let userOptions = (appState.usuarios || []).map(u => {
+                        const uid = u.ID || u.id;
+                        return `<option value="${uid}" ${uid === et.usuarioId ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
+                    }).join('');
+
+                    let etapaOptions = (appState.etapas || []).map(etp => {
+                        const val = etp.nome || etp.Nome;
+                        return `<option value="${val}" ${val === et.etapa ? 'selected' : ''}>${val}</option>`;
+                    }).join('');
+                    
+                    if (!(appState.etapas || []).find(etp => (etp.nome || etp.Nome) === et.etapa)) {
+                        etapaOptions = `<option value="${et.etapa}" selected>${et.etapa} (Antiga)</option>` + etapaOptions;
+                    }
+                    
+                    div.innerHTML = `
+                        <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
+                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
+                            <option value="">Selecione a Etapa...</option>
+                            ${etapaOptions}
+                        </select>
+                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
+                            <option value="">Selecione Usuário...</option>
+                            ${userOptions}
+                        </select>
+                    `;
+                    container.appendChild(div);
                 });
             }
             
@@ -1620,6 +1570,31 @@
             renderTarefas(); renderConcluidas();
             await apiRequest({ action: 'deleteTarefaFluxo', data: { id: id } });
             forceSync();
+        }
+
+        function addEtapaToForm() {
+            countEtapasForm++;
+            const container = document.getElementById('t_etapas_container');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center etapa-row";
+            
+            let userOptions = (appState.usuarios || []).map(u => `<option value="${u.ID || u.id}">${u.Nome} (${u.Funcao})</option>`).join('');
+            
+            let etapaOptions = (appState.etapas || []).map(e => `<option value="${e.nome || e.Nome}">${e.nome || e.Nome}</option>`).join('');
+            if((appState.etapas || []).length === 0) etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
+
+            div.innerHTML = `
+                <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
+                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
+                    <option value="">Selecione a Etapa...</option>
+                    ${etapaOptions}
+                </select>
+                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
+                    <option value="">Selecione Usuário...</option>
+                    ${userOptions}
+                </select>
+            `;
+            container.appendChild(div);
         }
 
         async function submitTarefa(e) {
@@ -1654,6 +1629,7 @@
 
                 const actionName = editingItemId ? 'editTarefaFluxo' : 'addTarefaFluxo';
                 if (editingItemId) data.id = editingItemId;
+                else data.id = 'id_' + Date.now() + Math.random().toString(36).substr(2, 5); 
 
                 if (editingItemId) {
                     const idx = appState.tarefasFluxo.findIndex(f => String(f.ID || f.id) === String(editingItemId));
@@ -1669,7 +1645,8 @@
                 } else {
                     const tempDate = new Date().toISOString(); 
                     appState.tarefasFluxo.push({
-                        ID: 'temp_' + Date.now(), 
+                        ID: data.id, 
+                        id: data.id,
                         Titulo: data.titulo, 
                         Descricao: data.descricao, 
                         Fluxo: JSON.stringify(data.fluxo), 
