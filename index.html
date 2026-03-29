@@ -564,7 +564,7 @@
                     <button type="button" onclick="addEtapaToForm()" class="w-full py-2 bg-white dark:bg-gray-700 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 shadow-sm text-iosBlue"><i class="ph-bold ph-plus"></i> Adicionar Etapa</button>
                 </div>
 
-                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
+                <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
                     <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
@@ -1432,7 +1432,6 @@
 
         async function submitUsuario(e) {
             e.preventDefault(); setBtnLoading('u_btn', true);
-            
             try {
                 const data = {
                     nome: document.getElementById('u_nome').value,
@@ -1629,7 +1628,6 @@
 
                 const actionName = editingItemId ? 'editTarefaFluxo' : 'addTarefaFluxo';
                 if (editingItemId) data.id = editingItemId;
-                else data.id = 'id_' + Date.now() + Math.random().toString(36).substr(2, 5); 
 
                 if (editingItemId) {
                     const idx = appState.tarefasFluxo.findIndex(f => String(f.ID || f.id) === String(editingItemId));
@@ -1643,10 +1641,8 @@
                         appState.tarefasFluxo[idx].urgente = isUrgente;
                     }
                 } else {
-                    const tempDate = new Date().toISOString(); 
                     appState.tarefasFluxo.push({
-                        ID: data.id, 
-                        id: data.id,
+                        ID: 'temp_' + Date.now(), 
                         Titulo: data.titulo, 
                         Descricao: data.descricao, 
                         Fluxo: JSON.stringify(data.fluxo), 
@@ -1659,9 +1655,7 @@
                         Prazo: data.prazo, 
                         prazo: data.prazo, 
                         Urgente: isUrgente, 
-                        urgente: isUrgente,
-                        DataCriacao: tempDate,
-                        datacriacao: tempDate
+                        urgente: isUrgente
                     });
                 }
                 
@@ -1783,38 +1777,35 @@
 
                 for (let i = 0; i < raw_files_array.length; i++) {
                     if (raw_files_array.length > 1) {
-                        document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                        document.getElementById('ce_progress_text').innerText = `Enviando arquivo ${i + 1} de ${raw_files_array.length}...`;
                     }
                     const compressed = await compressImage(raw_files_array[i]);
                     processedFiles.push(compressed);
                     
-                    let prog = 5 + Math.round(((i + 1) / raw_files_array.length) * 45);
+                    // Envio um a um usando Lotes
+                    const resArq = await apiRequest({ 
+                        action: 'avancarEtapaFluxo', 
+                        data: { id: fluxoId, files: [compressed], ehLote: true } 
+                    });
+                    
+                    if(!resArq.success) throw new Error("Falha no upload do arquivo " + (i+1));
+                    
+                    let prog = Math.round(((i + 1) / raw_files_array.length) * 90);
                     document.getElementById('ce_progress_bar').style.width = prog + '%';
                 }
 
-                if (processedFiles.length > 0) {
-                    document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
+                if (raw_files_array.length > 0) {
+                    document.getElementById('ce_progress_text').innerText = `Finalizando...`;
                 }
 
+                // Finaliza o lote ou apenas avança se não houver arquivos
                 const payloadData = { id: fluxoId };
                 if (processedFiles.length > 0) {
-                    payloadData.files = processedFiles;
+                    payloadData.finalizaLote = true;
                 }
 
-                let progUpload = 50;
-                let progressInterval;
-                if (processedFiles.length > 0) {
-                    progressInterval = setInterval(() => {
-                        progUpload += Math.random() * 5;
-                        if (progUpload >= 95) progUpload = 95; 
-                        document.getElementById('ce_progress_bar').style.width = parseInt(progUpload) + '%';
-                        document.getElementById('ce_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
-                    }, 400);
-                }
-
+                // Envio da conclusão da etapa
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
-                
-                if(progressInterval) clearInterval(progressInterval);
 
                 if(res.success) {
                     if (processedFiles.length > 0) {
