@@ -998,9 +998,7 @@
                             </div>
                         </div>
                         <h4 class="font-bold text-base leading-tight mb-1">${f.Titulo || f.titulo}</h4>
-                        <p class="text-gray-500 text-xs line-clamp-1">${f.Descricao || f.descricao}</p>
-                        <button type="button" onclick="openDetalheFluxo(event, '${idVal}')" class="text-[10px] font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-3 relative z-10 w-max"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
-
+                        <p class="text-gray-500 text-xs mb-3 line-clamp-1">${f.Descricao || f.descricao}</p>
                         ${anexosHtml}
                         <div class="bg-blue-50/50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-2 flex items-center justify-between mb-4">
                             <span class="text-[10px] text-iosBlue font-bold uppercase">Etapa Atual:</span>
@@ -1010,16 +1008,16 @@
                         ${isMinhaVez ? `
                             <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1033,6 +1031,7 @@
             document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
         }
 
+        // Função isolada para renderizar os cartões de arquivos independentes
         function renderAnexos(histArr) {
             let anexosHtml = '';
             if (!histArr || !Array.isArray(histArr)) return '';
@@ -1085,7 +1084,7 @@
         }
 
         function openPreviewTaskAlbum(e, encodedFilesJson, startIndex) {
-            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
+            if (e) { if (e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
             try {
                 const files = JSON.parse(decodeURIComponent(encodedFilesJson));
                 currentGalleryFiles = files.map(arq => {
@@ -1305,6 +1304,7 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
+                        <button type="button" onclick="openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2 relative z-10"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
@@ -2288,6 +2288,138 @@
                 setBtnLoading('conf_av_btn', false);
             }
         }
+
+        // Funções de Etapas e Materiais restauradas
+        function openEditMaterial(e, id) {
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
+            const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
+            if(!m) return;
+            editingItemId = id;
+            document.getElementById('modalMaterialTitle').innerText = 'Editar Vínculo';
+            document.getElementById('m_titulo').value = m.titulo || m.Titulo || '';
+            document.getElementById('m_desc').value = m.descricao || m.Descricao || '';
+            document.getElementById('m_link').value = m.linkDrive || m.LinkDrive || m.linkdrive || m.Linkdrive || '';
+            document.getElementById('m_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalMaterial');
+        }
+
+        async function deleteMaterial(e, id) {
+            if (e) { if(e.stopPropagation) e.stopPropagation(); e.cancelBubble = true; }
+            if(!confirm("Tem a certeza que deseja excluir este material?")) return;
+            appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
+            renderMateriais();
+            await apiRequest({ action: 'deleteMaterial', data: { id: id } });
+            forceSync();
+        }
+
+        async function submitMaterial(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('m_btn', true);
+            try {
+                const data = {
+                    titulo: document.getElementById('m_titulo').value,
+                    descricao: document.getElementById('m_desc').value,
+                    linkDrive: document.getElementById('m_link').value
+                };
+                const action = editingItemId ? 'editMaterial' : 'addMaterial';
+                if(editingItemId) data.id = editingItemId;
+
+                closeModal('modalMaterial');
+                await apiRequest({ action: action, data: data });
+                await forceSync();
+            } catch(err) {
+                console.error(err);
+            } finally {
+                setBtnLoading('m_btn', false);
+            }
+        }
+
+        function openEtapasConfig() {
+            document.getElementById('nova_etapa_nome').value = '';
+            renderListaEtapas();
+            openModal('modalEtapas');
+        }
+
+        function renderListaEtapas() {
+            const list = document.getElementById('listaEtapas');
+            let etapas = appState.etapas || [];
+            if(etapas.length === 0) { list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`; return; }
+            list.innerHTML = etapas.map(e => `
+                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <span class="font-semibold text-sm">${e.nome || e.Nome}</span>
+                    <button type="button" onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center active:scale-95"><i class="ph-bold ph-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function submitEtapa(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('btn_etapa', true);
+            try {
+                const nome = document.getElementById('nova_etapa_nome').value;
+                const res = await apiRequest({ action: 'addEtapa', data: { nome: nome } });
+                if(res.success) {
+                    document.getElementById('nova_etapa_nome').value = '';
+                    await forceSync();
+                    renderListaEtapas();
+                }
+            } catch(err) { console.error(err); } 
+            finally { setBtnLoading('btn_etapa', false); }
+        }
+
+        async function deleteEtapa(id) {
+            if(!confirm("Excluir esta etapa padrão?")) return;
+            appState.etapas = appState.etapas.filter(e => String(e.id || e.ID) !== String(id));
+            renderListaEtapas();
+            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
+            forceSync();
+        }
+        
+        async function openGallery(materialId) {
+            const m = appState.materiais.find(x => String(x.id || x.ID) === String(materialId));
+            if(!m) return;
+            document.getElementById('galleryTitle').innerText = m.titulo || m.Titulo;
+            document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full flex justify-center py-10"><i class="ph-bold ph-spinner animate-spin text-3xl text-iosBlue"></i></div>';
+            openModal('modalGallery');
+            
+            try {
+                let link = m.linkDrive || m.LinkDrive || m.linkdrive || m.Linkdrive || '';
+                const res = await apiRequest({ action: 'getDriveFiles', link: link });
+                if(res.success && res.files) {
+                    currentGalleryFiles = res.files;
+                    if(currentGalleryFiles.length === 0) {
+                        document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">Pasta vazia</div>';
+                        return;
+                    }
+                    document.getElementById('galleryGrid').innerHTML = currentGalleryFiles.map((file, idx) => {
+                        const isVideo = file.type === 'video' || (file.name && file.name.match(/\.(mp4|mov|avi|mkv)$/i));
+                        const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                        let thumbUrl = file.url;
+                        if(file.url.includes('drive.google.com') && file.id) {
+                            thumbUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w300`;
+                        }
+                        return `
+                        <div class="relative aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform" onclick="openPreview(${idx})">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                <i class="ph-fill ${icon} text-3xl mb-1"></i>
+                            </div>
+                            <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
+                            ${isVideo ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-4xl text-white drop-shadow-lg"></i></div>' : ''}
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">' + (res.error || 'Erro ao carregar') + '</div>';
+                }
+            } catch(err) {
+                document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">Erro de conexão</div>';
+            }
+        }
+
+        function closeGallery() {
+            closeModal('modalGallery');
+            setTimeout(() => { document.getElementById('galleryGrid').innerHTML = ''; }, 400);
+        }
+        // --- FIM DAS FUNÇÕES RESTAURADAS ---
 
         function openPreview(fileIndex) {
             currentPreviewIndex = fileIndex;
