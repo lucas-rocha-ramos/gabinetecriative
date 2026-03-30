@@ -135,7 +135,7 @@
             <h1 class="text-3xl font-extrabold text-center mb-2">Bem-vindo</h1>
             <p class="text-center text-gray-500 mb-8">Faça login para acessar suas demandas</p>
             
-            <form id="formLogin" onsubmit="realizarLogin(event)" class="space-y-4">
+            <form id="formLogin" onsubmit="event.preventDefault(); realizarLogin(event);" class="space-y-4">
                 <input type="email" id="login_email" placeholder="E-mail" class="ios-input" required>
                 <input type="password" id="login_senha" placeholder="Senha" class="ios-input" required>
                 
@@ -351,6 +351,61 @@
         </button>
     </nav>
 
+    <div id="modalMaterial" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalMaterialTitle" class="text-xl font-bold">Vincular Material</h2>
+                <button onclick="closeModal('modalMaterial')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formMaterial" onsubmit="submitMaterial(event)" class="space-y-4">
+                <input type="text" id="m_titulo" placeholder="Título da Pasta/Arquivo" class="ios-input" required>
+                <textarea id="m_desc" placeholder="Descrição..." class="ios-input h-20 resize-none" required></textarea>
+                <input type="url" id="m_link" placeholder="Link do Google Drive" class="ios-input" required>
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 flex justify-center items-center gap-2"><span id="m_btn_text">Salvar Vínculo</span><i id="m_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i></button>
+            </form>
+        </div>
+    </div>
+
+    <div id="modalUsuario" class="modal-overlay fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
+        <div class="modal-content w-full sm:w-[400px] max-h-[90vh] overflow-y-auto bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl hide-scrollbar">
+            <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modalUsuarioTitle" class="text-xl font-bold">Novo Membro</h2>
+                <button onclick="closeModal('modalUsuario')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500"><i class="ph-bold ph-x"></i></button>
+            </div>
+            <form id="formUsuario" onsubmit="submitUsuario(event)" class="space-y-4">
+                <div class="flex justify-center mb-2">
+                    <div class="relative group cursor-pointer" onclick="document.getElementById('u_foto_file').click()">
+                        <img id="u_preview_foto" src="https://ui-avatars.com/api/?name=U&background=random" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-800 transition-opacity group-hover:opacity-70">
+                        <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40 rounded-full">
+                            <i class="ph-bold ph-camera text-white text-xl"></i>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="u_foto_file" accept="image/*" class="hidden" onchange="previewProfileImage(event)">
+                <input type="hidden" id="u_foto_base64">
+                <input type="hidden" id="u_foto_mime">
+                <input type="hidden" id="u_foto_url">
+                
+                <input type="text" id="u_nome" placeholder="Nome Completo" class="ios-input" required>
+                <input type="text" id="u_funcao" placeholder="Função (Ex: Editor, Câmera)" class="ios-input" required>
+                <input type="tel" id="u_whatsapp" placeholder="Nº WhatsApp (Ex: 5565999999999)" class="ios-input" required>
+                <input type="email" id="u_email" placeholder="E-mail de Login" class="ios-input" required>
+                <input type="password" id="u_senha" placeholder="Senha" class="ios-input">
+                
+                <select id="u_tipo" class="ios-input appearance-none">
+                    <option value="usuario">Usuário Comum</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                
+                <button type="submit" class="w-full py-4 rounded-2xl bg-iosBlue text-white font-bold text-lg mt-4 active:scale-95 transition-transform flex justify-center items-center gap-2">
+                    <span id="u_btn_text">Salvar Usuário</span>
+                    <i id="u_btn_spin" class="ph-bold ph-spinner animate-spin hidden"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
     <div id="modalConcluirEtapa" class="modal-overlay fixed inset-0 z-[80] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm">
         <div class="modal-content w-full sm:w-[400px] bg-white dark:bg-[#1C1C1E] rounded-t-[32px] sm:rounded-[32px] p-6 pb-safe-bottom shadow-2xl">
             <div class="w-12 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full mx-auto mb-6 sm:hidden"></div>
@@ -565,7 +620,7 @@
                 </div>
 
                 <div class="flex items-center gap-3 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl cursor-pointer mt-3" onclick="const cb = document.getElementById('t_urgente'); cb.checked = !cb.checked;">
-                    <input type="checkbox" id="t_urgente" onclick="event.stopPropagation()" class="w-5 h-5 accent-red-600 rounded cursor-pointer">
+                    <input type="checkbox" id="t_urgente" class="w-5 h-5 accent-red-600 rounded cursor-pointer" onclick="if(typeof event !== 'undefined' && event.stopPropagation) event.stopPropagation();">
                     <span class="text-sm font-bold text-red-600 dark:text-red-400 uppercase tracking-wide">Marcar como Urgente</span>
                 </div>
 
@@ -726,7 +781,7 @@
         }
 
         async function realizarLogin(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             setBtnLoading('login_btn', true);
             document.getElementById('login_error').classList.add('hidden');
 
@@ -932,7 +987,7 @@
                         </div>
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <button onclick="if(event) event.stopPropagation(); openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
+                    <button onclick="openEditUsuario(event, '${u.ID || u.id}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-iosBlue">
                         <i class="ph-bold ph-pencil-simple"></i>
                     </button>
                     ` : '<i class="ph-bold ph-caret-right text-gray-400"></i>'}
@@ -987,18 +1042,18 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <div class="w-full flex gap-2">
+                            <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1008,7 +1063,8 @@
                 }).join('');
             }
             
-            openModal('modalPerfilUsuario');
+            document.getElementById('modalPerfilUsuario').classList.add('active');
+            document.getElementById('modalPerfilUsuario').style.visibility = 'visible';
         }
 
         // Função isolada para renderizar os cartões de arquivos independentes
@@ -1047,11 +1103,11 @@
                 const iconBottom = hasMultiple ? 'ph-images' : 'ph-download-simple';
 
                 anexosHtml += `
-                <div class="mb-4 relative w-full h-36 bg-gray-100 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700" onclick="if(event) event.stopPropagation(); openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
-                    <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                <div class="mb-4 relative w-full bg-black/5 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-all shadow-sm border border-gray-200 dark:border-gray-700 flex justify-center items-center min-h-[120px]" onclick="openPreviewTaskAlbum(event, '${encodedFiles}', 0)">
+                    <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400 z-0">
                         <i class="ph-fill ${icon} text-4xl mb-1"></i>
                     </div>
-                    <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
+                    <img src="${thumbUrl}" class="w-full h-auto max-h-[350px] object-contain relative z-10" onerror="this.style.display='none'">
                     ${isVideo && !hasMultiple ? `<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-5xl text-white drop-shadow-lg"></i></div>` : ''}
                     ${badgeExtra}
                     <div class="absolute bottom-0 left-0 w-full p-2 bg-gradient-to-t from-black/80 to-transparent z-30 flex justify-between items-end">
@@ -1211,10 +1267,10 @@
                                 ${(f.Prazo || f.prazo) ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-orange-100 text-orange-700"><i class="ph-bold ph-calendar-blank"></i> Entrega: ${formatarDataPTBR(f.Prazo || f.prazo)}</span>` : ''}
                                 ${foiIniciada ? `<span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-purple-100 text-purple-700"><i class="ph-bold ph-play"></i> Iniciada: ${formatarDataPTBR(etapaAtualInfo.iniciadaEm)}</span>` : ''}
                             </div>
-                            <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-3 relative z-10">
                                 ${currentUser.TipoUsuario === 'admin' ? `
-                                <button onclick="if(event) event.stopPropagation(); openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
-                                <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
+                                <button type="button" onclick="openEditTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-iosBlue"><i class="ph-bold ph-pencil-simple"></i> Editar</button>
+                                <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="text-xs text-gray-500 flex items-center gap-1 font-semibold hover:text-red-500"><i class="ph-bold ph-trash"></i> Excluir</button>
                                 ` : ''}
                             </div>
                         </div>
@@ -1240,19 +1296,19 @@
                         </div>
 
                         ${isMinhaVez ? `
-                            <div class="w-full flex gap-2">
+                            <div class="w-full flex gap-2 relative z-10">
                                 ${etapaAtualIdx > 0 ? `
-                                <button onclick="if(event) event.stopPropagation(); openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openRetornarEtapa(event, '${idVal}')" class="w-14 shrink-0 bg-red-100 text-red-600 dark:bg-red-900/30 rounded-xl flex items-center justify-center active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-arrow-u-up-left text-xl"></i>
                                 </button>
                                 ` : ''}
                                 
                                 ${!foiIniciada ? `
-                                <button id="btn_iniciar_${idVal}" onclick="if(event) event.stopPropagation(); iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" id="btn_iniciar_${idVal}" onclick="iniciarDemanda(event, '${idVal}')" class="flex-1 py-3 bg-iosGreen text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-play"></i> Iniciar Demanda
                                 </button>
                                 ` : `
-                                <button onclick="if(event) event.stopPropagation(); openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
+                                <button type="button" onclick="openConcluirEtapa(event, '${idVal}')" class="flex-1 py-3 bg-iosBlue text-white font-bold rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-sm">
                                     <i class="ph-bold ph-check-circle"></i> Concluir Minha Etapa
                                 </button>
                                 `}
@@ -1284,12 +1340,11 @@
                     <div class="w-8 h-8 rounded-full bg-iosGreen text-white flex-shrink-0 flex items-center justify-center mt-1"><i class="ph-bold ph-check text-sm"></i></div>
                     <div class="flex-1 text-gray-500 pr-10">
                         <h4 class="font-bold text-lg leading-tight line-through">${t.Titulo || t.titulo}</h4>
-                        <button onclick="if(event) event.stopPropagation(); openDetalheFluxo(event, '${idVal}')" class="text-xs font-semibold mt-1 flex items-center gap-1 text-iosBlue hover:underline mb-2"><i class="ph-bold ph-clock-counter-clockwise"></i> Ver Histórico</button>
                         ${anexosHtml}
                     </div>
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute right-4 top-1/2 -translate-y-1/2">
-                        <button onclick="if(event) event.stopPropagation(); deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute right-4 top-1/2 -translate-y-1/2 relative z-10">
+                        <button type="button" onclick="deleteTarefaFluxo(event, '${idVal}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center text-gray-500 hover:text-red-500"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                 </div>
@@ -1308,9 +1363,9 @@
                 return `
                 <div class="glass-panel ios-card p-5 relative cursor-pointer" onclick="openGallery('${idVal}')">
                     ${currentUser.TipoUsuario === 'admin' ? `
-                    <div class="absolute top-3 right-3 flex gap-2 z-10" onclick="if(event) event.stopPropagation();">
-                        <button onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
-                        <button onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
+                    <div class="absolute top-3 right-3 flex gap-2 z-10">
+                        <button type="button" onclick="openEditMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-iosBlue shadow-sm"><i class="ph-bold ph-pencil-simple"></i></button>
+                        <button type="button" onclick="deleteMaterial(event, '${idVal}')" class="w-8 h-8 rounded-full bg-white/80 dark:bg-[#1c1c1e]/80 backdrop-blur flex items-center justify-center text-gray-600 dark:text-gray-300 hover:text-red-500 shadow-sm"><i class="ph-bold ph-trash"></i></button>
                     </div>
                     ` : ''}
                     <div class="block pr-6">
@@ -1431,7 +1486,9 @@
         }
 
         async function submitUsuario(e) {
-            e.preventDefault(); setBtnLoading('u_btn', true);
+            if(e) e.preventDefault(); 
+            setBtnLoading('u_btn', true);
+            
             try {
                 const data = {
                     nome: document.getElementById('u_nome').value,
@@ -1480,6 +1537,86 @@
         }
 
         let countEtapasForm = 0;
+        
+        function reindexEtapas() {
+            const rows = document.querySelectorAll('#t_etapas_container .etapa-row');
+            countEtapasForm = 0;
+            rows.forEach(row => {
+                countEtapasForm++;
+                const numEl = row.querySelector('.etapa-numero');
+                if(numEl) numEl.innerText = countEtapasForm;
+            });
+        }
+
+        function deleteEtapaRow(btn) {
+            btn.closest('.etapa-row').remove();
+            reindexEtapas();
+        }
+
+        function moveEtapaUp(btn) {
+            const row = btn.closest('.etapa-row');
+            const prev = row.previousElementSibling;
+            if(prev) {
+                row.parentNode.insertBefore(row, prev);
+                reindexEtapas();
+            }
+        }
+
+        function moveEtapaDown(btn) {
+            const row = btn.closest('.etapa-row');
+            const next = row.nextElementSibling;
+            if(next) {
+                row.parentNode.insertBefore(next, row);
+                reindexEtapas();
+            }
+        }
+
+        function addEtapaToForm(etapaSelecionada = '', usuarioSelecionado = '') {
+            countEtapasForm++;
+            const container = document.getElementById('t_etapas_container');
+            const div = document.createElement('div');
+            div.className = "flex gap-2 items-center etapa-row bg-gray-50 dark:bg-gray-900/30 p-3 rounded-xl relative border border-gray-200 dark:border-gray-800";
+            
+            let userOptions = (appState.usuarios || []).map(u => {
+                const uid = u.ID || u.id;
+                return `<option value="${uid}" ${String(uid) === String(usuarioSelecionado) ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
+            }).join('');
+            
+            let etapaOptions = (appState.etapas || []).map(e => {
+                const val = e.nome || e.Nome;
+                return `<option value="${val}" ${String(val) === String(etapaSelecionada) ? 'selected' : ''}>${val}</option>`;
+            }).join('');
+
+            if (etapaSelecionada && !(appState.etapas || []).find(etp => (etp.nome || etp.Nome) === etapaSelecionada)) {
+                etapaOptions = `<option value="${etapaSelecionada}" selected>${etapaSelecionada} (Antiga)</option>` + etapaOptions;
+            }
+            
+            if ((appState.etapas || []).length === 0 && !etapaSelecionada) {
+                etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
+            }
+
+            div.innerHTML = `
+                <div class="flex flex-col items-center gap-1">
+                    <button type="button" onclick="moveEtapaUp(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-transform"><i class="ph-bold ph-caret-up"></i></button>
+                    <div class="w-6 h-6 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-[10px] shrink-0 etapa-numero">${countEtapasForm}</div>
+                    <button type="button" onclick="moveEtapaDown(this)" class="text-gray-400 hover:text-iosBlue active:scale-95 transition-transform"><i class="ph-bold ph-caret-down"></i></button>
+                </div>
+                <div class="flex flex-col gap-2 flex-1 min-w-0 ml-1">
+                    <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome m-0" required>
+                        <option value="">Selecione a Etapa...</option>
+                        ${etapaOptions}
+                    </select>
+                    <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user m-0" required>
+                        <option value="">Selecione Usuário...</option>
+                        ${userOptions}
+                    </select>
+                </div>
+                <button type="button" onclick="deleteEtapaRow(this)" class="w-8 h-8 rounded-full bg-red-100 dark:bg-red-900/30 text-red-500 flex items-center justify-center ml-1 active:scale-95 transition-transform shrink-0"><i class="ph-bold ph-trash"></i></button>
+            `;
+            container.appendChild(div);
+            reindexEtapas();
+        }
+
         function openTarefaCreate() {
             editingItemId = null;
             document.getElementById('modalTarefaTitle').innerText = 'Nova Tarefa';
@@ -1525,36 +1662,7 @@
                 addEtapaToForm();
             } else {
                 fluxoObj.forEach(et => {
-                    countEtapasForm++;
-                    const div = document.createElement('div');
-                    div.className = "flex gap-2 items-center etapa-row";
-                    
-                    let userOptions = (appState.usuarios || []).map(u => {
-                        const uid = u.ID || u.id;
-                        return `<option value="${uid}" ${uid === et.usuarioId ? 'selected' : ''}>${u.Nome} (${u.Funcao})</option>`;
-                    }).join('');
-
-                    let etapaOptions = (appState.etapas || []).map(etp => {
-                        const val = etp.nome || etp.Nome;
-                        return `<option value="${val}" ${val === et.etapa ? 'selected' : ''}>${val}</option>`;
-                    }).join('');
-                    
-                    if (!(appState.etapas || []).find(etp => (etp.nome || etp.Nome) === et.etapa)) {
-                        etapaOptions = `<option value="${et.etapa}" selected>${et.etapa} (Antiga)</option>` + etapaOptions;
-                    }
-                    
-                    div.innerHTML = `
-                        <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
-                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
-                            <option value="">Selecione a Etapa...</option>
-                            ${etapaOptions}
-                        </select>
-                        <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
-                            <option value="">Selecione Usuário...</option>
-                            ${userOptions}
-                        </select>
-                    `;
-                    container.appendChild(div);
+                    addEtapaToForm(et.etapa, et.usuarioId);
                 });
             }
             
@@ -1571,33 +1679,8 @@
             forceSync();
         }
 
-        function addEtapaToForm() {
-            countEtapasForm++;
-            const container = document.getElementById('t_etapas_container');
-            const div = document.createElement('div');
-            div.className = "flex gap-2 items-center etapa-row";
-            
-            let userOptions = (appState.usuarios || []).map(u => `<option value="${u.ID || u.id}">${u.Nome} (${u.Funcao})</option>`).join('');
-            
-            let etapaOptions = (appState.etapas || []).map(e => `<option value="${e.nome || e.Nome}">${e.nome || e.Nome}</option>`).join('');
-            if((appState.etapas || []).length === 0) etapaOptions = `<option value="">Nenhuma etapa cadastrada</option>`;
-
-            div.innerHTML = `
-                <div class="w-8 h-8 rounded-full bg-iosBlue text-white flex items-center justify-center font-bold text-xs shrink-0">${countEtapasForm}</div>
-                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-nome" required>
-                    <option value="">Selecione a Etapa...</option>
-                    ${etapaOptions}
-                </select>
-                <select class="ios-input py-2 px-3 text-sm flex-1 t-etapa-user" required>
-                    <option value="">Selecione Usuário...</option>
-                    ${userOptions}
-                </select>
-            `;
-            container.appendChild(div);
-        }
-
         async function submitTarefa(e) {
-            e.preventDefault(); 
+            if(e) e.preventDefault(); 
             setBtnLoading('t_btn', true);
             
             try {
@@ -1641,6 +1724,7 @@
                         appState.tarefasFluxo[idx].urgente = isUrgente;
                     }
                 } else {
+                    const tempDate = new Date().toISOString(); 
                     appState.tarefasFluxo.push({
                         ID: 'temp_' + Date.now(), 
                         Titulo: data.titulo, 
@@ -1655,7 +1739,9 @@
                         Prazo: data.prazo, 
                         prazo: data.prazo, 
                         Urgente: isUrgente, 
-                        urgente: isUrgente
+                        urgente: isUrgente,
+                        DataCriacao: tempDate,
+                        datacriacao: tempDate
                     });
                 }
                 
@@ -1673,7 +1759,7 @@
         }
 
         function openConcluirEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             let etapaNome = "";
             if (f) {
@@ -1715,7 +1801,7 @@
         }
 
         async function submitAvancarEtapa(e) {
-            e.preventDefault(); 
+            if(e) e.preventDefault(); 
             setBtnLoading('ce_btn', true);
             
             try {
@@ -1777,35 +1863,38 @@
 
                 for (let i = 0; i < raw_files_array.length; i++) {
                     if (raw_files_array.length > 1) {
-                        document.getElementById('ce_progress_text').innerText = `Enviando arquivo ${i + 1} de ${raw_files_array.length}...`;
+                        document.getElementById('ce_progress_text').innerText = `Otimizando arquivo ${i + 1} de ${raw_files_array.length}...`;
                     }
                     const compressed = await compressImage(raw_files_array[i]);
                     processedFiles.push(compressed);
                     
-                    // Envio um a um usando Lotes
-                    const resArq = await apiRequest({ 
-                        action: 'avancarEtapaFluxo', 
-                        data: { id: fluxoId, files: [compressed], ehLote: true } 
-                    });
-                    
-                    if(!resArq.success) throw new Error("Falha no upload do arquivo " + (i+1));
-                    
-                    let prog = Math.round(((i + 1) / raw_files_array.length) * 90);
+                    let prog = 5 + Math.round(((i + 1) / raw_files_array.length) * 45);
                     document.getElementById('ce_progress_bar').style.width = prog + '%';
                 }
 
-                if (raw_files_array.length > 0) {
-                    document.getElementById('ce_progress_text').innerText = `Finalizando...`;
+                if (processedFiles.length > 0) {
+                    document.getElementById('ce_progress_text').innerText = `Enviando para a nuvem...`;
                 }
 
-                // Finaliza o lote ou apenas avança se não houver arquivos
                 const payloadData = { id: fluxoId };
                 if (processedFiles.length > 0) {
-                    payloadData.finalizaLote = true;
+                    payloadData.files = processedFiles;
                 }
 
-                // Envio da conclusão da etapa
+                let progUpload = 50;
+                let progressInterval;
+                if (processedFiles.length > 0) {
+                    progressInterval = setInterval(() => {
+                        progUpload += Math.random() * 5;
+                        if (progUpload >= 95) progUpload = 95; 
+                        document.getElementById('ce_progress_bar').style.width = parseInt(progUpload) + '%';
+                        document.getElementById('ce_progress_text').innerText = parseInt(progUpload) + '% (Enviando...)';
+                    }, 400);
+                }
+
                 const res = await apiRequest({ action: 'avancarEtapaFluxo', data: payloadData });
+                
+                if(progressInterval) clearInterval(progressInterval);
 
                 if(res.success) {
                     if (processedFiles.length > 0) {
@@ -1870,8 +1959,67 @@
             }
         }
 
+        function openDetalheFluxo(e, fluxoId) {
+            try {
+                if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+                const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
+                if(!f) return;
+
+                document.getElementById('det_f_titulo').innerText = f.Titulo || f.titulo;
+                
+                let fluxoArr = [];
+                let histArr = [];
+                try { fluxoArr = JSON.parse(f.Fluxo || f.fluxo || "[]"); } catch(err){}
+                try { histArr = JSON.parse(f.Historico || f.historico || "[]"); } catch(err){}
+                
+                const etapaAtualVal = f.EtapaAtual !== undefined ? f.EtapaAtual : f.Etapaatual;
+                const etapaAtualIdx = parseInt(etapaAtualVal) || 0;
+
+                document.getElementById('det_f_timeline').innerHTML = fluxoArr.map((et, idx) => {
+                    const isPassado = idx < etapaAtualIdx;
+                    const isAtual = idx === etapaAtualIdx && (f.Status || f.status) !== 'concluida';
+                    const user = (appState.usuarios || []).find(u => String(u.ID || u.id) === String(et.usuarioId));
+                    const userName = user ? user.Nome : 'Desconhecido';
+                    
+                    let icon = '<div class="w-3 h-3 bg-gray-300 rounded-full mt-1"></div>';
+                    let txtColor = 'text-gray-400';
+                    if(isPassado) { icon = '<i class="ph-fill ph-check-circle text-green-500 text-base"></i>'; txtColor = 'text-gray-500 line-through'; }
+                    if(isAtual) { icon = '<i class="ph-fill ph-record text-iosBlue text-base animate-pulse"></i>'; txtColor = 'text-gray-900 dark:text-white font-bold'; }
+
+                    return `
+                    <div class="flex gap-3 relative">
+                        <div class="absolute -left-[1.35rem] bg-white dark:bg-[#1C1C1E] py-1">${icon}</div>
+                        <div>
+                            <p class="text-sm ${txtColor}">${idx+1}. ${et.etapa}</p>
+                            <p class="text-[10px] text-gray-500 flex items-center gap-1"><i class="ph-bold ph-user"></i> ${userName}</p>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                document.getElementById('det_f_logs').innerHTML = histArr.map(h => {
+                    let dateStr = '';
+                    try {
+                        if(h.data) {
+                            const d = new Date(h.data);
+                            if(!isNaN(d.getTime())) {
+                                dateStr = d.toLocaleString('pt-BR');
+                            }
+                        }
+                    } catch(e){}
+                    
+                    let anexosHtml = renderAnexos([h]);
+                    return `<div class="border-b border-gray-200 dark:border-gray-800 last:border-0 pb-3 mb-3"><span class="text-gray-400 block text-[9px]">${dateStr}</span><p class="mt-0.5 text-sm">${h.msg}</p>${anexosHtml}</div>`;
+                }).join('') || '<p class="text-xs text-gray-500">Sem histórico</p>';
+
+                openModal('modalDetalheFluxo');
+            } catch (error) {
+                console.error(error);
+                alert("Houve um erro ao abrir o histórico.");
+            }
+        }
+
         function openRetornarEtapa(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const f = appState.tarefasFluxo.find(x => String(x.ID !== undefined ? x.ID : x.id) === String(fluxoId));
             if(!f) return;
 
@@ -1893,7 +2041,7 @@
         }
 
         async function submitRetornarEtapa(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             setBtnLoading('re_btn', true);
             
             try {
@@ -1944,7 +2092,7 @@
         }
 
         async function iniciarDemanda(e, fluxoId) {
-            if(e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
             const btn = document.getElementById('btn_iniciar_' + fluxoId);
             if(btn) {
                 btn.innerHTML = '<i class="ph-bold ph-spinner animate-spin"></i> Iniciando...';
@@ -1982,6 +2130,32 @@
                 alert("Erro de conexão ao iniciar. Verifique sua internet.");
                 renderAll();
             }
+        }
+
+        function toggleAlvoUsuarios() {
+            const tipo = document.getElementById('av_alvo_tipo').value;
+            const lista = document.getElementById('av_usuarios_lista');
+            if(tipo === 'especificos') {
+                const users = (appState.usuarios || []).filter(u => u.Status === 'ativo');
+                lista.innerHTML = users.map(u => `
+                    <label class="flex items-center gap-3 p-2 bg-white dark:bg-[#1C1C1E] border border-gray-200 dark:border-gray-800 rounded-lg cursor-pointer active:scale-95 transition-transform">
+                        <input type="checkbox" value="${u.ID || u.id}" class="av_check_user w-5 h-5 accent-iosBlue rounded cursor-pointer">
+                        <img src="${u.FotoPerfilURL || 'https://ui-avatars.com/api/?name='+encodeURIComponent(u.Nome)}" class="w-8 h-8 rounded-full object-cover">
+                        <span class="text-sm font-semibold">${u.Nome}</span>
+                    </label>
+                `).join('');
+                lista.classList.remove('hidden');
+            } else {
+                lista.classList.add('hidden');
+            }
+        }
+
+        function openCreateAviso() {
+            document.getElementById('av_titulo').value = '';
+            document.getElementById('av_desc').value = '';
+            document.getElementById('av_alvo_tipo').value = 'todos';
+            toggleAlvoUsuarios();
+            openModal('modalCreateAviso');
         }
 
         function openAvisosHistorico() {
@@ -2048,7 +2222,7 @@
         }
 
         async function submitAviso(e) {
-            e.preventDefault();
+            if(e) e.preventDefault();
             setBtnLoading('av_btn', true);
             
             try {
@@ -2156,6 +2330,136 @@
             } finally {
                 setBtnLoading('conf_av_btn', false);
             }
+        }
+
+        function openEditMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            const m = appState.materiais.find(x => String(x.id !== undefined ? x.id : x.ID) === String(id));
+            if(!m) return;
+            editingItemId = id;
+            document.getElementById('modalMaterialTitle').innerText = 'Editar Vínculo';
+            document.getElementById('m_titulo').value = m.titulo || m.Titulo || '';
+            document.getElementById('m_desc').value = m.descricao || m.Descricao || '';
+            document.getElementById('m_link').value = m.linkDrive || m.LinkDrive || m.linkdrive || m.Linkdrive || '';
+            document.getElementById('m_btn_text').innerText = 'Salvar Alterações';
+            openModal('modalMaterial');
+        }
+
+        async function deleteMaterial(e, id) {
+            if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+            if(!confirm("Tem a certeza que deseja excluir este material?")) return;
+            appState.materiais = appState.materiais.filter(m => String(m.id !== undefined ? m.id : m.ID) !== String(id));
+            renderMateriais();
+            await apiRequest({ action: 'deleteMaterial', data: { id: id } });
+            forceSync();
+        }
+
+        async function submitMaterial(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('m_btn', true);
+            try {
+                const data = {
+                    titulo: document.getElementById('m_titulo').value,
+                    descricao: document.getElementById('m_desc').value,
+                    linkDrive: document.getElementById('m_link').value
+                };
+                const action = editingItemId ? 'editMaterial' : 'addMaterial';
+                if(editingItemId) data.id = editingItemId;
+
+                closeModal('modalMaterial');
+                await apiRequest({ action: action, data: data });
+                await forceSync();
+            } catch(err) {
+                console.error(err);
+            } finally {
+                setBtnLoading('m_btn', false);
+            }
+        }
+
+        function openEtapasConfig() {
+            document.getElementById('nova_etapa_nome').value = '';
+            renderListaEtapas();
+            openModal('modalEtapas');
+        }
+
+        function renderListaEtapas() {
+            const list = document.getElementById('listaEtapas');
+            let etapas = appState.etapas || [];
+            if(etapas.length === 0) { list.innerHTML = `<p class="text-center text-gray-500 text-sm py-4">Nenhuma etapa cadastrada.</p>`; return; }
+            list.innerHTML = etapas.map(e => `
+                <div class="flex justify-between items-center bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <span class="font-semibold text-sm">${e.nome || e.Nome}</span>
+                    <button type="button" onclick="deleteEtapa('${e.id || e.ID}')" class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center active:scale-95"><i class="ph-bold ph-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        async function submitEtapa(e) {
+            if(e) e.preventDefault();
+            setBtnLoading('btn_etapa', true);
+            try {
+                const nome = document.getElementById('nova_etapa_nome').value;
+                const res = await apiRequest({ action: 'addEtapa', data: { nome: nome } });
+                if(res.success) {
+                    document.getElementById('nova_etapa_nome').value = '';
+                    await forceSync();
+                    renderListaEtapas();
+                }
+            } catch(err) { console.error(err); } 
+            finally { setBtnLoading('btn_etapa', false); }
+        }
+
+        async function deleteEtapa(id) {
+            if(!confirm("Excluir esta etapa padrão?")) return;
+            appState.etapas = appState.etapas.filter(e => String(e.id || e.ID) !== String(id));
+            renderListaEtapas();
+            await apiRequest({ action: 'deleteEtapa', data: { id: id } });
+            forceSync();
+        }
+        
+        async function openGallery(materialId) {
+            const m = appState.materiais.find(x => String(x.id || x.ID) === String(materialId));
+            if(!m) return;
+            document.getElementById('galleryTitle').innerText = m.titulo || m.Titulo;
+            document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full flex justify-center py-10"><i class="ph-bold ph-spinner animate-spin text-3xl text-iosBlue"></i></div>';
+            openModal('modalGallery');
+            
+            try {
+                let link = m.linkDrive || m.LinkDrive || m.linkdrive || m.Linkdrive || '';
+                const res = await apiRequest({ action: 'getDriveFiles', link: link });
+                if(res.success && res.files) {
+                    currentGalleryFiles = res.files;
+                    if(currentGalleryFiles.length === 0) {
+                        document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-gray-500 py-10">Pasta vazia</div>';
+                        return;
+                    }
+                    document.getElementById('galleryGrid').innerHTML = currentGalleryFiles.map((file, idx) => {
+                        const isVideo = file.type === 'video' || (file.name && file.name.match(/\.(mp4|mov|avi|mkv)$/i));
+                        const icon = isVideo ? 'ph-video-camera' : 'ph-image';
+                        let thumbUrl = file.url;
+                        if(file.url.includes('drive.google.com') && file.id) {
+                            thumbUrl = `https://drive.google.com/thumbnail?id=${file.id}&sz=w300`;
+                        }
+                        return `
+                        <div class="relative aspect-square bg-gray-200 dark:bg-gray-800 rounded-xl overflow-hidden cursor-pointer active:scale-95 transition-transform" onclick="openPreview(${idx})">
+                            <div class="absolute inset-0 flex flex-col items-center justify-center text-gray-400">
+                                <i class="ph-fill ${icon} text-3xl mb-1"></i>
+                            </div>
+                            <img src="${thumbUrl}" class="absolute inset-0 w-full h-full object-cover z-10" onerror="this.style.display='none'">
+                            ${isVideo ? '<div class="absolute inset-0 flex items-center justify-center bg-black/30 z-20"><i class="ph-fill ph-play-circle text-4xl text-white drop-shadow-lg"></i></div>' : ''}
+                        </div>`;
+                    }).join('');
+                } else {
+                    document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">' + (res.error || 'Erro ao carregar') + '</div>';
+                }
+            } catch(err) {
+                document.getElementById('galleryGrid').innerHTML = '<div class="col-span-full text-center text-red-500 py-10">Erro de conexão</div>';
+            }
+        }
+
+        function closeGallery() {
+            closeModal('modalGallery');
+            setTimeout(() => { document.getElementById('galleryGrid').innerHTML = ''; }, 400);
         }
 
         function openPreview(fileIndex) {
