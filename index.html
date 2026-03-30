@@ -1871,6 +1871,9 @@
                     }
                     histArr.push(logInicialLocal);
 
+                    // FIX: Enviando o histórico com os arquivos em base64 para o backend salvar corretamente.
+                    data.historico = JSON.stringify(histArr);
+
                     appState.tarefasFluxo.push({
                         ID: 'temp_' + Date.now(), 
                         Titulo: data.titulo, 
